@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Hardware Portal{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col font-sans">
+
+<!-- Header -->
+<header class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+            <circle cx="12" cy="12" r="3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 8h.01M16 8h.01M8 16h.01M16 16h.01" />
+        </svg>
+        <span class="text-2xl font-bold text-blue-600">Hardware Portal</span>
+    </div>
+
+    <nav class="flex space-x-4">
+        {% if user.is_authenticated %}
+            <span class="text-gray-600">Vítej, {{ user.username }}</span>
+        {% else %}
+            <a class="text-blue-600 hover:underline" href="#">Přihlásit</a>
+            <a class="text-blue-600 hover:underline" href="#">Registrovat</a>
+        {% endif %}
+    </nav>
+</header>
+
+<!-- Navbar -->
+<div class="bg-white shadow-sm px-6 py-3">
+    <div class="max-w-4xl mx-auto flex justify-center space-x-8">
+        <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Domů</a>
+        <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Komponenty</a>
+        <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Recenze</a>
+    </div>
+</div>
+
+<!-- Search bar -->
+<div class="flex flex-col items-center min-h-screen py-4 pt-20">
+    <form method="GET" action="#" class="w-full max-w-3xl flex space-x-4">
+        <input
+            type="text"
+            name="q"
+            placeholder="Hledat komponenty..."
+            class="flex-grow p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <button
+            type="submit"
+            class="px-6 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+            Hledat
+        </button>
+    </form>
+</div>
+
+<!-- Content -->
+<main class="flex-grow px-6">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="bg-white border-t border-gray-200 text-center text-sm text-gray-500 py-4 mt-6">
+    &copy; {{ year|default:"2025" }} Hardware Portal by Team 4. Všechna práva vyhrazena.
+</footer>
+
+</body>
+</html>
