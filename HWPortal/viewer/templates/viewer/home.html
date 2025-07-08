@@ -1,11 +1,142 @@
+{% extends 'viewer/base.html' %}
 
-{% extends "viewer/base.html" %}
-
-{% block title %}Domů{% endblock %}
+{% block title %}Hardware Portal{% endblock %}
 
 {% block content %}
-  <div class="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Vítej na Hardware Portálu!</h2>
-    <p class="text-gray-600">Toto je ukázková stránka!</p>
-  </div>
+<div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Vítejte na Hardware Portálu</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Objevte nejnovější komponenty, přečtěte si recenze a najděte perfektní hardware pro váš počítač.
+    </p>
+</div>
+
+<!-- Kategorie -->
+<div class="grid md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-800">Procesory</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Nejnovější CPU od Intel a AMD pro výkon a efektivitu.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium">Prohlédnout procesory →</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-800">Grafické karty</h3>
+        </div>
+        <p class="text-gray-600 mb-4">Vysokovýkonné GPU pro gaming a profesionální použití.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium">Prohlédnout GPU →</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-800">Paměti</h3>
+        </div>
+        <p class="text-gray-600 mb-4">RAM a úložiště pro maximální rychlost a kapacitu.</p>
+        <a href="#" class="text-blue-600 hover:underline font-medium">Prohlédnout paměti →</a>
+    </div>
+</div>
+
+<!-- Latest Reviews - will be done trough DB -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Nejnovější recenze</h2>
+    <div class="space-y-4">
+        <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+            <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-800">Intel Core i9-14900K</h3>
+                <p class="text-gray-600 text-sm mb-2">Recenze od uživatele TechMaster</p>
+                <div class="flex items-center space-x-2 mb-2">
+                    <div class="flex text-yellow-400">
+                        <span>★★★★★</span>
+                    </div>
+                    <span class="text-sm text-gray-500">5/5</span>
+                </div>
+                <p class="text-gray-700 text-sm">Vynikající výkon pro náročné aplikace a gaming. Doporučuji!</p>
+            </div>
+        </div>
+
+        <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+            <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-800">NVIDIA RTX 4080</h3>
+                <p class="text-gray-600 text-sm mb-2">Recenze od uživatele GameLover</p>
+                <div class="flex items-center space-x-2 mb-2">
+                    <div class="flex text-yellow-400">
+                        <span>★★★★☆</span>
+                    </div>
+                    <span class="text-sm text-gray-500">4/5</span>
+                </div>
+                <p class="text-gray-700 text-sm">Skvělý výkon ve hrách, ale cena je poměrně vysoká.</p>
+            </div>
+        </div>
+    </div>
+    <div class="mt-6 text-center">
+        <a href="#" class="text-blue-600 hover:underline font-medium">Zobrazit všechny recenze →</a>
+    </div>
+</div>
+
+<!-- Popular Components (top rated) -->
+<div class="bg-white rounded-lg shadow-md p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Populární komponenty</h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">AMD Ryzen 7</h3>
+            <p class="text-sm text-gray-600">od 8 990 Kč</p>
+        </div>
+
+        <div class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="w-12 h-12 bg-green-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">RTX 4070</h3>
+            <p class="text-sm text-gray-600">od 15 990 Kč</p>
+        </div>
+
+        <div class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="w-12 h-12 bg-purple-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">DDR5 32GB</h3>
+            <p class="text-sm text-gray-600">od 3 990 Kč</p>
+        </div>
+
+        <div class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="w-12 h-12 bg-orange-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">SSD 1TB</h3>
+            <p class="text-sm text-gray-600">od 2 490 Kč</p>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

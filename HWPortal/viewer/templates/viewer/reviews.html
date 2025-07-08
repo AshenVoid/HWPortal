@@ -1,0 +1,266 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Recenze - Hardware Portal{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Recenze komponent</h1>
+    <p class="text-gray-600">Přečtěte si recenze od našich uživatelů a podělte se o svou vlastní zkušenost</p>
+</div>
+
+<!-- Buttons -->
+<div class="flex justify-between text-gray-800 mb-2">
+    <div class="flex space-x-4">
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            Napsat recenzi
+        </button>
+        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option>Seřadit podle nejnovějších</option>
+            <option>Seřadit podle nejlepších</option>
+            <option>Seřadit podle nejhoršího</option>
+        </select>
+    </div>
+    <div class="flex space-x-2">
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            Všechny kategorie
+        </button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            Procesory
+        </button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            GPU
+        </button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            Paměti
+        </button>
+    </div>
+</div>
+
+<!-- List -->
+<div class="space-y-6">
+    <!-- Review 1 -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-start space-x-4">
+            <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Intel Core i9-14900K</h3>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">Procesor</span>
+                            <span class="text-sm text-gray-500">Recenze od uživatele</span>
+                            <span class="text-sm font-medium text-gray-700">TechMaster</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center space-x-1 mb-1">
+                            <div class="flex text-yellow-400 text-lg">
+                                <span>★★★★★</span>
+                            </div>
+                            <span class="text-sm text-gray-500">5/5</span>
+                        </div>
+                        <span class="text-sm text-gray-500">15. prosince 2024</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Vynikající výkon pro všechny aplikace</h4>
+                    <p class="text-gray-700 leading-relaxed">
+                        Po několika týdnech testování mohu s jistotou říci, že Intel Core i9-14900K je fantastický procesor.
+                        Výkon v hrách je vynikající, multitasking žádný problém a při práci s náročnými aplikacemi jako
+                        Adobe Premiere nebo Blender se procesor ukázal jako velmi spolehlivý. Teploty jsou v rozumných mezích
+                        s kvalitním chladičem.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👍 Klady:</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Vysoký výkon</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Dobrý multitasking</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👎 Zápory:</span>
+                        <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">Vysoká spotřeba</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h1.096c.142 0 .284.021.42.06L12 12m-2 4v4h6v-4" />
+                            </svg>
+                            <span class="text-sm">Užitečné (24)</span>
+                        </button>
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 18v-4m-4-4h-1.096c-.142 0-.284-.021-.42-.06L12 12m2-4v-4H8v4" />
+                            </svg>
+                            <span class="text-sm">Neužitečné (2)</span>
+                        </button>
+                    </div>
+                    <button class="text-sm text-blue-600 hover:underline">Odpovědět</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review 2 -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-start space-x-4">
+            <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">NVIDIA RTX 4080</h3>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">Grafická karta</span>
+                            <span class="text-sm text-gray-500">Recenze od uživatele</span>
+                            <span class="text-sm font-medium text-gray-700">GameLover</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center space-x-1 mb-1">
+                            <div class="flex text-yellow-400 text-lg">
+                                <span>★★★★☆</span>
+                            </div>
+                            <span class="text-sm text-gray-500">4/5</span>
+                        </div>
+                        <span class="text-sm text-gray-500">12. prosince 2024</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Skvělý výkon, ale vysoká cena</h4>
+                    <p class="text-gray-700 leading-relaxed">
+                        RTX 4080 je bez pochyby velmi výkonná grafická karta. Ve hrách v rozlišení 4K dosahuje
+                        vynikajících snímkových frekvencí a ray tracing vypadá fantasticky. DLSS 3.0 je opravdu
+                        užitečné. Jediné mínus je cena, která je poměrně vysoká vzhledem k výkonu.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👍 Klady:</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Výkon v 4K</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Ray tracing</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">DLSS 3.0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👎 Zápory:</span>
+                        <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">Vysoká cena</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h1.096c.142 0 .284.021.42.06L12 12m-2 4v4h6v-4" />
+                            </svg>
+                            <span class="text-sm">Užitečné (18)</span>
+                        </button>
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 18v-4m-4-4h-1.096c-.142 0-.284-.021-.42-.06L12 12m2-4v-4H8v4" />
+                            </svg>
+                            <span class="text-sm">Neužitečné (1)</span>
+                        </button>
+                    </div>
+                    <button class="text-sm text-blue-600 hover:underline">Odpovědět</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review 3 -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-start space-x-4">
+            <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Corsair Vengeance LPX 32GB</h3>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded">Paměť RAM</span>
+                            <span class="text-sm text-gray-500">Recenze od uživatele</span>
+                            <span class="text-sm font-medium text-gray-700">BuilderPro</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center space-x-1 mb-1">
+                            <div class="flex text-yellow-400 text-lg">
+                                <span>★★★★★</span>
+                            </div>
+                            <span class="text-sm text-gray-500">5/5</span>
+                        </div>
+                        <span class="text-sm text-gray-500">10. prosince 2024</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Spolehlivé a rychlé paměti</h4>
+                    <p class="text-gray-700 leading-relaxed">
+                        Tyto paměti používám už několik měsíců a jsem velmi spokojený. Instalace byla jednoduchá,
+                        rychlosti odpovídají specifikacím a stabilita je výborná. Pro svou cenu nabízí velmi
+                        dobrý poměr cena/výkon. Rozhodně doporučuji.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👍 Klady:</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Snadná instalace</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Stabilita</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Dobrá cena</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">👎 Zápory:</span>
+                        <span class="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">Žádné</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h1.096c.142 0 .284.021.42.06L12 12m-2 4v4h6v-4" />
+                            </svg>
+                            <span class="text-sm">Užitečné (31)</span>
+                        </button>
+                        <button class="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 18v-4m-4-4h-1.096c-.142 0-.284-.021-.42-.06L12 12m2-4v-4H8v4" />
+                            </svg>
+                            <span class="text-sm">Neužitečné (0)</span>
+                        </button>
+                    </div>
+                    <button class="text-sm text-blue-600 hover:underline">Odpovědět</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load More Button -->
+<div>
+    <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Načíst více recenzí
+    </button>
+</div>
+
+{% endblock %}
