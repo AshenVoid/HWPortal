@@ -12,9 +12,12 @@ def reviews(request):
     return render(request, 'viewer/reviews.html')
 
 def search(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', '').strip()
+    selected_types = request.GET.getlist('type')
+    selected_category = request.GET.get('category')
+    sort = request.GET.get('sort', 'relevance')
+
     results = []
-    results_count = 0
 
     if query:
         #TODO Až bude model Component, přidání logiky vyhledávání
@@ -26,10 +29,11 @@ def search(request):
                 'description': 'Výkonná grafická karta pro nejnáročnější hry a aplikace',
                 'url': '/components/rtx-4080/',
                 'price': 32999,
-                'rating': 5,
+                'rating': 2,
                 'type': 'Grafická karta',
                 'date': '2024-01-15',
-                'image': None
+                'image': None,
+                'category': 'graphics'
             },
             {
                 'title': f'AMD Ryzen 7 7800X3D - {query}',
@@ -39,9 +43,34 @@ def search(request):
                 'rating': 4,
                 'type': 'Procesor',
                 'date': '2024-01-10',
-                'image': None
+                'image': None,
+                'category': 'processors'
             }
         ]
+        # Fulltext
+        results = [
+            r for r in results
+            if query.lower() in r['title'].lower() or query.lower() in r['description'].lower()
+        ]
+
+        # Type checkbox
+        if selected_types:
+            results = [r for r in results if r['type'] in selected_types]
+
+        # Kategorie select
+        if selected_category:
+            results = [r for r in results if r['category'] == selected_category]
+
+        # Řazení - Relevance default
+        if sort == 'price_asc':
+            results.sort(key=lambda r: r['price'])
+        elif sort == 'price_desc':
+            results.sort(key=lambda r: r['price'], reverse=True)
+        elif sort == 'date':
+            results.sort(key=lambda r: r['date'], reverse=True)
+        elif sort == 'rating':
+            results.sort(key=lambda r: r['rating'], reverse=True)
+
         results_count = len(results)
 
         #Paginace
