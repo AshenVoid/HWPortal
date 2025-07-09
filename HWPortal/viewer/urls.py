@@ -7,4 +7,5 @@ urlpatterns = [
     #path('home/', views.home, name='home'),
     path('components/', views.components, name='components'),
     path('reviews/', views.reviews, name='reviews'),
+    path('search/', views.search, name='search'),
 ]

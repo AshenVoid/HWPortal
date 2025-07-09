@@ -36,6 +36,7 @@
         <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 font-medium">Domů</a>
         <a href="{% url 'components' %}" class="text-gray-700 hover:text-blue-600 font-medium">Komponenty</a>
         <a href="{% url 'reviews' %}" class="text-gray-700 hover:text-blue-600 font-medium">Recenze</a>
+        <a href="{% url 'search' %}" class="text-gray-700 hover:text-blue-600 font-medium">Vyhledávání</a>
     </div>
 </div>
 
@@ -43,10 +44,11 @@
 <div class="flex-grow">
     <div class="max-w-4xl mx-auto w-full px-6 py-10">
         <!-- Search bar -->
-        <form method="GET" action="#" class="w-full flex space-x-4 mb-8">
+        <form method="GET" action="{% url 'search' %}" class="w-full flex space-x-4 mb-8">
             <input
                 type="text"
                 name="q"
+                value="{{ request.GET.q }}"
                 placeholder="Hledat komponenty..."
                 class="flex-grow p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
