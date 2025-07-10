@@ -1,5 +1,10 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .forms import CustomLoginForm, CustomUserCreationForm
+
 
 # Create your views here.
 def home(request):
@@ -90,3 +95,48 @@ def search(request):
             'results_count': 0,
         }
     return render(request, 'viewer/search.html', context)
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = CustomLoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Vítej zpět, {user.username}!")
+                next_url = request.GET.get('next', 'home')
+                return redirect(next_url)
+        else:
+            messages.error(request, 'Nesprávné uživatelské jméno nebo heslo.')
+    else:
+        form = CustomLoginForm()
+
+    return render(request, 'registration/login.html', {'form': form})
+
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f"Účet pro {username} byl úspěšně vytvořen!")
+            login(request, user)
+            return redirect('home')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'registration/register.html', {'form': form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "Byl jsi úspěšně odhlášen.")
+    return redirect('home')

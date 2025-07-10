@@ -24,8 +24,8 @@
         {% if user.is_authenticated %}
             <span class="text-gray-600">Vítej, {{ user.username }}</span>
         {% else %}
-            <a class="text-blue-600 hover:underline" href="#">Přihlásit</a>
-            <a class="text-blue-600 hover:underline" href="#">Registrovat</a>
+            <a class="text-blue-600 hover:underline" href="{% url 'login' %}">Přihlásit</a>
+            <a class="text-blue-600 hover:underline" href="{% url 'register' %}">Registrovat</a>
         {% endif %}
     </nav>
 </header>
