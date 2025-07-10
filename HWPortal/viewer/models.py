@@ -150,9 +150,3 @@ class PowerSupplyUnits(Model):
 
     def __str__(self):
         return self.__repr__()
-
-ACCOUNT_STATUSES = (
-    (1, 'active'),
-    (2, 'disabled'),
-    (3, 'blocked')
-)
