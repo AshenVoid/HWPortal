@@ -158,16 +158,16 @@ ACCOUNT_STATUSES = (
 )
 
 class Accounts(Model):
-    login = CharField(max_length=100)
+    email = CharField(max_length=100)
     password = CharField(max_length=100)
-    name = CharField(max_length=100)
+    username = CharField(max_length=100)
     dateadded = DateField(auto_now=True)
     status = CharField(choices=ACCOUNT_STATUSES)
 
     def __repr__(self):
-        return (f"Accounts (login={self.login}, "
+        return (f"Accounts (login={self.email}, "
                 f"password={self.password}, "
-                f"name={self.name}, "
+                f"name={self.username}, "
                 f"dateadded={self.dateadded}, "
                 f"status={self.status}, ")
 
