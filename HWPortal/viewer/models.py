@@ -153,7 +153,7 @@ class PowerSupplyUnits(Model):
 
 ACCOUNT_STATUSES = (
     (1, 'active'),
-    (2, 'disabled')
+    (2, 'disabled'),
     (3, 'blocked')
 )
 
