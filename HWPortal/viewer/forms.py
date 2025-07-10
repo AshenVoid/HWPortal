@@ -30,6 +30,7 @@ class CustomLoginForm(AuthenticationForm):
         self.fields['username'].help_text = None
         self.fields['password'].help_text = None
 
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
