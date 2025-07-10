@@ -156,20 +156,3 @@ ACCOUNT_STATUSES = (
     (2, 'disabled'),
     (3, 'blocked')
 )
-
-class Accounts(Model):
-    email = CharField(max_length=100)
-    password = CharField(max_length=100)
-    username = CharField(max_length=100)
-    dateadded = DateField(auto_now=True)
-    status = CharField(choices=ACCOUNT_STATUSES)
-
-    def __repr__(self):
-        return (f"Accounts (login={self.email}, "
-                f"password={self.password}, "
-                f"name={self.username}, "
-                f"dateadded={self.dateadded}, "
-                f"status={self.status}, ")
-
-    def __str__(self):
-        return self.__repr__()
