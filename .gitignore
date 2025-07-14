@@ -209,3 +209,5 @@ __marimo__/
 # PyCharm
 /.idea
 
+# Migrations
+HWPortal/viewer/migrations/
