@@ -134,7 +134,7 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f"Účet pro {username} byl úspěšně vytvořen!")
             login(request, user)
-            return redirect('/')
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
 
