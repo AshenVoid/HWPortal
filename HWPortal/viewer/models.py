@@ -1,5 +1,5 @@
 from django.db.models import Model, CharField, DateField, ForeignKey, SET_NULL, \
-    TextField, DateTimeField, ManyToManyField, IntegerField, ImageField, DecimalField
+    TextField, DateTimeField, ManyToManyField, IntegerField, ImageField, DecimalField, CASCADE
 from django.db.models.fields import BooleanField
 from django.db.models.functions import datetime
 from django.contrib.auth.models import User
