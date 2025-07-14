@@ -98,7 +98,12 @@ def search(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('/')
+
+    if not request.user.is_authenticated:
+        storage = messages.get_messages(request)
+        for message in storage:
+            pass
 
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
@@ -109,7 +114,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Vítej zpět, {user.username}!")
-                next_url = request.GET.get('next', 'home')
+                next_url = request.GET.get('next', '/')
                 return redirect(next_url)
         else:
             messages.error(request, 'Nesprávné uživatelské jméno nebo heslo.')
@@ -120,7 +125,7 @@ def login_view(request):
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('/')
 
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -129,7 +134,7 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f"Účet pro {username} byl úspěšně vytvořen!")
             login(request, user)
-            return redirect('home')
+            return redirect('/')
     else:
         form = CustomUserCreationForm()
 
@@ -137,6 +142,10 @@ def register_view(request):
 
 @login_required
 def logout_view(request):
+    username = request.user.username
     logout(request)
+    storage = messages.get_messages(request)
+    for message in storage:
+        pass
     messages.success(request, "Byl jsi úspěšně odhlášen.")
-    return redirect('home')
+    return redirect('/')
