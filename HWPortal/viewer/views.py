@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Avg
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomLoginForm, CustomUserCreationForm
-from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, STORAGE_TYPES
+from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, StorageTypes
 
 
 # Create your views here.
@@ -59,7 +59,7 @@ def components_view(request):
                 'name': gpu.name,
                 'manufacturer': gpu.manufacturer,
                 'description': f"{gpu.vram}GB VRAM, TGP {gpu.tgp}W",
-                'price': 0,
+                'price': gpu.price,
                 'rating': gpu.rating,
                 'reviews_count': Reviews.objects.filter(graphics_card=gpu).count(),
                 'icon': 'gpu'
@@ -80,7 +80,7 @@ def components_view(request):
                 'name': ram.name,
                 'manufacturer': ram.manufacturer,
                 'description': f"{ram.capacity}GB, {ram.clock} MHz, {ram.type}",
-                'price': 0,
+                'price': ram.price,
                 'rating': ram.rating,
                 'reviews_count': Reviews.objects.filter(ram=ram).count(),
                 'icon': 'ram'
@@ -94,14 +94,8 @@ def components_view(request):
 
         for storage in storages:
             storage_type_display = "N/A"
-            try:
-                if hasattr(storage, 'type') and storage.type:
-                    storage_type_display = str(storage.type)
-                elif storage.type_id:
-                    type_dict = dict(STORAGE_TYPES)
-                    storage_type_display = type_dict.get(storage.type_id, "N/A")
-            except (AttributeError, ValueError, TypeError):
-                storage_type_display = "SSD/HDD"
+            if storage.type:
+                storage_type_display = str(storage.type)
 
             components.append({
                 'type': 'storage',
@@ -110,8 +104,8 @@ def components_view(request):
                 'id': storage.id,
                 'name': storage.name,
                 'manufacturer': storage.manufacturer,
-                'description': f"{storage.capacity}GB, {storage_type_display.upper()}",
-                'price': storage.price if hasattr(storage, 'price') else 0,
+                'description': f"{storage.capacity}GB, {storage_type_display}",
+                'price': storage.price,
                 'rating': storage.rating,
                 'reviews_count': Reviews.objects.filter(storage=storage).count(),
                 'icon': 'storage'
@@ -132,7 +126,7 @@ def components_view(request):
                 'name': mb.name,
                 'manufacturer': mb.manufacturer,
                 'description': f"{mb.socket}, {mb.format}, PCIe {mb.pciegen}",
-                'price': 0,
+                'price': mb.price,
                 'rating': mb.rating,
                 'reviews_count': Reviews.objects.filter(motherboard=mb).count(),
                 'icon': 'motherboard'
@@ -153,7 +147,7 @@ def components_view(request):
                 'name': psu.name,
                 'manufacturer': psu.manufacturer,
                 'description': f"{psu.maxpower}W",
-                'price': 0,
+                'price': psu.price,
                 'rating': psu.rating,
                 'reviews_count': Reviews.objects.filter(power_supply=psu).count(),
                 'icon': 'psu'
@@ -215,10 +209,10 @@ def component_detail_view(request, component_type, component_id):
         'motherboard': Motherboards,
         'power_supply': PowerSupplyUnits,
     }
-
+    """
     if component_type in model_mapping:
         return render(request, '404.html')
-
+    """
     model = model_mapping[component_type]
     component = get_object_or_404(model, id=component_id)
 
@@ -259,6 +253,7 @@ def component_detail_view(request, component_type, component_id):
 
     return render(request, 'viewer/component_detail.html', context)
 
+
 def get_component_specs(component, component_type):
 
     if component_type == 'processor':
@@ -288,7 +283,8 @@ def get_component_specs(component, component_type):
         return {
             'Výrobce': component.manufacturer,
             'Kapacita': f"{component.capacity} GB",
-            'Typ': component.get_type_display(),
+            'Typ': str(component.type) if component.type else 'N/A',
+            'Cena': f"{component.price} Kč" if component.price > 0 else 'N/A',
         }
     elif component_type == 'motherboard':
         return {
