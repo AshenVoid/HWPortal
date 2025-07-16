@@ -18,13 +18,12 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
                 <select name="category" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="">Všechny kategorie</option>
-                    <option value="cpu">Procesory</option>
-                    <option value="gpu">Grafické karty</option>
-                    <option value="ram">Paměti RAM</option>
-                    <option value="storage">Úložiště</option>
-                    <option value="motherboard">Základní desky</option>
-                    <option value="psu">Zdroje</option>
-                    <option value="cooling">Chlazení</option>
+                    <option value="cpu" {% if selected_category == 'cpu' %}selected{% endif %}>Procesory</option>
+                    <option value="gpu" {% if selected_category == 'gpu' %}selected{% endif %}>Grafické karty</option>
+                    <option value="ram" {% if selected_category == 'ram' %}selected{% endif %}>Paměti RAM</option>
+                    <option value="storage" {% if selected_category == 'storage' %}selected{% endif %}>Úložiště</option>
+                    <option value="motherboard" {% if selected_category == 'motherboard' %}selected{% endif %}>Základní desky</option>
+                    <option value="psu" {% if selected_category == 'psu' %}selected{% endif %}>Zdroje</option>
                 </select>
             </div>
 
@@ -32,12 +31,11 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Značka</label>
                 <select name="brand" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="">Všechny značky</option>
-                    <option value="intel">Intel</option>
-                    <option value="amd">AMD</option>
-                    <option value="nvidia">NVIDIA</option>
-                    <option value="corsair">Corsair</option>
-                    <option value="asus">ASUS</option>
-                    <option value="msi">MSI</option>
+                    {% for manufacturer in manufacturers %}
+                        <option value="{{ manufacturer }}" {% if selected_brand == manufacturer %}selected{% endif %}>
+                            {{ manufacturer }}
+                        </option>
+                    {% endfor %}
                 </select>
             </div>
 
@@ -45,22 +43,22 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Cenové rozpětí</label>
                 <select name="price_range" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="">Všechny ceny</option>
-                    <option value="0-2000">0 - 2 000 Kč</option>
-                    <option value="2000-5000">2 000 - 5 000 Kč</option>
-                    <option value="5000-10000">5 000 - 10 000 Kč</option>
-                    <option value="10000-20000">10 000 - 20 000 Kč</option>
-                    <option value="20000+">20 000+ Kč</option>
+                    <option value="0-2000" {% if selected_price_range == '0-2000' %}selected{% endif %}>0 - 2 000 Kč</option>
+                    <option value="2000-5000" {% if selected_price_range == '2000-5000' %}selected{% endif %}>2 000 - 5 000 Kč</option>
+                    <option value="5000-10000" {% if selected_price_range == '5000-10000' %}selected{% endif %}>5 000 - 10 000 Kč</option>
+                    <option value="10000-20000" {% if selected_price_range == '10000-20000' %}selected{% endif %}>10 000 - 20 000 Kč</option>
+                    <option value="20000+" {% if selected_price_range == '20000+' %}selected{% endif %}>20 000+ Kč</option>
                 </select>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Seřadit podle</label>
                 <select name="sort" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option value="name">Název</option>
-                    <option value="price_asc">Cena (nejlevnější)</option>
-                    <option value="price_desc">Cena (nejdražší)</option>
-                    <option value="rating">Hodnocení</option>
-                    <option value="newest">Nejnovější</option>
+                    <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Název</option>
+                    <option value="price_asc" {% if selected_sort == 'price_asc' %}selected{% endif %}>Cena (nejlevnější)</option>
+                    <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Cena (nejdražší)</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Hodnocení</option>
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Nejnovější</option>
                 </select>
             </div>
         </div>
@@ -78,183 +76,120 @@
 
 <!-- Components -->
 <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
-    <!-- Plceholder Cards DB-->
+    {% for component in components %}
     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
         <div class="p-6">
             <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
+                {% if component.icon == 'cpu' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                {% elif component.icon == 'gpu' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+                    </svg>
+                {% elif component.icon == 'ram' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                {% elif component.icon == 'storage' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                {% elif component.icon == 'motherboard' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                {% endif %}
             </div>
             <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">Procesor</span>
-                <h3 class="font-semibold text-gray-800">Intel Core i7-13700K</h3>
-                <p class="text-sm text-gray-600">16 jader, 24 vláken, 3.4 GHz základní frekvence</p>
+                <span class="inline-block px-2 py-1 {{ component.type_class }} text-xs font-medium rounded">
+                    {{ component.type_display }}
+                </span>
+                <h3 class="font-semibold text-gray-800">{{ component.name }}</h3>
+                <p class="text-sm text-gray-600">{{ component.description }}</p>
                 <div class="flex items-center space-x-2">
                     <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★★</span>
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= component.rating %}
+                                <span>★</span>
+                            {% else %}
+                                <span>☆</span>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <span class="text-sm text-gray-500">(127 recenzí)</span>
+                    <span class="text-sm text-gray-500">({{ component.reviews_count }} recenzí)</span>
                 </div>
                 <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">12 990 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                    {% if component.price > 0 %}
+                        <span class="text-2xl font-bold text-gray-800">{{ component.price|floatformat:0 }} Kč</span>
+                    {% else %}
+                        <span class="text-lg text-gray-500">Cena na dotaz</span>
+                    {% endif %}
+                    <a href="{% url 'component_detail' component.type component.id %}"
+                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                         Detail
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-        <div class="p-6">
-            <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
-                </svg>
-            </div>
-            <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">Grafická karta</span>
-                <h3 class="font-semibold text-gray-800">NVIDIA RTX 4070 Ti</h3>
-                <p class="text-sm text-gray-600">12GB GDDR6X, DLSS 3.0, Ray Tracing</p>
-                <div class="flex items-center space-x-2">
-                    <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★☆</span>
-                    </div>
-                    <span class="text-sm text-gray-500">(89 recenzí)</span>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">22 990 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Detail
-                    </button>
-                </div>
-            </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <svg class="mx-auto h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2M4 13h2" />
+            </svg>
         </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Žádné komponenty nenalezeny</h3>
+        <p class="text-gray-500">Zkuste změnit filtry nebo přidat komponenty do databáze.</p>
     </div>
-
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-        <div class="p-6">
-            <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-                </svg>
-            </div>
-            <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded">Paměť RAM</span>
-                <h3 class="font-semibold text-gray-800">Corsair Vengeance LPX 32GB</h3>
-                <p class="text-sm text-gray-600">DDR4-3200, 2x16GB, CL16</p>
-                <div class="flex items-center space-x-2">
-                    <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★★</span>
-                    </div>
-                    <span class="text-sm text-gray-500">(203 recenzí)</span>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">4 590 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Detail
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-        <div class="p-6">
-            <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-            </div>
-            <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded">Úložiště</span>
-                <h3 class="font-semibold text-gray-800">Samsung 980 PRO 1TB</h3>
-                <p class="text-sm text-gray-600">NVMe SSD, 7000 MB/s čtení, PCIe 4.0</p>
-                <div class="flex items-center space-x-2">
-                    <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★★</span>
-                    </div>
-                    <span class="text-sm text-gray-500">(156 recenzí)</span>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">3 290 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Detail
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-        <div class="p-6">
-            <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-            </div>
-            <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">Základní deska</span>
-                <h3 class="font-semibold text-gray-800">ASUS ROG Strix Z790-E</h3>
-                <p class="text-sm text-gray-600">LGA 1700, DDR5, WiFi 6</p>
-                <div class="flex items-center space-x-2">
-                    <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★☆</span>
-                    </div>
-                    <span class="text-sm text-gray-500">(64 recenzí)</span>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">8 990 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Detail
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-        <div class="p-6">
-            <div class="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
-            <div class="space-y-2">
-                <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">Zdroj</span>
-                <h3 class="font-semibold text-gray-800">Corsair RM850x</h3>
-                <p class="text-sm text-gray-600">850W, 80+ Gold, modulární</p>
-                <div class="flex items-center space-x-2">
-                    <div class="flex text-yellow-400 text-sm">
-                        <span>★★★★★</span>
-                    </div>
-                    <span class="text-sm text-gray-500">(98 recenzí)</span>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <span class="text-2xl font-bold text-gray-800">3 790 Kč</span>
-                    <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Detail
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 </div>
 
+<!-- Pagination -->
+{% if components.has_other_pages %}
 <div class="flex justify-center items-center space-x-4 mt-12">
-    <button class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
-        Předchozí
-    </button>
+    {% if components.has_previous %}
+    {% endif %}
+
     <div class="flex space-x-2">
-        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">1</button>
-        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">2</button>
-        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">3</button>
-        <span class="px-4 py-2 text-gray-500">...</span>
-        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">10</button>
+        {% for num in components.paginator.page_range %}
+            {% if components.number == num %}
+                <span class="px-4 py-2 bg-blue-600 text-white rounded-lg">{{ num }}</span>
+            {% elif num > components.number|add:'-3' and num < components.number|add:'3' %}
+                <a href="?page={{ num }}&{{ request.GET.urlencode }}"
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">{{ num }}</a>
+            {% elif num == 1 %}
+                <a href="?page=1&{{ request.GET.urlencode }}"
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">1</a>
+                {% if components.number > 4 %}
+                    <span class="px-4 py-2 text-gray-500">...</span>
+                {% endif %}
+            {% elif num == components.paginator.num_pages %}
+                {% if components.number < components.paginator.num_pages|add:'-3' %}
+                    <span class="px-4 py-2 text-gray-500">...</span>
+                {% endif %}
+                <a href="?page={{ components.paginator.num_pages }}&{{ request.GET.urlencode }}"
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">{{ components.paginator.num_pages }}</a>
+            {% endif %}
+        {% endfor %}
     </div>
-    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-        Další
-    </button>
+
+    {% if components.has_next %}
+        <a href="?page={{ components.next_page_number }}&{{ request.GET.urlencode }}"
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Další
+        </a>
+    {% else %}
+        <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
+            Další
+        </span>
+    {% endif %}
 </div>
+{% endif %}
 {% endblock %}
