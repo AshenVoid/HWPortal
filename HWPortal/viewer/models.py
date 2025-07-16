@@ -9,11 +9,32 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Sockets(Model):
     type = CharField(max_length=32)
 
+    def __repr__(self):
+        return self.type
+    def __str__(self):
+        return self.type
+
 class BoardFormats(Model):
     format = CharField(max_length=32)
+    def __repr__(self):
+        return self.format
+    def __str__(self):
+        return self.format
+
 
 class RamTypes(Model):
     type = CharField(max_length=32)
+    def __repr__(self):
+        return self.type
+    def __str__(self):
+        return self.type
+
+class StorageTypes(Model):
+    type = CharField(max_length=32)
+    def __repr__(self):
+        return self.type
+    def __str__(self):
+        return self.type
 
 class Processors(Model):
     name = CharField(max_length=100)
@@ -22,7 +43,7 @@ class Processors(Model):
     tdp = IntegerField(default=0)
     corecount = IntegerField(default=0)
     smt = BooleanField(default=False)
-    price = DecimalField(default=0, decimal_places=2, max_digits=10)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
     benchresult = IntegerField(default=0)
     clock = IntegerField(default=0)
     dateadded = DateField(auto_now=True)
@@ -58,6 +79,7 @@ class Motherboards(Model):
     pciegen = IntegerField(default=0)
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
         return (f"Motherboard (name={self.name}, "
@@ -81,6 +103,7 @@ class Ram(Model):
     clock = IntegerField(default=0)
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
         return (f"Ram (name={self.name}, "
@@ -101,6 +124,7 @@ class GraphicsCards(Model):
     tgp = IntegerField(default=0)
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
         return (f"Graphics card (name={self.name}, "
@@ -113,18 +137,16 @@ class GraphicsCards(Model):
     def __str__(self):
         return self.__repr__()
 
-STORAGE_TYPES = (
-    (1, 'sata'),
-    (2, 'nvme')
-)
+
 
 class Storage(Model):
     name = CharField(max_length=100)
     manufacturer = CharField(max_length=100)
     capacity = IntegerField(default=0)
-    type = CharField(choices=STORAGE_TYPES)
+    type = ForeignKey(StorageTypes, on_delete=SET_NULL, null=True)
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
         return (f"Storage (name={self.name}, "
@@ -143,6 +165,7 @@ class PowerSupplyUnits(Model):
     maxpower = IntegerField(default=0)
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
+    price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
         return (f"PowerSupply (name={self.name}, "
