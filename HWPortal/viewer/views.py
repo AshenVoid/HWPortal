@@ -784,7 +784,6 @@ def reviews_view(request):
 
     return render(request, 'viewer/reviews.html', context)
 
-
 @login_required(login_url='/login/')
 @require_POST
 def vote_review_ajax(request):
@@ -1003,7 +1002,6 @@ def my_reviews_view(request):
     }
 
     return render(request, 'viewer/my_reviews.html', context)
-
 
 @login_required(login_url='/login/')
 def create_review_view(request, component_type=None, component_id=None):
