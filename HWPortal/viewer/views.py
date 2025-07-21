@@ -1004,8 +1004,10 @@ def my_reviews_view(request):
 
     return render(request, 'viewer/my_reviews.html', context)
 
+
 @login_required(login_url='/login/')
 def create_review_view(request, component_type=None, component_id=None):
+    # Model mapping pro získání komponenty
     model_mapping = {
         'processor': Processors,
         'graphics_card': GraphicsCards,
@@ -1028,10 +1030,12 @@ def create_review_view(request, component_type=None, component_id=None):
             review = form.save(commit=False)
             review.author = request.user
 
+            # Zpracování vybrané komponenty
             component_choice = form.cleaned_data.get('component_choice')
             if component_choice:
-                choice_type, choice_id = component_choice.split('_', 1)
+                choice_type, choice_id = component_choice.rsplit('_', 1)
 
+                # Nastavení příslušné komponenty podle typu
                 if choice_type == 'processor':
                     review.processor = get_object_or_404(Processors, id=choice_id)
                 elif choice_type == 'graphics_card':
@@ -1049,7 +1053,6 @@ def create_review_view(request, component_type=None, component_id=None):
 
             messages.success(request, 'Recenze byla úspěšně vytvořena!')
             return redirect('reviews')
-
     else:
         initial_data = {'user': request.user}
         form = ReviewForm(
@@ -1118,7 +1121,7 @@ def edit_review_view(request, review_id):
 
             component_choice = form.cleaned_data.get('component_choice')
             if component_choice:
-                choice_type, choice_id = component_choice.split('_', 1)
+                choice_type, choice_id = component_choice.rsplit('_', 1)
 
                 updated_review.processor = None
                 updated_review.graphics_card = None

@@ -102,13 +102,14 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class ReviewForm(forms.ModelForm):
+    # Dynamické pole pro výběr komponenty
     component_choice = forms.ChoiceField(
         choices=[],
         widget=forms.Select(attrs={
             'class': 'w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400',
             'id': 'component_choice'
         }),
-        label = "Vyberte komponentu"
+        label="Vyberte komponentu"
     )
 
     class Meta:
@@ -169,11 +170,11 @@ class ReviewForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        component_type = kwargs.pop('component_type', None)
-        component_id = kwargs.pop('component_id', None)
+        self.component_type_param = kwargs.pop('component_type', None)
+        self.component_id_param = kwargs.pop('component_id', None)
         super().__init__(*args, **kwargs)
 
-        # Předvyplnění uživatelského jména, pokud je k dispozici
+        # Předvyplnění uživatelského jména
         if 'initial' in kwargs and 'user' in kwargs['initial']:
             user = kwargs['initial']['user']
             if user.is_authenticated:
@@ -181,31 +182,34 @@ class ReviewForm(forms.ModelForm):
 
         # Pokud editujeme existující recenzi
         if self.instance and self.instance.pk:
-            # Nastavení component_choice pro existující recenzi
             component = self.instance.component
             if component:
                 self.fields['component_choice'].initial = f'{self.instance.component_type}_{component.id}'
 
-            # Zakázání změny typu komponenty při editaci
-            self.fields['component_type'].widget.attrs['readonly'] = True
-            self.fields['component_type'].widget.attrs['disabled'] = True
+            # Místo disabled použij hidden field pro component_type
+            self.fields['component_type'].widget = forms.HiddenInput()
+            self.fields['component_type'].initial = self.instance.component_type
 
-        # Dynamické načtení komponent podle typu
-        if component_type:
-            self.fields['component_type'].initial = component_type
+        # Pokud je předán component_type jako parametr
+        if self.component_type_param:
+            self.fields['component_type'].initial = self.component_type_param
+
+            # Pokud vytváříme recenzi pro konkrétní komponentu, skryj výběr typu
+            if self.component_id_param:
+                self.fields['component_type'].widget = forms.HiddenInput()
 
             # Načtení komponent podle typu
-            components = self.get_components_by_type(component_type)
+            components = self.get_components_by_type(self.component_type_param)
             self.fields['component_choice'].choices = components
 
-            if component_id:
-                self.fields['component_choice'].initial = f'{component_type}_{component_id}'
+            if self.component_id_param:
+                self.fields['component_choice'].initial = f'{self.component_type_param}_{self.component_id_param}'
         else:
-            # Pokud není specifikován typ, zobraz všechny
-            self.fields['component_choice'].choices = self.get_all_components()
+            self.fields['component_choice'].choices = [('', 'Nejdříve vyberte typ komponenty...')]
 
     def get_components_by_type(self, component_type):
-        components = []
+        """Vrací komponenty podle typu"""
+        components = [('', 'Vyberte komponentu...')]
 
         if component_type == 'processor':
             for proc in Processors.objects.all().order_by('manufacturer', 'name'):
@@ -231,13 +235,6 @@ class ReviewForm(forms.ModelForm):
             for psu in PowerSupplyUnits.objects.all().order_by('manufacturer', 'name'):
                 components.append((f'power_supply_{psu.id}', f'{psu.manufacturer} {psu.name}'))
 
-        return [('', 'Vyberte komponentu...')] + components
-
-    def get_all_components(self):
-        components = [('', 'Nejdříve vyberte typ komponenty...')]
-
-        # TODO : Logika načtení všeho?
-
         return components
 
     def clean(self):
@@ -245,12 +242,17 @@ class ReviewForm(forms.ModelForm):
         component_choice = cleaned_data.get('component_choice')
         component_type = cleaned_data.get('component_type')
 
+        if not component_type:
+            component_type = self.component_type_param
+            cleaned_data['component_type'] = component_type
+
         if component_choice and component_choice != '':
-            # Parsování component_choice (formát: "type_id")
             try:
-                choice_type, choice_id = component_choice.split('_', 1)
+                choice_type, choice_id = component_choice.rsplit('_', 1)
+
                 if choice_type != component_type:
-                    raise forms.ValidationError('Vybraná komponenta neodpovídá typu komponenty.')
+                    raise forms.ValidationError(
+                        f'Vybraná komponenta ({choice_type}) neodpovídá typu komponenty ({component_type}).')
             except ValueError:
                 raise forms.ValidationError('Neplatná komponenta.')
 
