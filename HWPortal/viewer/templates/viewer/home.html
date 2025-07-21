@@ -11,7 +11,7 @@
 
     <!-- Statistiky -->
     {% if stats %}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 max-w-2xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8 max-w-2xl mx-auto">
         <div class="bg-white rounded-lg p-4 shadow-sm">
             <div class="text-2xl font-bold text-blue-600">{{ stats.total_components }}</div>
             <div class="text-sm text-gray-600">Komponent</div>
@@ -27,6 +27,10 @@
         <div class="bg-white rounded-lg p-4 shadow-sm">
             <div class="text-2xl font-bold text-orange-600">{{ stats.gpus_count }}</div>
             <div class="text-sm text-gray-600">GPU</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="text-2xl font-bold text-pink-600">{{ stats.total_favorites }}</div>
+            <div class="text-sm text-gray-600">Oblíbených</div>
         </div>
     </div>
     {% endif %}
@@ -122,14 +126,30 @@
     </div>
 </div>
 
-<!-- Popular Components - DB data -->
+<!-- Popular Components - Based on Favorites -->
 <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Nejoblíbenější komponenty</h2>
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Nejoblíbenější komponenty</h2>
+        <span class="text-sm text-gray-500">Podle počtu oblíbených</span>
+    </div>
+
     {% if top_components %}
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {% for component in top_components %}
             <a href="{% url 'component_detail' component.type component.id %}"
-               class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors block">
+               class="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors block relative">
+
+                <!-- Badge s počtem favorites -->
+                {% if component.favorites_count > 0 %}
+                <div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    {{ component.favorites_count }}
+                </div>
+                {% endif %}
+
+                <!-- Ikona komponenty -->
                 <div class="w-12 h-12 {{ component.icon_class }} rounded-lg mx-auto mb-3 flex items-center justify-center">
                     {% if component.icon == 'cpu' %}
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,24 +163,65 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                         </svg>
+                    {% elif component.icon == 'storage' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                        </svg>
+                    {% elif component.icon == 'motherboard' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                    {% elif component.icon == 'power' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                     {% else %}
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     {% endif %}
                 </div>
-                <h3 class="font-semibold text-gray-800 mb-1">{{ component.name|truncatechars:20 }}</h3>
+
+                <!-- Název komponenty -->
+                <h3 class="font-semibold text-gray-800 mb-1">{{ component.name|truncatechars:25 }}</h3>
+                <p class="text-xs text-gray-500 mb-2">{{ component.manufacturer }}</p>
+
+                <!-- Cena -->
                 {% if component.price > 0 %}
-                    <p class="text-sm text-gray-600">od {{ component.price|floatformat:0 }} Kč</p>
+                    <p class="text-sm text-gray-600 font-medium">{{ component.price|floatformat:0 }} Kč</p>
                 {% else %}
                     <p class="text-sm text-gray-600">Cena na dotaz</p>
+                {% endif %}
+
+                <!-- Počet oblíbených (pro komponenty s favorites) -->
+                {% if component.favorites_count > 0 %}
+                    <p class="text-xs text-gray-400 mt-1">{{ component.favorites_count }} lidí má v oblíbených</p>
                 {% endif %}
             </a>
             {% endfor %}
         </div>
+
+        <!-- Link na všechny oblíbené -->
+        <div class="mt-6 text-center">
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_favorites' %}" class="text-blue-600 hover:underline font-medium mr-4">
+                    Moje oblíbené →
+                </a>
+            {% endif %}
+            <a href="{% url 'components' %}" class="text-blue-600 hover:underline font-medium">
+                Všechny komponenty →
+            </a>
+        </div>
     {% else %}
         <div class="text-center py-8 text-gray-500">
-            <p>Zatím žádné komponenty v databázi. Přidejte je v admin panelu!</p>
+            <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Zatím žádné oblíbené komponenty</h3>
+            <p class="text-gray-500 mb-4">Buďte první, kdo si přidá komponentu do oblíbených!</p>
+            <a href="{% url 'components' %}" class="text-blue-600 hover:underline font-medium">
+                Prohlédnout komponenty →
+            </a>
         </div>
     {% endif %}
 </div>

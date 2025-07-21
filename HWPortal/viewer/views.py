@@ -609,7 +609,9 @@ def logout_view(request):
     messages.success(request, "Byl jsi úspěšně odhlášen.")
     return redirect('/')
 
+
 def home_view(request):
+    from django.db.models import Count
 
     latest_reviews = Reviews.objects.filter(
         is_published=True,
@@ -617,63 +619,144 @@ def home_view(request):
 
     top_components = []
 
-    top_processor = Processors.objects.filter(rating__gt=0).order_by('-rating', '-benchresult').first()
+    # Top procesor podle favorites
+    top_processor = Processors.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-benchresult').first()
+
+    # Fallback na nejlepší procesor podle ratingu pokud žádný nemá favorites
+    if not top_processor:
+        top_processor = Processors.objects.filter(rating__gt=0).order_by('-rating', '-benchresult').first()
+
     if top_processor:
+        favorites_count = getattr(top_processor, 'favorites_count', 0)
         top_components.append({
             'name': top_processor.name,
+            'manufacturer': top_processor.manufacturer,
             'price': top_processor.price,
             'type': 'processor',
             'id': top_processor.id,
             'icon_class': 'bg-blue-100 text-blue-600',
-            'icon': 'cpu'
+            'icon': 'cpu',
+            'favorites_count': favorites_count
         })
 
-    top_gpu = GraphicsCards.objects.filter(rating__gt=0).order_by('-rating', '-vram').first()
+    # Top GPU podle favorites
+    top_gpu = GraphicsCards.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-vram').first()
+
+    # Fallback na nejlepší GPU podle ratingu
+    if not top_gpu:
+        top_gpu = GraphicsCards.objects.filter(rating__gt=0).order_by('-rating', '-vram').first()
+
     if top_gpu:
+        favorites_count = getattr(top_gpu, 'favorites_count', 0)
         top_components.append({
             'name': top_gpu.name,
+            'manufacturer': top_gpu.manufacturer,
             'price': top_gpu.price,
             'type': 'graphics_card',
             'id': top_gpu.id,
             'icon_class': 'bg-green-100 text-green-600',
-            'icon': 'gpu'
+            'icon': 'gpu',
+            'favorites_count': favorites_count
         })
 
-    top_ram = Ram.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+    # Top RAM podle favorites
+    top_ram = Ram.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-capacity').first()
+
+    # Fallback na nejlepší RAM podle ratingu
+    if not top_ram:
+        top_ram = Ram.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+
     if top_ram:
+        favorites_count = getattr(top_ram, 'favorites_count', 0)
         top_components.append({
             'name': top_ram.name,
+            'manufacturer': top_ram.manufacturer,
             'price': top_ram.price,
             'type': 'ram',
             'id': top_ram.id,
             'icon_class': 'bg-purple-100 text-purple-600',
-            'icon': 'ram'
+            'icon': 'ram',
+            'favorites_count': favorites_count
         })
 
-    top_storage = Storage.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+    # Top Storage podle favorites
+    top_storage = Storage.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-capacity').first()
+
+    # Fallback na nejlepší Storage podle ratingu
+    if not top_storage:
+        top_storage = Storage.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+
     if top_storage:
+        favorites_count = getattr(top_storage, 'favorites_count', 0)
         top_components.append({
             'name': top_storage.name,
+            'manufacturer': top_storage.manufacturer,
             'price': top_storage.price,
             'type': 'storage',
             'id': top_storage.id,
             'icon_class': 'bg-orange-100 text-orange-600',
-            'icon': 'storage'
+            'icon': 'storage',
+            'favorites_count': favorites_count
         })
+
+    # Přidej motherboard a power supply pokud mají favorites
+    top_motherboard = Motherboards.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating').first()
+
+    if top_motherboard:
+        top_components.append({
+            'name': top_motherboard.name,
+            'manufacturer': top_motherboard.manufacturer,
+            'price': top_motherboard.price,
+            'type': 'motherboard',
+            'id': top_motherboard.id,
+            'icon_class': 'bg-red-100 text-red-600',
+            'icon': 'motherboard',
+            'favorites_count': top_motherboard.favorites_count
+        })
+
+    top_psu = PowerSupplyUnits.objects.annotate(
+        favorites_count=Count('userfavorites')
+    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating').first()
+
+    if top_psu:
+        top_components.append({
+            'name': top_psu.name,
+            'manufacturer': top_psu.manufacturer,
+            'price': top_psu.price,
+            'type': 'power_supply',
+            'id': top_psu.id,
+            'icon_class': 'bg-yellow-100 text-yellow-600',
+            'icon': 'power',
+            'favorites_count': top_psu.favorites_count
+        })
+
+    # Seřaď komponenty podle favorites a vezmi max 6
+    top_components = sorted(top_components, key=lambda x: x['favorites_count'], reverse=True)[:6]
 
     stats = {
         'total_components': (
-            Processors.objects.count() +
-            GraphicsCards.objects.count() +
-            Ram.objects.count() +
-            Storage.objects.count() +
-            Motherboards.objects.count() +
-            PowerSupplyUnits.objects.count()
+                Processors.objects.count() +
+                GraphicsCards.objects.count() +
+                Ram.objects.count() +
+                Storage.objects.count() +
+                Motherboards.objects.count() +
+                PowerSupplyUnits.objects.count()
         ),
         'total_reviews': Reviews.objects.filter(is_published=True).count(),
         'processors_count': Processors.objects.count(),
         'gpus_count': GraphicsCards.objects.count(),
         'ram_count': Ram.objects.count(),
+        'total_favorites': UserFavorites.objects.count(),
     }
 
     context = {
@@ -1367,4 +1450,6 @@ def get_user_favorites(request):
     favorites = UserFavorites.objects.filter(**filter_kwargs).values_list(f'{component_type}__id', flat=True)
 
     return JsonResponse({'favorites': list(favorites)})
+
+
 
