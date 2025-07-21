@@ -3,8 +3,9 @@ import json
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -864,4 +865,97 @@ def vote_review_ajax(request):
     except Exception as e:
         return JsonResponse({'error': 'Došlo k chybě při hlasování'}, status=500)
 
+@login_required(login_url='/login/')
+def profile_view(request):
+
+    user = request.user
+
+    user_reviews = Reviews.objects.filter(author=user, is_published=True)
+    user_votes = ReviewVotes.objects.filter(user=user)
+
+    stats = {
+        'total_reviews': user_reviews.count(),
+        'avg_rating': user_reviews.aggregate(avg=Avg('rating'))['avg'] or 0,
+        'total_votes_cast': user_votes.count(),
+        'helpful_votes_received': user_reviews.aggregate(
+            total_helpful=Sum('helpful_votes')
+        )['total_helpful'] or 0,
+    }
+
+    recent_reviews = user_reviews.order_by('-date_created')[:5]
+
+    top_reviews = user_reviews.filter(helpful_votes__gt=0).order_by('-helpful_votes')[:5]
+
+    context = {
+        'user_stats': stats,
+        'recent_reviews': recent_reviews,
+        'top_reviews': top_reviews,
+    }
+
+    return render(request, 'viewer/profile.html', context)
+
+@login_required(login_url='/login/')
+def profile_edit_view(request):
+
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+
+        if email and User.objects.filter(email=email).exclude(id=request.user.id).exists():
+            messages.error(request, 'Tento email už používá jiný uživatel.')
+        else:
+            request.user.first_name = first_name
+            request.user.last_name = last_name
+            request.user.email = email
+            request.user.save()
+
+            messages.success(request, 'Profil byl úspěšně aktualizován!')
+            return redirect('profile')
+
+    return render(request, 'viewer/profile_edit.html')
+
+@login_required(login_url='/login/')
+def change_password_view(request):
+
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if not request.user.check_password(old_password):
+            messages.error(request, 'Současné heslo není správné.')
+        elif new_password != confirm_password:
+            messages.error(request, 'Nová hesla se neshodují.')
+        elif len(new_password) < 8:
+            messages.error(request, 'Heslo musí mít alespoň 8 znaků.')
+        else:
+            request.user.set_password(new_password)
+            request.user.save()
+
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, 'Heslo bylo úspěšně změněno!')
+            return redirect('profile')
+
+    return render(request, 'viewer/change_password.html')
+
+@login_required(login_url='/login/')
+def my_reviews_view(request):
+
+    user_reviews = Reviews.objects.filter(
+        author=request.user
+    ).select_related().order_by('-date_created')
+
+    paginator = Paginator(user_reviews, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'reviews': page_obj,
+        'total_reviews': user_reviews.count(),
+    }
+
+    return render(request, 'viewer/my_reviews.html', context)
 

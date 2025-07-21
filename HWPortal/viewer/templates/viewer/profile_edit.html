@@ -1,0 +1,99 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Upravit profil - Hardware Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="{% url 'profile' %}" class="hover:text-blue-600">Můj profil</a></li>
+            <li class="text-gray-300">/</li>
+            <li class="text-gray-800 font-medium">Upravit profil</li>
+        </ol>
+    </nav>
+
+    <!-- Formulář pro úpravu profilu -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Upravit profil</h1>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Uživatelské jméno (nelze změnit) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Uživatelské jméno</label>
+                <input type="text" value="{{ user.username }}" disabled class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+                <p class="text-xs text-gray-500 mt-1">Uživatelské jméno nelze změnit</p>
+            </div>
+
+            <!-- Jméno -->
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">Křestní jméno</label>
+                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       placeholder="Vaše křestní jméno">
+            </div>
+
+            <!-- Příjmení -->
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Příjmení</label>
+                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       placeholder="Vaše příjmení">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                       placeholder="vas@email.cz">
+            </div>
+
+            <!-- Datum registrace (jen pro info) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Člen od</label>
+                <input type="text" value="{{ user.date_joined|date:'j. F Y, H:i' }}" disabled 
+                       class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+            </div>
+
+            <!-- Tlačítka -->
+            <div class="flex space-x-4 pt-6">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition font-medium">
+                    Uložit změny
+                </button>
+                <a href="{% url 'profile' %}" class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 transition text-center font-medium">
+                    Zrušit
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Další možnosti -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Další možnosti</h2>
+        <div class="space-y-3">
+            <a href="{% url 'change_password' %}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <div>
+                    <div class="font-medium">Změnit heslo</div>
+                    <div class="text-sm text-gray-500">Aktualizovat přihlašovací heslo</div>
+                </div>
+            </a>
+
+            <a href="{% url 'my_reviews' %}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                </svg>
+                <div>
+                    <div class="font-medium">Moje recenze</div>
+                    <div class="text-sm text-gray-500">Spravovat všechny své recenze</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

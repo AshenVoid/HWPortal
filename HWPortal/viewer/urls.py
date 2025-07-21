@@ -18,4 +18,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
+
+    # User profile URLS
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit_view, name='profile_edit'),
+    path('profile/password/', views.change_password_view, name='change_password'),
+    path('profile/reviews/', views.my_reviews_view, name='my_reviews'),
 ]
