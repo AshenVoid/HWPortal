@@ -1367,3 +1367,4 @@ def get_user_favorites(request):
     favorites = UserFavorites.objects.filter(**filter_kwargs).values_list(f'{component_type}__id', flat=True)
 
     return JsonResponse({'favorites': list(favorites)})
+
