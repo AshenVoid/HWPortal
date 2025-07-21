@@ -211,3 +211,10 @@ __marimo__/
 
 # Migrations
 HWPortal/viewer/migrations/
+
+# Static files
+HWPortal/staticfiles/
+/staticfiles/
+/static/
+*.pyc
+

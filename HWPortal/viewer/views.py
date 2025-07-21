@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg
+from django.db.models.functions import Power
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomLoginForm, CustomUserCreationForm
 from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, StorageTypes
@@ -458,3 +459,79 @@ def logout_view(request):
         pass
     messages.success(request, "Byl jsi úspěšně odhlášen.")
     return redirect('/')
+
+def home_view(request):
+
+    latest_reviews = Reviews.objects.filter(
+        is_published=True,
+    ).select_related('author').order_by('-date_created')[:3]
+
+    top_components = []
+
+    top_processor = Processors.objects.filter(rating__gt=0).order_by('-rating', '-benchresult').first()
+    if top_processor:
+        top_components.append({
+            'name': top_processor.name,
+            'price': top_processor.price,
+            'type': 'processor',
+            'id': top_processor.id,
+            'icon_class': 'bg-blue-100 text-blue-600',
+            'icon': 'cpu'
+        })
+
+    top_gpu = GraphicsCards.objects.filter(rating__gt=0).order_by('-rating', '-vram').first()
+    if top_gpu:
+        top_components.append({
+            'name': top_gpu.name,
+            'price': top_gpu.price,
+            'type': 'graphics_card',
+            'id': top_gpu.id,
+            'icon_class': 'bg-green-100 text-green-600',
+            'icon': 'gpu'
+        })
+
+    top_ram = Ram.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+    if top_ram:
+        top_components.append({
+            'name': top_ram.name,
+            'price': top_ram.price,
+            'type': 'ram',
+            'id': top_ram.id,
+            'icon_class': 'bg-purple-100 text-purple-600',
+            'icon': 'ram'
+        })
+
+    top_storage = Storage.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+    if top_storage:
+        top_components.append({
+            'name': top_storage.name,
+            'price': top_storage.price,
+            'type': 'storage',
+            'id': top_storage.id,
+            'icon_class': 'bg-orange-100 text-orange-600',
+            'icon': 'storage'
+        })
+
+    stats = {
+        'total_components': (
+            Processors.objects.count() +
+            GraphicsCards.objects.count() +
+            Ram.objects.count() +
+            Storage.objects.count() +
+            Motherboards.objects.count() +
+            PowerSupplyUnits.objects.count()
+        ),
+        'total_reviews': Reviews.objects.filter(is_published=True).count(),
+        'processors_count': Processors.objects.count(),
+        'gpus_count': GraphicsCards.objects.count(),
+        'ram_count': Ram.objects.count(),
+    }
+
+    context = {
+        'latest_reviews': latest_reviews,
+        'top_components': top_components,
+        'stats': stats,
+    }
+
+    return render(request, 'viewer/home.html', context)
+

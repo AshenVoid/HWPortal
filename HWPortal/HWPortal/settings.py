@@ -17,9 +17,21 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static_collected'
+
+# Pro development
+"""
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+"""
+
+# Allowed hosts pro DEBUG=False
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 #REDIRECT URLs
 LOGIN_REDIRECT_URL = "/"
