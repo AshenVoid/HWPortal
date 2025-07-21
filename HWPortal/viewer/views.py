@@ -13,7 +13,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
-from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, ReviewVotes
+from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, ReviewVotes, \
+    UserFavorites, COMPONENT_TYPES
 
 
 # Create your views here.
@@ -1206,3 +1207,163 @@ def toggle_review_visibility(request, review_id):
 
     return JsonResponse({'success': False, 'error': 'Neplatný požadavek'})
 
+@login_required
+@require_POST
+def toggle_favorite_ajax(request):
+    """AJAX endpoint pro přidání/odebrání komponenty z oblíbených"""
+    try:
+        data = json.loads(request.body)
+        component_type = data.get('component_type')
+        component_id = data.get('component_id')
+
+        if not component_type or not component_id:
+            return JsonResponse({'success': False, 'error': 'Chybí povinné parametry'})
+
+        # Mapování typů komponent na modely
+        model_mapping = {
+            'processor': Processors,
+            'motherboard': Motherboards,
+            'ram': Ram,
+            'graphics_card': GraphicsCards,
+            'storage': Storage,
+            'power_supply': PowerSupplyUnits,
+        }
+
+        if component_type not in model_mapping:
+            return JsonResponse({'success': False, 'error': 'Neplatný typ komponenty'})
+
+        # Získej komponentu
+        ComponentModel = model_mapping[component_type]
+        component = get_object_or_404(ComponentModel, id=component_id)
+
+        # Zkontroluj jestli už je v oblíbených
+        field_name = component_type
+        filter_kwargs = {
+            'user': request.user,
+            field_name: component,
+            'component_type': component_type
+        }
+
+        existing_favorite = UserFavorites.objects.filter(**filter_kwargs).first()
+
+        if existing_favorite:
+            # Odeber z oblíbených
+            existing_favorite.delete()
+            is_favorite = False
+            message = f"{component.name} byl odebrán z oblíbených"
+        else:
+            # Přidej do oblíbených
+            create_kwargs = {
+                'user': request.user,
+                'component_type': component_type,
+                field_name: component
+            }
+            UserFavorites.objects.create(**create_kwargs)
+            is_favorite = True
+            message = f"{component.name} byl přidán do oblíbených"
+
+        return JsonResponse({
+            'success': True,
+            'is_favorite': is_favorite,
+            'message': message
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def check_favorite_status(request, component_type, component_id):
+    """Kontrola jestli je komponenta v oblíbených"""
+    try:
+        model_mapping = {
+            'processor': Processors,
+            'motherboard': Motherboards,
+            'ram': Ram,
+            'graphics_card': GraphicsCards,
+            'storage': Storage,
+            'power_supply': PowerSupplyUnits,
+        }
+
+        if component_type not in model_mapping:
+            return JsonResponse({'is_favorite': False})
+
+        ComponentModel = model_mapping[component_type]
+        component = get_object_or_404(ComponentModel, id=component_id)
+
+        filter_kwargs = {
+            'user': request.user,
+            component_type: component,
+            'component_type': component_type
+        }
+
+        is_favorite = UserFavorites.objects.filter(**filter_kwargs).exists()
+
+        return JsonResponse({'is_favorite': is_favorite})
+
+    except Exception:
+        return JsonResponse({'is_favorite': False})
+
+@login_required
+def my_favorites_view(request):
+    favorites = UserFavorites.objects.filter(user=request.user).select_related(
+        'processor', 'motherboard', 'ram', 'graphics_card', 'storage', 'power_supply'
+    )
+
+    # Seskupení podle typu komponenty
+    favorites_by_type = {}
+    for favorite in favorites:
+        component_type = favorite.component_type
+        if component_type not in favorites_by_type:
+            favorites_by_type[component_type] = []
+        favorites_by_type[component_type].append(favorite)
+
+    # Statistiky
+    stats = {
+        'total_favorites': favorites.count(),
+        'by_type': {component_type: len(favs) for component_type, favs in favorites_by_type.items()}
+    }
+
+    context = {
+        'favorites_by_type': favorites_by_type,
+        'stats': stats,
+        'component_types': COMPONENT_TYPES,
+    }
+
+    return render(request, 'viewer/my_favorites.html', context)
+
+@login_required
+def remove_favorite_view(request, favorite_id):
+    """Odstraní komponentu z oblíbených"""
+    favorite = get_object_or_404(UserFavorites, id=favorite_id, user=request.user)
+    component_name = favorite.component_name
+
+    favorite.delete()
+    messages.success(request, f'Komponenta "{component_name}" byla odebrána z oblíbených.')
+
+    return redirect('my_favorites')
+
+def get_user_favorites(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'favorites': []})
+
+    component_ids = request.GET.get('component_ids', '').split(',')
+    component_type = request.GET.get('component_type', '')
+
+    if not component_ids or not component_type:
+        return JsonResponse({'favorites': []})
+
+    try:
+        component_ids = [int(cid) for cid in component_ids if cid.isdigit()]
+    except ValueError:
+        return JsonResponse({'favorites': []})
+
+    # Filtruj oblíbené podle typu a ID
+    filter_kwargs = {
+        'user': request.user,
+        'component_type': component_type,
+        f'{component_type}__id__in': component_ids
+    }
+
+    favorites = UserFavorites.objects.filter(**filter_kwargs).values_list(f'{component_type}__id', flat=True)
+
+    return JsonResponse({'favorites': list(favorites)})

@@ -39,27 +39,42 @@
 
             <!-- Quick Actions -->
             <div class="space-y-2 mb-4">
-                <button class="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                    </svg>
-                    Oblíbené
-                </button>
+                <div class="space-y-2 mb-4">
+                    {% if user.is_authenticated %}
+                        <button id="favorite-btn"
+                                onclick="toggleFavorite('{{ component_type }}', {{ component.id }})"
+                                class="w-full flex items-center justify-center px-3 py-2 rounded-lg transition text-sm favorite-btn"
+                                data-component-type="{{ component_type }}"
+                                data-component-id="{{ component.id }}">
+                            <svg id="favorite-icon" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <span id="favorite-text">Načítání...</span>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="w-full flex items-center justify-center px-3 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            Přihlásit se pro oblíbené
+                        </a>
+                    {% endif %}
 
-                <div class="grid grid-cols-2 gap-2">
-                    <button class="flex items-center justify-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
-                        </svg>
-                        Porovnat
-                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="flex items-center justify-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
+                            </svg>
+                            Porovnat
+                        </button>
 
-                    <button class="flex items-center justify-center px-2 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-xs">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
-                        </svg>
-                        Sdílet
-                    </button>
+                        <button class="flex items-center justify-center px-2 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-xs">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                            </svg>
+                            Sdílet
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -494,6 +509,82 @@ function showMessage(message, type) {
             }
         }, 300);
     }, 3000);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Pouze pokud je uživatel přihlášený
+    {% if user.is_authenticated %}
+        checkFavoriteStatus('{{ component_type }}', {{ component.id }});
+    {% endif %}
+});
+
+function checkFavoriteStatus(componentType, componentId) {
+    fetch(`/favorites/check/${componentType}/${componentId}/`)
+        .then(response => response.json())
+        .then(data => {
+            updateFavoriteButton(data.is_favorite);
+        })
+        .catch(error => {
+            console.error('Error checking favorite status:', error);
+            updateFavoriteButton(false);
+        });
+}
+
+function updateFavoriteButton(isFavorite) {
+    const btn = document.getElementById('favorite-btn');
+    const icon = document.getElementById('favorite-icon');
+    const text = document.getElementById('favorite-text');
+
+    if (!btn || !icon || !text) return;
+
+    if (isFavorite) {
+        btn.className = 'w-full flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm favorite-btn';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" fill="currentColor"/>';
+        text.textContent = 'Odebrat z oblíbených';
+    } else {
+        btn.className = 'w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm favorite-btn';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>';
+        text.textContent = 'Přidat do oblíbených';
+    }
+}
+
+function toggleFavorite(componentType, componentId) {
+    const btn = document.getElementById('favorite-btn');
+    const text = document.getElementById('favorite-text');
+
+    // Disable tlačítko během požadavku
+    btn.disabled = true;
+    text.textContent = 'Zpracovávám...';
+    btn.style.opacity = '0.7';
+
+    fetch('{% url "toggle_favorite_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            component_type: componentType,
+            component_id: componentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateFavoriteButton(data.is_favorite);
+            showMessage(data.message, 'success');
+        } else {
+            showMessage(data.error || 'Došlo k chybě', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Došlo k chybě při upravování oblíbených', 'error');
+    })
+    .finally(() => {
+        // Re-enable tlačítko
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    });
 }
 </script>
 

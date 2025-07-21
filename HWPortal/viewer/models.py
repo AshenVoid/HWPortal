@@ -1,3 +1,4 @@
+from django.db import models
 from django.db.models import Model, CharField, DateField, ForeignKey, SET_NULL, \
     TextField, DateTimeField, ManyToManyField, IntegerField, ImageField, DecimalField, CASCADE
 from django.db.models.fields import BooleanField
@@ -291,3 +292,136 @@ class ReviewVotes(Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.review.title} ({'Užitečné' if self.is_helpful else 'Neužitečné'})"
+
+
+class UserFavorites(Model):
+    user = ForeignKey(User, on_delete=CASCADE, verbose_name="Uživatel")
+    component_type = CharField(max_length=20, choices=COMPONENT_TYPES, verbose_name="Typ komponenty")
+
+    # Foreign keys na jednotlivé komponenty (pouze jedna bude vyplněná)
+    processor = ForeignKey(Processors, on_delete=CASCADE, null=True, blank=True)
+    motherboard = ForeignKey(Motherboards, on_delete=CASCADE, null=True, blank=True)
+    ram = ForeignKey(Ram, on_delete=CASCADE, null=True, blank=True)
+    graphics_card = ForeignKey(GraphicsCards, on_delete=CASCADE, null=True, blank=True)
+    storage = ForeignKey(Storage, on_delete=CASCADE, null=True, blank=True)
+    power_supply = ForeignKey(PowerSupplyUnits, on_delete=CASCADE, null=True, blank=True)
+
+    # Metadata
+    date_added = DateTimeField(auto_now_add=True, verbose_name="Datum přidání")
+
+    # Nastavení sledování (pro budoucí notifikace)
+    watch_reviews = BooleanField(default=True, verbose_name="Sledovat nové recenze")
+    watch_price_changes = BooleanField(default=True, verbose_name="Sledovat změny cen")
+
+    class Meta:
+        unique_together = [
+            ('user', 'processor'),
+            ('user', 'motherboard'),
+            ('user', 'ram'),
+            ('user', 'graphics_card'),
+            ('user', 'storage'),
+            ('user', 'power_supply'),
+        ]
+        ordering = ['-date_added']
+        verbose_name = "Oblíbená komponenta"
+        verbose_name_plural = "Oblíbené komponenty"
+        indexes = [
+            # Index pro rychlé vyhledávání oblíbených podle uživatele a typu
+            models.Index(fields=['user', 'component_type']),
+        ]
+
+    def __str__(self):
+        component = self.component
+        return f"{self.user.username} - {component.name if component else 'Neznámá komponenta'}"
+
+    @property
+    def component(self):
+        """Vrátí komponentu podle typu"""
+        if self.component_type == 'processor' and self.processor:
+            return self.processor
+        elif self.component_type == 'motherboard' and self.motherboard:
+            return self.motherboard
+        elif self.component_type == 'ram' and self.ram:
+            return self.ram
+        elif self.component_type == 'graphics_card' and self.graphics_card:
+            return self.graphics_card
+        elif self.component_type == 'storage' and self.storage:
+            return self.storage
+        elif self.component_type == 'power_supply' and self.power_supply:
+            return self.power_supply
+        return None
+
+    @property
+    def component_name(self):
+        """Vrátí název komponenty"""
+        component = self.component
+        return component.name if component else "Neznámá komponenta"
+
+    @property
+    def component_manufacturer(self):
+        """Vrátí výrobce komponenty"""
+        component = self.component
+        return component.manufacturer if component else "Neznámý výrobce"
+
+    @property
+    def recent_reviews_count(self):
+        from datetime import datetime, timedelta
+        week_ago = datetime.now() - timedelta(days=7)
+
+        component = self.component
+        if not component:
+            return 0
+
+        # Počítej recenze pro tuto komponentu za poslední týden
+        filter_kwargs = {
+            self.component_type: component,
+            'date_created__gte': week_ago,
+            'is_published': True
+        }
+
+        return Reviews.objects.filter(**filter_kwargs).count()
+
+    @property
+    def has_recent_activity(self):
+        return self.recent_reviews_count > 0
+
+
+class FavoriteActivity(Model):
+
+    ACTIVITY_TYPES = (
+        ('new_review', 'Nová recenze'),
+        ('price_change', 'Změna ceny'),
+        ('rating_change', 'Změna hodnocení'),
+        ('new_helpful_review', 'Nová užitečná recenze'),
+    )
+
+    favorite = ForeignKey(UserFavorites, on_delete=CASCADE, related_name='activities')
+    activity_type = CharField(max_length=20, choices=ACTIVITY_TYPES, verbose_name="Typ aktivity")
+
+    # Popis aktivity
+    title = CharField(max_length=200, verbose_name="Název aktivity")
+    description = TextField(blank=True, verbose_name="Popis aktivity")
+
+    # Data pro různé typy aktivit
+    old_value = CharField(max_length=100, blank=True, verbose_name="Stará hodnota")
+    new_value = CharField(max_length=100, blank=True, verbose_name="Nová hodnota")
+
+    # Reference na související objekty
+    related_review = ForeignKey(Reviews, on_delete=CASCADE, null=True, blank=True, verbose_name="Související recenze")
+
+    # Metadata
+    date_created = DateTimeField(auto_now_add=True, verbose_name="Datum vytvoření")
+    is_read = BooleanField(default=False, verbose_name="Přečteno")
+
+    class Meta:
+        ordering = ['-date_created']
+        verbose_name = "Aktivita oblíbené komponenty"
+        verbose_name_plural = "Aktivity oblíbených komponent"
+
+    def __str__(self):
+        return f"{self.favorite.user.username} - {self.title}"
+
+    @property
+    def component_name(self):
+        return self.favorite.component_name
+

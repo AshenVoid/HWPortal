@@ -22,6 +22,14 @@ urlpatterns = [
     path('review/toggle-visibility/<int:review_id>/', views.toggle_review_visibility, name='toggle_review_visibility'),
     path('get-user-votes/', views.get_user_votes, name='get_user_votes'),
 
+    # Favorites
+    path('favorites/', views.my_favorites_view, name='my_favorites'),
+    path('favorites/toggle/', views.toggle_favorite_ajax, name='toggle_favorite_ajax'),
+    path('favorites/check/<str:component_type>/<int:component_id>/', views.check_favorite_status,
+         name='check_favorite_status'),
+    path('favorites/remove/<int:favorite_id>/', views.remove_favorite_view, name='remove_favorite'),
+    path('get-user-favorites/', views.get_user_favorites, name='get_user_favorites'),
+
     #AUTH URLS
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
