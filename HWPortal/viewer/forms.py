@@ -125,7 +125,7 @@ class ReviewForm(forms.ModelForm):
                 'id': 'component_type'
             }),
             'rating': forms.Select(
-                choices=[(i, f'{i} hvězdička{"y" if i in [2, 3, 4] else "a" if i == 1 else "ek"}') for i in
+                choices=[(i, f'{i} hvězdič{"ky" if i in [2, 3, 4] else "ka" if i == 1 else "ek"}') for i in
                          range(1, 6)],
                 attrs={
                     'class': 'w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'
