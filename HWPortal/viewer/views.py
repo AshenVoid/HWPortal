@@ -205,6 +205,7 @@ def components_view(request):
 
     return render(request, 'viewer/components.html', context)
 
+
 def component_detail_view(request, component_type, component_id):
     # Mapování typu na model
     model_mapping = {
@@ -215,22 +216,41 @@ def component_detail_view(request, component_type, component_id):
         'motherboard': Motherboards,
         'power_supply': PowerSupplyUnits,
     }
-    """
-    if component_type in model_mapping:
+
+    # Mapování typu na pole v Reviews modelu
+    reviews_field_mapping = {
+        'processor': 'processor',
+        'graphics_card': 'graphics_card',
+        'ram': 'ram',
+        'storage': 'storage',
+        'motherboard': 'motherboard',
+        'power_supply': 'power_supply',
+    }
+
+    if component_type not in model_mapping:
         return render(request, '404.html')
-    """
+
     model = model_mapping[component_type]
     component = get_object_or_404(model, id=component_id)
 
-    # Pull recenzí
-    reviews_filter = {component_type: component}
-    reviews = Reviews.objects.filter(**reviews_filter).select_related('author').order_by('-date_created')
+    # Opravený filter pro recenze
+    reviews_field = reviews_field_mapping[component_type]
+    reviews_filter = {reviews_field: component}
+    reviews = Reviews.objects.filter(
+        **reviews_filter,
+        is_published=True
+    ).select_related('author').order_by('-date_created')
 
-    # Statisticky recenzí
+    # Statistiky recenzí
     review_stats = reviews.aggregate(
         avg_rating=Avg('rating'),
         total_reviews=Count('id'),
     )
+
+    if review_stats['total_reviews'] > 0:
+        component.calculated_rating = round(review_stats['avg_rating'])
+    else:
+        component.calculated_rating = 0
 
     # Hodnocení dle hvězdiček
     rating_distribution = {}

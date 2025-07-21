@@ -17,9 +17,9 @@
     </ol>
 </nav>
 
-<div class="grid lg:grid-cols-4 gap-8">
+<div class="grid lg:grid-cols-5 gap-8">
     <!-- Left Column - Product Image & Quick Actions -->
-    <div class="lg:col-span-1">
+    <div class="lg:col-span-2">
         <div class="bg-white rounded-lg shadow-lg p-6 sticky top-6">
             <!-- Main Product Image -->
             <div class="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
@@ -35,51 +35,57 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="space-y-3">
-                <button class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="space-y-2 mb-4">
+                <button class="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
-                    Přidat do oblíbených
+                    Oblíbené
                 </button>
 
-                <button class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
-                    </svg>
-                    Přidat k porovnání
-                </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="flex items-center justify-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
+                        </svg>
+                        Porovnat
+                    </button>
 
-                <button class="w-full flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
-                    </svg>
-                    Sdílet
-                </button>
+                    <button class="flex items-center justify-center px-2 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-xs">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                        </svg>
+                        Sdílet
+                    </button>
+                </div>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <!-- Quick Stats širší layout -->
+            <div class="p-4 bg-gray-50 rounded-lg">
                 <h4 class="font-medium text-gray-900 mb-3">Rychlé info</h4>
                 <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Celkové hodnocení:</span>
-                        <div class="flex items-center">
-                            <span class="font-medium mr-1">{{ component.rating }}/5</span>
-                            <div class="flex text-yellow-400 text-xs">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= component.rating %}★{% else %}☆{% endif %}
-                                {% endfor %}
+                    <div class="grid grid-cols-1 gap-2">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-600 text-xs leading-tight">Hodnocení:</span>
+                            <div class="text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="flex text-yellow-400 text-xs mr-1">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review_stats.avg_rating|default:0 %}★{% else %}☆{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="font-medium text-xs">{{ review_stats.avg_rating|default:0|floatformat:0 }}/5</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Recenze:</span>
-                        <span class="font-medium">{{ review_stats.total_reviews|default:0 }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">Datum přidání:</span>
-                        <span class="font-medium">{{ component.dateadded|date:"j.n.Y" }}</span>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-xs">Recenze:</span>
+                            <span class="font-medium text-xs">{{ review_stats.total_reviews|default:0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 text-xs">Přidáno:</span>
+                            <span class="font-medium text-xs">{{ component.dateadded|date:"j.n.Y" }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,13 +107,13 @@
 
                 <!-- Overall Rating -->
                 <div class="text-right">
-                    <div class="flex items-center mb-2">
-                        <div class="flex text-yellow-400 text-2xl mr-2">
+                    <div class="flex items-center justify-end mb-2 min-h-[32px]">
+                        <div class="flex text-yellow-400 text-2xl mr-2 flex-shrink-0">
                             {% for i in "12345" %}
-                                {% if forloop.counter <= component.rating %}★{% else %}☆{% endif %}
+                                {% if forloop.counter <= review_stats.avg_rating|default:0 %}★{% else %}☆{% endif %}
                             {% endfor %}
                         </div>
-                        <span class="text-2xl font-bold text-gray-900">{{ component.rating }}/5</span>
+                        <span class="text-2xl font-bold text-gray-900 whitespace-nowrap">{{ review_stats.avg_rating|default:0|floatformat:0 }}/5</span>
                     </div>
                     <p class="text-sm text-gray-600">{{ review_stats.total_reviews|default:0 }} hodnocení</p>
                 </div>
@@ -211,37 +217,41 @@
 
         <!-- Reviews Section -->
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Hodnocení komunity</h2>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Hodnocení komunity</h2>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition self-start sm:self-auto">
                     Přidat hodnocení
                 </button>
             </div>
 
             <!-- Rating Summary -->
             <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <div class="flex items-center">
-                    <span class="text-5xl font-bold text-gray-900 mr-6">
-                        {{ review_stats.avg_rating|default:0|floatformat:1 }}
-                    </span>
-                    <div>
-                        <div class="flex text-yellow-400 text-xl mb-2">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= review_stats.avg_rating|default:0 %}★{% else %}☆{% endif %}
-                            {% endfor %}
+                <!-- Overall Rating -->
+                <div class="flex items-center justify-center md:justify-start">
+                    <div class="text-center md:text-left">
+                        <div class="text-5xl font-bold text-gray-900 mb-2">
+                            {{ review_stats.avg_rating|default:0|floatformat:1 }}
+                        </div>
+                        <div class="flex justify-center md:justify-start text-yellow-400 text-xl mb-2 min-h-[24px]">
+                            <div class="flex flex-shrink-0">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review_stats.avg_rating|default:0 %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
                         <p class="text-gray-600">{{ review_stats.total_reviews|default:0 }} hodnocení</p>
                     </div>
                 </div>
 
-                <div>
+                <!-- Rating Distribution -->
+                <div class="space-y-2">
                     {% for rating, count in rating_distribution.items %}
-                    <div class="flex items-center mb-2">
-                        <span class="text-sm w-8">{{ rating }}★</span>
-                        <div class="flex-1 h-3 bg-gray-200 rounded-full mx-3">
+                    <div class="flex items-center">
+                        <span class="text-sm w-10 text-right mr-2">{{ rating }}★</span>
+                        <div class="flex-1 h-3 bg-gray-200 rounded-full mx-2">
                             {% if review_stats.total_reviews > 0 %}
                                 {% widthratio count review_stats.total_reviews 100 as percentage %}
-                                <div class="h-3 bg-yellow-400 rounded-full" style="width: {{ percentage }}%"></div>
+                                <div class="h-3 bg-yellow-400 rounded-full transition-all duration-300" style="width: {{ percentage }}%"></div>
                             {% endif %}
                         </div>
                         <span class="text-sm text-gray-600 w-8">{{ count }}</span>
@@ -253,38 +263,45 @@
             <!-- Individual Reviews -->
             <div class="space-y-6">
                 {% for review in reviews %}
-                <div class="border-b border-gray-200 pb-6">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                    <!-- Review Header -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">
                                 {{ review.reviewer_name|first|upper }}
                             </div>
-                            <div>
+                            <div class="min-w-0 flex-1">
                                 <p class="font-semibold text-gray-900">{{ review.reviewer_name }}</p>
-                                <div class="flex items-center">
-                                    <div class="flex text-yellow-400 text-sm mr-2">
+                                <div class="flex items-center mt-1 min-h-[20px]">
+                                    <div class="flex text-yellow-400 text-sm mr-2 flex-shrink-0">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
                                         {% endfor %}
                                     </div>
-                                    <span class="text-sm text-gray-500">{{ review.date_created|date:"j. n. Y" }}</span>
+                                    <span class="text-sm text-gray-500 whitespace-nowrap">{{ review.date_created|date:"j. n. Y" }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">{{ review.title }}</h3>
-                    <p class="text-gray-700 mb-3">{{ review.summary }}</p>
-                    {% if review.helpful_votes > 0 %}
-                    <div class="flex items-center text-sm">
-                        <button class="text-blue-600 hover:underline mr-4 flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                            </svg>
-                            Užitečné ({{ review.helpful_votes }})
-                        </button>
-                        <button class="text-gray-600 hover:underline">Odpovědět</button>
+
+                    <!-- Review Content -->
+                    <div class="ml-16">
+                        <h3 class="font-semibold text-gray-900 mb-2">{{ review.title }}</h3>
+                        <p class="text-gray-700 mb-4 leading-relaxed">{{ review.summary }}</p>
+
+                        <!-- Review Actions -->
+                        {% if review.helpful_votes > 0 %}
+                        <div class="flex items-center space-x-4 text-sm">
+                            <button class="text-blue-600 hover:text-blue-700 flex items-center transition-colors">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                                </svg>
+                                Užitečné ({{ review.helpful_votes }})
+                            </button>
+                            <button class="text-gray-600 hover:text-gray-700 transition-colors">Odpovědět</button>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
                 {% empty %}
                 <div class="text-center py-12 text-gray-500">
@@ -298,15 +315,17 @@
             </div>
 
             {% if reviews.count > 5 %}
-            <div class="text-center mt-6">
-                <button class="text-blue-600 hover:underline font-medium">Zobrazit všechny recenze ({{ review_stats.total_reviews }})</button>
+            <div class="text-center mt-6 pt-6 border-t border-gray-200">
+                <button class="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                    Zobrazit všechny recenze ({{ review_stats.total_reviews }}) →
+                </button>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Similar Components -->
+<!-- Similar Components - OPRAVENO -->
 {% if similar_components %}
 <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Podobné komponenty</h2>
@@ -321,13 +340,13 @@
             <h3 class="font-semibold text-gray-900 mb-2 text-sm">{{ similar.name|truncatechars:40 }}</h3>
             <p class="text-xs text-gray-600 mb-2">{{ similar.manufacturer }}</p>
             <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="flex text-yellow-400 text-xs mr-1">
+                <div class="flex items-center min-h-[16px]">
+                    <div class="flex text-yellow-400 text-xs mr-1 flex-shrink-0">
                         {% for i in "12345" %}
                             {% if forloop.counter <= similar.rating %}★{% else %}☆{% endif %}
                         {% endfor %}
                     </div>
-                    <span class="text-xs text-gray-500">({{ similar.rating }})</span>
+                    <span class="text-xs text-gray-500 whitespace-nowrap">({{ similar.rating }})</span>
                 </div>
                 <span class="text-xs text-blue-600 font-medium">Porovnat →</span>
             </div>
