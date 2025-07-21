@@ -17,6 +17,9 @@ urlpatterns = [
     path('review/create/<str:component_type>/<int:component_id>/', views.create_review_for_component,
          name='create_review_for_component'),
     path('get-components/', views.get_components_ajax, name='get_components_ajax'),
+    path('review/edit/<int:review_id>/', views.edit_review_view, name='edit_review'),
+    path('review/delete/<int:review_id>/', views.delete_review_view, name='delete_review'),
+    path('review/toggle-visibility/<int:review_id>/', views.toggle_review_visibility, name='toggle_review_visibility'),
 
     #AUTH URLS
     path('login/', views.login_view, name='login'),

@@ -179,17 +179,27 @@ class ReviewForm(forms.ModelForm):
             if user.is_authenticated:
                 self.fields['reviewer_name'].initial = user.username
 
+        # Pokud editujeme existující recenzi
+        if self.instance and self.instance.pk:
+            # Nastavení component_choice pro existující recenzi
+            component = self.instance.component
+            if component:
+                self.fields['component_choice'].initial = f'{self.instance.component_type}_{component.id}'
+
+            # Zakázání změny typu komponenty při editaci
+            self.fields['component_type'].widget.attrs['readonly'] = True
+            self.fields['component_type'].widget.attrs['disabled'] = True
+
         # Dynamické načtení komponent podle typu
         if component_type:
             self.fields['component_type'].initial = component_type
-            self.fields['component_type'].widget.attrs['readonly'] = True
 
             # Načtení komponent podle typu
             components = self.get_components_by_type(component_type)
             self.fields['component_choice'].choices = components
 
             if component_id:
-                self.fields['component_choice'].initial = component_id
+                self.fields['component_choice'].initial = f'{component_type}_{component_id}'
         else:
             # Pokud není specifikován typ, zobraz všechny
             self.fields['component_choice'].choices = self.get_all_components()
@@ -245,3 +255,4 @@ class ReviewForm(forms.ModelForm):
                 raise forms.ValidationError('Neplatná komponenta.')
 
         return cleaned_data
+

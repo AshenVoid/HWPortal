@@ -1050,3 +1050,112 @@ def get_components_ajax(request):
 def create_review_for_component(request, component_type, component_id):
     return create_review_view(request, component_type, component_id)
 
+@login_required(login_url='/login/')
+def edit_review_view(request, review_id):
+    review = get_object_or_404(Reviews, id=review_id, author=request.user)
+
+    # Type & ID
+    component_type = review.component_type
+    component = review.component
+    component_id = component.id if component else None
+
+    if request.method == 'POST':
+        form = ReviewForm(
+            request.POST,
+            instance=review,
+            component_type=component_type,
+            component_id=component_id
+        )
+
+        if form.is_valid():
+            updated_review = form.save(commit=False)
+
+            component_choice = form.cleaned_data.get('component_choice')
+            if component_choice:
+                choice_type, choice_id = component_choice.split('_', 1)
+
+                updated_review.processor = None
+                updated_review.graphics_card = None
+                updated_review.ram = None
+                updated_review.storage = None
+                updated_review.motherboard = None
+                updated_review.power_supply = None
+
+                if choice_type == 'processor':
+                    updated_review.processor = get_object_or_404(Processors, id=choice_id)
+                elif choice_type == 'graphics_card':
+                    updated_review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
+                elif choice_type == 'ram':
+                    updated_review.ram = get_object_or_404(Ram, id=choice_id)
+                elif choice_type == 'storage':
+                    updated_review.storage = get_object_or_404(Storage, id=choice_id)
+                elif choice_type == 'motherboard':
+                    updated_review.motherboard = get_object_or_404(Motherboards, id=choice_id)
+                elif choice_type == 'power_supply':
+                    updated_review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+
+            updated_review.save()
+
+            messages.success(request, 'Recenze byla úspěšně aktualizována!')
+            return redirect('my_reviews')
+    else:
+        initial_data = {
+            'user': request.user
+        }
+
+        if component:
+            initial_data['component_choice'] = f'{component_type}_{component.id}'
+
+        form = ReviewForm(
+            instance=review,
+            initial=initial_data,
+            component_type=component_type,
+            component_id=component_id
+        )
+
+    context = {
+        'form': form,
+        'review': review,
+        'component': component,
+        'component_type': component_type,
+        'component_type_display': get_component_type_display(component_type),
+        'is_edit': True,
+    }
+
+    return render(request, 'viewer/edit_review.html', context)
+
+@login_required(login_url='/login/')
+def delete_review_view(request, review_id):
+    review = get_object_or_404(Reviews, id=review_id, author=request.user)
+
+    if request.method == 'POST':
+        review_title = review.title
+        review.delete()
+        messages.success(request, f'Recenze "{review_title}" byla úspěšně smazána.')
+        return redirect('my_reviews')
+
+    context = {
+        'review': review,
+    }
+
+    return render(request, 'viewer/delete_review.html', context)
+
+@login_required(login_url='/login/')
+def toggle_review_visibility(request, review_id):
+    if request.method == 'POST':
+        review = get_object_or_404(Reviews, id=review_id, author=request.user)
+
+        review.is_published = not review.is_published
+        review.save()
+
+        status = "publikována" if review.is_published else "skryta"
+        messages.success(request, f'Recenze byla {status}.')
+
+        return JsonResponse({
+            'success': True,
+            'is_published': review.is_published,
+            'message': f'Recenze byla {status}.'
+        })
+
+    return JsonResponse({'success': False, 'error': 'Neplatný požadavek'})
+

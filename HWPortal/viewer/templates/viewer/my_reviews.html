@@ -72,18 +72,32 @@
                     
                     <!-- Akční tlačítka -->
                     <div class="flex flex-col space-y-2 ml-4">
-                        <button class="text-blue-600 hover:text-blue-700 text-sm font-medium transition">
-                            Upravit
-                        </button>
-                        <button class="text-red-600 hover:text-red-700 text-sm font-medium transition">
-                            Smazat
-                        </button>
+                        <a href="{% url 'edit_review' review.id %}"
+                           class="text-blue-600 hover:text-blue-700 text-sm font-medium transition">
+                            ✏️ Upravit
+                        </a>
+
+                        <a href="{% url 'delete_review' review.id %}"
+                           class="text-red-600 hover:text-red-700 text-sm font-medium transition">
+                            🗑️ Smazat
+                        </a>
+
                         {% if review.component %}
-                            <a href="{% url 'component_detail' review.component_type review.component.id %}" 
+                            <a href="{% url 'component_detail' review.component_type review.component.id %}"
                                class="text-gray-600 hover:text-gray-700 text-sm font-medium transition">
-                                Zobrazit komponentu
+                                👁️ Zobrazit komponentu
                             </a>
                         {% endif %}
+
+                        <!-- Toggle publikování -->
+                        <button onclick="toggleVisibility({{ review.id }}, {{ review.is_published|yesno:'true,false' }})"
+                                class="text-sm font-medium transition {% if review.is_published %}text-orange-600 hover:text-orange-700{% else %}text-green-600 hover:text-green-700{% endif %}">
+                            {% if review.is_published %}
+                                👁️‍🗨️ Skrýt
+                            {% else %}
+                                👁️ Publikovat
+                            {% endif %}
+                        </button>
                     </div>
                 </div>
                 
@@ -162,4 +176,33 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function toggleVisibility(reviewId, isPublished) {
+    fetch(`/review/toggle-visibility/${reviewId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Jednoduchý reload stránky
+        } else {
+            alert('Chyba při změně viditelnosti: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Došlo k chybě při změně viditelnosti');
+    });
+}
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+</script>
+
 {% endblock %}
