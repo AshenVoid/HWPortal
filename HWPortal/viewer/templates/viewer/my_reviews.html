@@ -71,33 +71,53 @@
                     </div>
                     
                     <!-- Akční tlačítka -->
-                    <div class="flex flex-col space-y-2 ml-4">
+                    <div class="flex flex-col space-y-2 ml-4 min-w-[120px]">
+                        <!-- Upravit tlačítko -->
                         <a href="{% url 'edit_review' review.id %}"
-                           class="text-blue-600 hover:text-blue-700 text-sm font-medium transition">
-                            ✏️ Upravit
+                           class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Upravit
                         </a>
 
+                        <!-- Smazat tlačítko -->
                         <a href="{% url 'delete_review' review.id %}"
-                           class="text-red-600 hover:text-red-700 text-sm font-medium transition">
-                            🗑️ Smazat
+                           class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Smazat
                         </a>
 
-                        {% if review.component %}
-                            <a href="{% url 'component_detail' review.component_type review.component.id %}"
-                               class="text-gray-600 hover:text-gray-700 text-sm font-medium transition">
-                                👁️ Zobrazit komponentu
-                            </a>
-                        {% endif %}
-
-                        <!-- Toggle publikování -->
+                        <!-- Publikovat/Skrýt tlačítko -->
                         <button onclick="toggleVisibility({{ review.id }}, {{ review.is_published|yesno:'true,false' }})"
-                                class="text-sm font-medium transition {% if review.is_published %}text-orange-600 hover:text-orange-700{% else %}text-green-600 hover:text-green-700{% endif %}">
+                                class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium transition-all rounded-lg border {% if review.is_published %}text-orange-700 bg-orange-50 border-orange-200 hover:bg-orange-100 hover:border-orange-300{% else %}text-green-700 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300{% endif %}">
                             {% if review.is_published %}
-                                👁️‍🗨️ Skrýt
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.465 8.465M9.878 9.878L8.465 8.465"/>
+                                </svg>
+                                Skrýt
                             {% else %}
-                                👁️ Publikovat
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                Publikovat
                             {% endif %}
                         </button>
+
+                        <!-- Zobrazit komponentu tlačítko -->
+                        {% if review.component %}
+                            <a href="{% url 'component_detail' review.component_type review.component.id %}"
+                               class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7h10v10"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6L21 6l-5-5"/>
+                                </svg>
+                                Komponenta
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
                 
