@@ -13,6 +13,10 @@ urlpatterns = [
     # Reviews
     path('reviews/', views.reviews_view, name='reviews'),
     path('reviews/vote/', views.vote_review_ajax, name='vote_review_ajax'),
+    path('review/create/', views.create_review_view, name='create_review'),
+    path('review/create/<str:component_type>/<int:component_id>/', views.create_review_for_component,
+         name='create_review_for_component'),
+    path('get-components/', views.get_components_ajax, name='get_components_ajax'),
 
     #AUTH URLS
     path('login/', views.login_view, name='login'),

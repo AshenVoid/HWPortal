@@ -219,9 +219,9 @@
         <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Hodnocení komunity</h2>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition self-start sm:self-auto">
+                <a href="{% url 'create_review_for_component' component_type component.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                     Přidat hodnocení
-                </button>
+                </a>
             </div>
 
             <!-- Rating Summary -->

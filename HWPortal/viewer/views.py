@@ -10,9 +10,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .forms import CustomLoginForm, CustomUserCreationForm
-from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, StorageTypes, \
-    ReviewVotes
+from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
+from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, ReviewVotes
 
 
 # Create your views here.
@@ -958,4 +957,96 @@ def my_reviews_view(request):
     }
 
     return render(request, 'viewer/my_reviews.html', context)
+
+@login_required(login_url='/login/')
+def create_review_view(request, component_type=None, component_id=None):
+    model_mapping = {
+        'processor': Processors,
+        'graphics_card': GraphicsCards,
+        'ram': Ram,
+        'storage': Storage,
+        'motherboard': Motherboards,
+        'power_supply': PowerSupplyUnits,
+    }
+
+    component = None
+    if component_type and component_id:
+        if component_type in model_mapping:
+            model = model_mapping[component_type]
+            component = get_object_or_404(model, id=component_id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, component_type=component_type, component_id=component_id)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.author = request.user
+
+            component_choice = form.cleaned_data.get('component_choice')
+            if component_choice:
+                choice_type, choice_id = component_choice.split('_', 1)
+
+                if choice_type == 'processor':
+                    review.processor = get_object_or_404(Processors, id=choice_id)
+                elif choice_type == 'graphics_card':
+                    review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
+                elif choice_type == 'ram':
+                    review.ram = get_object_or_404(Ram, id=choice_id)
+                elif choice_type == 'storage':
+                    review.storage = get_object_or_404(Storage, id=choice_id)
+                elif choice_type == 'motherboard':
+                    review.motherboard = get_object_or_404(Motherboards, id=choice_id)
+                elif choice_type == 'power_supply':
+                    review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+
+            review.save()
+
+            messages.success(request, 'Recenze byla úspěšně vytvořena!')
+            return redirect('reviews')
+
+    else:
+        initial_data = {'user': request.user}
+        form = ReviewForm(
+            initial=initial_data,
+            component_type=component_type,
+            component_id=component_id
+        )
+
+    context = {
+        'form': form,
+        'component': component,
+        'component_type': component_type,
+        'component_type_display': get_component_type_display(component_type) if component_type else None,
+    }
+
+    return render(request, 'viewer/create_review.html', context)
+
+@login_required(login_url='/login/')
+def get_components_ajax(request):
+    component_type = request.GET.get('type')
+
+    model_mapping = {
+        'processor': Processors,
+        'graphics_card': GraphicsCards,
+        'ram': Ram,
+        'storage': Storage,
+        'motherboard': Motherboards,
+        'power_supply': PowerSupplyUnits,
+    }
+
+    components = []
+
+    if component_type in model_mapping:
+        model = model_mapping[component_type]
+        for comp in model.objects.all().order_by('manufacturer', 'name'):
+            components.append({
+                'id': f'{component_type}_{comp.id}',
+                'name': f'{comp.manufacturer} {comp.name}'
+            })
+
+    return JsonResponse({'components': components})
+
+@login_required
+def create_review_for_component(request, component_type, component_id):
+    return create_review_view(request, component_type, component_id)
 
