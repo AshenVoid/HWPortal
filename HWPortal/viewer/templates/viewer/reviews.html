@@ -3,6 +3,9 @@
 {% block title %}Recenze - Hardware Portal{% endblock %}
 
 {% block content %}
+<!-- CSRF Token pro AJAX -->
+{% csrf_token %}
+
 <!-- Header -->
 <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-2">Recenze komponent</h1>
@@ -204,7 +207,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 18v-4m-4-4h-1.096c-.142 0-.284-.021-.42-.06L12 12m2-4v-4H8v4" />
                             </svg>
-                            <span class="text-sm">Neužitečné ({{ review.total_votes|add:review.helpful_votes.neg }})</span>
+                            <span class="text-sm">Neužitečné ({{ review.total_votes|add:"-"|add:review.helpful_votes }})</span>
                         </button>
                     </div>
                     {% if review.component %}
@@ -283,10 +286,100 @@ function toggleContent(reviewId) {
     }
 }
 
+// CSRF Token helper
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+// AJAX Voting Function
 function voteHelpful(reviewId, isHelpful) {
-    // TODO: Implementovat AJAX voting
-    console.log(`Vote for review ${reviewId}: ${isHelpful ? 'helpful' : 'not helpful'}`);
-    alert('Funkce hlasování bude implementována později!');
+    // Zkontroluj jestli je uživatel přihlášený
+    {% if not user.is_authenticated %}
+        alert('Pro hlasování se musíte přihlásit!');
+        window.location.href = "{% url 'login' %}";
+        return;
+    {% endif %}
+
+    // Najdi tlačítka pro vizuální feedback
+    const helpfulBtn = document.querySelector(`[onclick="voteHelpful(${reviewId}, true)"]`);
+    const unhelpfulBtn = document.querySelector(`[onclick="voteHelpful(${reviewId}, false)"]`);
+
+    // Disable tlačítka během požadavku
+    helpfulBtn.disabled = true;
+    unhelpfulBtn.disabled = true;
+    helpfulBtn.style.opacity = '0.5';
+    unhelpfulBtn.style.opacity = '0.5';
+
+    // AJAX požadavek
+    fetch('{% url "vote_review_ajax" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            review_id: reviewId,
+            is_helpful: isHelpful
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Aktualizuj počítadla
+            helpfulBtn.querySelector('span').textContent = `Užitečné (${data.helpful_votes})`;
+            unhelpfulBtn.querySelector('span').textContent = `Neužitečné (${data.unhelpful_votes})`;
+
+            // Vizuální indikace hlasu uživatele
+            helpfulBtn.classList.remove('text-blue-600', 'text-gray-600');
+            unhelpfulBtn.classList.remove('text-red-600', 'text-gray-600');
+
+            if (data.user_vote === true) {
+                // Uživatel hlasoval helpful
+                helpfulBtn.classList.add('text-blue-600');
+                unhelpfulBtn.classList.add('text-gray-600');
+            } else if (data.user_vote === false) {
+                // Uživatel hlasoval unhelpful
+                helpfulBtn.classList.add('text-gray-600');
+                unhelpfulBtn.classList.add('text-red-600');
+            } else {
+                // Žádný hlas
+                helpfulBtn.classList.add('text-gray-600');
+                unhelpfulBtn.classList.add('text-gray-600');
+            }
+
+            // Zobraz zprávu
+            showMessage(data.message, 'success');
+        } else {
+            showMessage(data.error || 'Došlo k chybě při hlasování', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Došlo k chybě při hlasování', 'error');
+    })
+    .finally(() => {
+        // Re-enable tlačítka
+        helpfulBtn.disabled = false;
+        unhelpfulBtn.disabled = false;
+        helpfulBtn.style.opacity = '1';
+        unhelpfulBtn.style.opacity = '1';
+    });
+}
+
+// Message toast helper
+function showMessage(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 transition-opacity duration-300 ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
 }
 </script>
 
