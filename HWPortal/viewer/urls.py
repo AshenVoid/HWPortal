@@ -6,7 +6,7 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('components/', views.components_view, name='components'),
     path('components/<str:component_type>/<int:component_id>/', views.component_detail_view, name='component_detail'),
-    path('reviews/', views.reviews, name='reviews'),
+    path('reviews/', views.reviews_view, name='reviews'),
     path('search/', views.search, name='search'),
 
     #AUTH URLS

@@ -535,3 +535,104 @@ def home_view(request):
 
     return render(request, 'viewer/home.html', context)
 
+def reviews_view(request):
+    category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', 'newest')
+
+    # Standartní query
+    reviews = Reviews.objects.filter(is_published=True).select_related(
+        'author', 'processor', 'motherboard', 'storage', 'ram', 'graphics_card', 'power_supply'
+    )
+
+    if category_filter:
+        reviews = reviews.filter(component_type=category_filter)
+
+    if sort_by == 'newest':
+        reviews = reviews.order_by('-date_created')
+    elif sort_by == 'oldest':
+        reviews = reviews.order_by('date_created')
+    elif sort_by == 'best':
+        reviews = reviews.order_by('-rating', '-helpful_votes')
+    elif sort_by == 'worst':
+        reviews = reviews.order_by('-helpful_votes', '-rating')
+    elif sort_by == 'helpful':
+        reviews = reviews.order_by('helpful_votes', '-rating')
+    else:
+        reviews = reviews.order_by('-date_created')
+
+    # Paginace
+    paginator = Paginator(reviews, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Statistiky
+    stats = {
+        'total_reviews': Reviews.objects.filter(is_published=True).count(),
+        'avg_rating': Reviews.objects.filter(is_published=True).aggregate(Avg('rating'))['rating__avg'] or 0,
+        'categories_count': {
+            'processor': Reviews.objects.filter(is_published=True, component_type='processor').count(),
+            'graphics_card': Reviews.objects.filter(is_published=True, component_type='graphics_card').count(),
+            'ram': Reviews.objects.filter(is_published=True, component_type='ram').count(),
+            'storage': Reviews.objects.filter(is_published=True, component_type='storage').count(),
+            'motherboard': Reviews.objects.filter(is_published=True, component_type='motherboard').count(),
+            'power_supply': Reviews.objects.filter(is_published=True, component_type='power_supply').count(),
+        }
+    }
+
+    # IKONKY
+    def get_component_icon_class(component_type):
+        icons = {
+            'processor': 'bg-blue-100 text-blue-800',
+            'graphics_card': 'bg-green-100 text-green-800',
+            'ram': 'bg-purple-100 text-purple-800',
+            'storage': 'bg-orange-100 text-orange-800',
+            'motherboard': 'bg-red-100 text-red-800',
+            'power_supply': 'bg-yellow-100 text-yellow-800',
+        }
+        return icons.get(component_type, 'bg-gray-100 text-gray-800')
+
+    def get_component_display_name(component_type):
+        names = {
+            'processor': 'Procesor',
+            'graphics_card': 'Grafická karta',
+            'ram': 'Paměť RAM',
+            'storage': 'Úložiště',
+            'motherboard': 'Základní deska',
+            'power_supply': 'Zdroj',
+        }
+        return names.get(component_type, component_type)
+
+    # IKONKY, context a tak
+    for review in page_obj:
+        review.icon_class = get_component_icon_class(review.component_type)
+        review.type_display = get_component_display_name(review.component_type)
+
+        # Parse pros a cons na seznam
+        review.pros_list = [p.strip() for p in review.pros.split('\n') if p.strip()] if review.pros else []
+        review.cons_list = [c.strip() for c in review.cons.split('\n') if c.strip()] if review.cons else []
+
+    context = {
+        'reviews': page_obj,
+        'stats': stats,
+        'selected_category': category_filter,
+        'selected_sort': sort_by,
+        'category_choices': [
+            ('', 'Všechny kategorie'),
+            ('processor', 'Procesory'),
+            ('graphics_card', 'Grafické karty'),
+            ('ram', 'Paměti RAM'),
+            ('storage', 'Úložiště'),
+            ('motherboard', 'Základní desky'),
+            ('power_supply', 'Zdroje'),
+        ],
+        'sort_choices': [
+            ('newest', 'Nejnovější'),
+            ('oldest', 'Nejstarší'),
+            ('best', 'Nejlepší hodnocení'),
+            ('worst', 'Nejhorší hodnocení'),
+            ('helpful', 'Nejužitečnější'),
+        ]
+    }
+
+    return render(request, 'viewer/reviews.html', context)
+
