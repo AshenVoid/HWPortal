@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Avg, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
@@ -782,10 +784,10 @@ def reviews_view(request):
 
     return render(request, 'viewer/reviews.html', context)
 
+
 @login_required(login_url='/login/')
 @require_POST
 def vote_review_ajax(request):
-
     try:
         data = json.loads(request.body)
         review_id = data.get('review_id')
@@ -796,35 +798,60 @@ def vote_review_ajax(request):
 
         review = get_object_or_404(Reviews, id=review_id, is_published=True)
 
-        # Kontrola jestli hlasoval
+        # Kontrola jestli uživatel nehlasuje na vlastní recenzi
+        if review.author == request.user:
+            return JsonResponse({
+                'error': 'Nemůžete hlasovat o vlastní recenzi',
+                'success': False
+            }, status=403)
+
+        # Kontrola jestli už hlasoval
         existing_vote = ReviewVotes.objects.filter(
             review=review,
             user=request.user,
         ).first()
 
         if existing_vote:
-            # Hlasoval
-            if existing_vote.is_helpful != is_helpful:
-                # Změna hlasu
-                old_helpful = existing_vote.is_helpful
-                existing_vote.is_helpful = is_helpful
-                existing_vote.save()
-
-                if old_helpful and not is_helpful:
-                    review.helpful_votes = max(0, review.helpful_votes - 1)
-                elif not old_helpful and is_helpful:
-                    review.helpful_votes += 1
-
-                review.save()
-                message = "Váš hlas byl aktualizován"
-            else:
+            # Lepší logika pro změnu/odstranění hlasu
+            if existing_vote.is_helpful == is_helpful:
+                # Stejný hlas - odstraň ho (toggle off)
                 existing_vote.delete()
                 review.total_votes = max(0, review.total_votes - 1)
                 if is_helpful:
                     review.helpful_votes = max(0, review.helpful_votes - 1)
                 review.save()
                 message = "Váš hlas byl odstraněn"
+                user_vote = None
+            else:
+                # Jiný hlas - změň ho
+                old_helpful = existing_vote.is_helpful
+                existing_vote.is_helpful = is_helpful
+                existing_vote.save()
+
+                # Aktualizuj počítadla
+                if old_helpful and not is_helpful:
+                    # Z helpful na unhelpful
+                    review.helpful_votes = max(0, review.helpful_votes - 1)
+                elif not old_helpful and is_helpful:
+                    # Z unhelpful na helpful
+                    review.helpful_votes += 1
+
+                review.save()
+                message = "Váš hlas byl změněn"
+                user_vote = is_helpful
         else:
+            # Kontrola rate limiting (max 10 hlasů za hodinu)
+            recent_votes = ReviewVotes.objects.filter(
+                user=request.user,
+                date_voted__gte=timezone.now() - timedelta(hours=1)
+            ).count()
+
+            if recent_votes >= 10:
+                return JsonResponse({
+                    'error': 'Příliš mnoho hlasů za krátký čas. Zkuste to později.',
+                    'success': False
+                }, status=429)
+
             # Nový hlas
             ReviewVotes.objects.create(
                 review=review,
@@ -832,23 +859,16 @@ def vote_review_ajax(request):
                 is_helpful=is_helpful,
             )
 
-            # Update počítadlo
+            # Update počítadla
             review.total_votes += 1
             if is_helpful:
                 review.helpful_votes += 1
             review.save()
             message = "Děkujeme za váš hlas!"
+            user_vote = is_helpful
 
+        # Spočítej unhelpful votes
         unhelpful_votes = review.total_votes - review.helpful_votes
-        user_vote = None
-
-        current_vote = ReviewVotes.objects.filter(
-            review=review,
-            user=request.user,
-        ).first()
-
-        if current_vote:
-            user_vote = current_vote.is_helpful
 
         return JsonResponse({
             'success': True,
@@ -862,7 +882,33 @@ def vote_review_ajax(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Neplatná JSON data'}, status=400)
     except Exception as e:
+        # Log error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Vote error: {str(e)}")
+
         return JsonResponse({'error': 'Došlo k chybě při hlasování'}, status=500)
+
+@login_required
+def get_user_votes(request):
+    review_ids = request.GET.get('review_ids', '').split(',')
+
+    if not review_ids or review_ids == ['']:
+        return JsonResponse({'votes': {}})
+
+    try:
+        review_ids = [int(rid) for rid in review_ids if rid.isdigit()]
+    except ValueError:
+        return JsonResponse({'error': 'Neplatná ID recenzí'}, status=400)
+
+    votes = ReviewVotes.objects.filter(
+        user=request.user,
+        review_id__in=review_ids
+    ).values('review_id', 'is_helpful')
+
+    user_votes = {vote['review_id']: vote['is_helpful'] for vote in votes}
+
+    return JsonResponse({'votes': user_votes})
 
 @login_required(login_url='/login/')
 def profile_view(request):

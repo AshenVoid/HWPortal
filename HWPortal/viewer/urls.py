@@ -20,6 +20,7 @@ urlpatterns = [
     path('review/edit/<int:review_id>/', views.edit_review_view, name='edit_review'),
     path('review/delete/<int:review_id>/', views.delete_review_view, name='delete_review'),
     path('review/toggle-visibility/<int:review_id>/', views.toggle_review_visibility, name='toggle_review_visibility'),
+    path('get-user-votes/', views.get_user_votes, name='get_user_votes'),
 
     #AUTH URLS
     path('login/', views.login_view, name='login'),
