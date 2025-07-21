@@ -205,7 +205,6 @@ def components_view(request):
 
     return render(request, 'viewer/components.html', context)
 
-
 def component_detail_view(request, component_type, component_id):
     # Mapování typu na model
     model_mapping = {
@@ -278,7 +277,6 @@ def component_detail_view(request, component_type, component_id):
     }
 
     return render(request, 'viewer/component_detail.html', context)
-
 
 def get_component_specs(component, component_type):
 
@@ -354,66 +352,182 @@ def get_breadcrumbs(component_type, component):
 def search(request):
     query = request.GET.get('q', '').strip()
     selected_types = request.GET.getlist('type')
-    selected_category = request.GET.get('category')
+    selected_category = request.GET.get('category', '')
     sort = request.GET.get('sort', 'relevance')
 
     results = []
+    results_count = 0
 
     if query:
-        #TODO Až bude model Component, přidání logiky vyhledávání
+        # Vyhledávání v komponentách
+        if not selected_types or 'components' in selected_types:
+            # Procesory
+            if not selected_category or selected_category == 'processor':
+                processors = Processors.objects.filter(
+                    name__icontains=query
+                ).select_related()
 
-        # Mock data pro test:
-        results = [
-            {
-                'title': f'NVIDIA RTX 4080 - {query}',
-                'description': 'Výkonná grafická karta pro nejnáročnější hry a aplikace',
-                'url': '/components/rtx-4080/',
-                'price': 32999,
-                'rating': 2,
-                'type': 'Grafická karta',
-                'date': '2024-01-15',
-                'image': None,
-                'category': 'graphics'
-            },
-            {
-                'title': f'AMD Ryzen 7 7800X3D - {query}',
-                'description': 'Herní procesor s 3D V-Cache technologií',
-                'url': '/components/ryzen-7800x3d/',
-                'price': 12499,
-                'rating': 4,
-                'type': 'Procesor',
-                'date': '2024-01-10',
-                'image': None,
-                'category': 'processors'
-            }
-        ]
-        # Fulltext
-        results = [
-            r for r in results
-            if query.lower() in r['title'].lower() or query.lower() in r['description'].lower()
-        ]
+                for processor in processors:
+                    results.append({
+                        'title': processor.name,
+                        'description': f'{processor.manufacturer} - {processor.corecount} jader, {processor.clock} MHz, TDP {processor.tdp}W',
+                        'url': f'/components/processor/{processor.id}/',
+                        'price': float(processor.price) if processor.price else None,
+                        'rating': processor.rating,
+                        'type': 'Procesor',
+                        'date': processor.dateadded,
+                        'image': None,
+                        'category': 'processor',
+                        'relevance': processor.name.lower().count(query.lower()) + processor.manufacturer.lower().count(
+                            query.lower())
+                    })
 
-        # Type checkbox
-        if selected_types:
-            results = [r for r in results if r['type'] in selected_types]
+            # Grafické karty
+            if not selected_category or selected_category == 'graphics_card':
+                graphics_cards = GraphicsCards.objects.filter(
+                    name__icontains=query
+                ).select_related()
 
-        # Kategorie select
-        if selected_category:
-            results = [r for r in results if r['category'] == selected_category]
+                for gpu in graphics_cards:
+                    results.append({
+                        'title': gpu.name,
+                        'description': f'{gpu.manufacturer} - {gpu.vram}GB VRAM, TGP {gpu.tgp}W',
+                        'url': f'/components/graphics_card/{gpu.id}/',
+                        'price': float(gpu.price) if gpu.price else None,
+                        'rating': gpu.rating,
+                        'type': 'Grafická karta',
+                        'date': gpu.dateadded,
+                        'image': None,
+                        'category': 'graphics_card',
+                        'relevance': gpu.name.lower().count(query.lower()) + gpu.manufacturer.lower().count(
+                            query.lower())
+                    })
 
-        # Řazení - Relevance default
-        if sort == 'price_asc':
-            results.sort(key=lambda r: r['price'])
+            # RAM
+            if not selected_category or selected_category == 'ram':
+                ram_modules = Ram.objects.filter(
+                    name__icontains=query
+                ).select_related()
+
+                for ram in ram_modules:
+                    results.append({
+                        'title': ram.name,
+                        'description': f'{ram.manufacturer} - {ram.capacity}GB, {ram.clock} MHz, {ram.type}',
+                        'url': f'/components/ram/{ram.id}/',
+                        'price': float(ram.price) if ram.price else None,
+                        'rating': ram.rating,
+                        'type': 'RAM',
+                        'date': ram.dateadded,
+                        'image': None,
+                        'category': 'ram',
+                        'relevance': ram.name.lower().count(query.lower()) + ram.manufacturer.lower().count(
+                            query.lower())
+                    })
+
+            # Storage
+            if not selected_category or selected_category == 'storage':
+                storages = Storage.objects.filter(
+                    name__icontains=query
+                ).select_related()
+
+                for storage in storages:
+                    storage_type_display = str(storage.type) if storage.type else "N/A"
+                    results.append({
+                        'title': storage.name,
+                        'description': f'{storage.manufacturer} - {storage.capacity}GB, {storage_type_display}',
+                        'url': f'/components/storage/{storage.id}/',
+                        'price': float(storage.price) if storage.price else None,
+                        'rating': storage.rating,
+                        'type': 'Úložiště',
+                        'date': storage.dateadded,
+                        'image': None,
+                        'category': 'storage',
+                        'relevance': storage.name.lower().count(query.lower()) + storage.manufacturer.lower().count(
+                            query.lower())
+                    })
+
+            # Motherboards
+            if not selected_category or selected_category == 'motherboard':
+                motherboards = Motherboards.objects.filter(
+                    name__icontains=query
+                ).select_related()
+
+                for mb in motherboards:
+                    results.append({
+                        'title': mb.name,
+                        'description': f'{mb.manufacturer} - Socket {mb.socket}, {mb.format}, PCIe {mb.pciegen}',
+                        'url': f'/components/motherboard/{mb.id}/',
+                        'price': float(mb.price) if mb.price else None,
+                        'rating': mb.rating,
+                        'type': 'Základní deska',
+                        'date': mb.dateadded,
+                        'image': None,
+                        'category': 'motherboard',
+                        'relevance': mb.name.lower().count(query.lower()) + mb.manufacturer.lower().count(query.lower())
+                    })
+
+            # Power Supply Units
+            if not selected_category or selected_category == 'power_supply':
+                psus = PowerSupplyUnits.objects.filter(
+                    name__icontains=query
+                ).select_related()
+
+                for psu in psus:
+                    results.append({
+                        'title': psu.name,
+                        'description': f'{psu.manufacturer} - {psu.maxpower}W',
+                        'url': f'/components/power_supply/{psu.id}/',
+                        'price': float(psu.price) if psu.price else None,
+                        'rating': psu.rating,
+                        'type': 'Zdroj',
+                        'date': psu.dateadded,
+                        'image': None,
+                        'category': 'power_supply',
+                        'relevance': psu.name.lower().count(query.lower()) + psu.manufacturer.lower().count(
+                            query.lower())
+                    })
+
+        # Vyhledávání v recenzích
+        if not selected_types or 'reviews' in selected_types:
+            reviews = Reviews.objects.filter(
+                is_published=True
+            ).filter(
+                title__icontains=query
+            ).select_related('author')
+
+            # Filtrování recenzí podle kategorie
+            if selected_category:
+                reviews = reviews.filter(component_type=selected_category)
+
+            for review in reviews:
+                results.append({
+                    'title': f'Recenze: {review.title}',
+                    'description': review.summary,
+                    'url': f'/reviews/',  # Můžeš přidat detail recenze později
+                    'price': None,
+                    'rating': review.rating,
+                    'type': 'Recenze',
+                    'date': review.date_created,
+                    'image': None,
+                    'category': review.component_type,
+                    'relevance': review.title.lower().count(query.lower()) + review.summary.lower().count(query.lower())
+                })
+
+        # Řazení výsledků
+        if sort == 'relevance':
+            results.sort(key=lambda r: r['relevance'], reverse=True)
+        elif sort == 'price_asc':
+            results.sort(key=lambda r: r['price'] or float('inf'))
         elif sort == 'price_desc':
-            results.sort(key=lambda r: r['price'], reverse=True)
+            results.sort(key=lambda r: r['price'] or 0, reverse=True)
         elif sort == 'date':
             results.sort(key=lambda r: r['date'], reverse=True)
         elif sort == 'rating':
-            results.sort(key=lambda r: r['rating'], reverse=True)
+            results.sort(key=lambda r: r['rating'] or 0, reverse=True)
 
         results_count = len(results)
 
-        #Paginace
+        # Paginace
         paginator = Paginator(results, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -422,13 +536,20 @@ def search(request):
             'query': query,
             'results': page_obj,
             'results_count': results_count,
+            'selected_types': selected_types,
+            'selected_category': selected_category,
+            'selected_sort': sort,
         }
     else:
         context = {
             'query': query,
             'results': None,
             'results_count': 0,
+            'selected_types': selected_types,
+            'selected_category': selected_category,
+            'selected_sort': sort,
         }
+
     return render(request, 'viewer/search.html', context)
 
 def login_view(request):
