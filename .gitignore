@@ -218,6 +218,7 @@ HWPortal/staticfiles/
 /static/
 *.pyc
 
+# Jen tak hehe - ignorovat :)
 /HWPortal/run_scraper.py
 /HWPortal/test_selenium.py
 /HWPortal/generate_more_fixtures.py
