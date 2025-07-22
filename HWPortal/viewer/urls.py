@@ -30,6 +30,13 @@ urlpatterns = [
     path('favorites/remove/<int:favorite_id>/', views.remove_favorite_view, name='remove_favorite'),
     path('get-user-favorites/', views.get_user_favorites, name='get_user_favorites'),
 
+    # Comparison URLs
+    path('compare/', views.component_selector_view, name='component_selector'),
+    path('compare/view/', views.component_comparison_view, name='component_comparison'),
+    path('compare/add/', views.add_to_comparison, name='add_to_comparison'),
+    path('compare/remove/', views.remove_from_comparison, name='remove_from_comparison'),
+    path('compare/clear/', views.clear_comparison, name='clear_comparison'),
+
     #AUTH URLS
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
@@ -41,3 +48,4 @@ urlpatterns = [
     path('profile/password/', views.change_password_view, name='change_password'),
     path('profile/reviews/', views.my_reviews_view, name='my_reviews'),
 ]
+

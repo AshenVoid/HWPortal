@@ -61,7 +61,8 @@
                     {% endif %}
 
                     <div class="grid grid-cols-2 gap-2">
-                        <button class="flex items-center justify-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
+                        <button onclick="addToComparison('{{ component_type }}', {{ component.id }})"
+                                class="flex items-center justify-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
                             </svg>
@@ -584,6 +585,35 @@ function toggleFavorite(componentType, componentId) {
         // Re-enable tlačítko
         btn.disabled = false;
         btn.style.opacity = '1';
+    });
+}
+
+function addToComparison(componentType, componentId) {
+    fetch('{% url "add_to_comparison" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            component_type: componentType,
+            component_id: componentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(data.message + ' - ' + data.count + '/3', 'success');
+            if (data.count >= 2) {
+                setTimeout(() => {
+                    if (confirm('Chcete přejít na porovnání komponent?')) {
+                        window.location.href = '{% url "component_comparison" %}';
+                    }
+                }, 1500);
+            }
+        } else {
+            showMessage(data.error, 'error');
+        }
     });
 }
 </script>

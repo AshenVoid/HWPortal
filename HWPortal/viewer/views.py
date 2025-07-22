@@ -609,7 +609,6 @@ def logout_view(request):
     messages.success(request, "Byl jsi úspěšně odhlášen.")
     return redirect('/')
 
-
 def home_view(request):
     from django.db.models import Count
 
@@ -1451,5 +1450,338 @@ def get_user_favorites(request):
 
     return JsonResponse({'favorites': list(favorites)})
 
+def component_selector_view(request):
+    """Stránka pro výběr komponent k porovnání"""
 
+    # Získej aktuální selection ze session
+    comparison_data = request.session.get('comparison', {})
+
+    # Získej všechny komponenty podle typu - explicitně jako list
+    processors = list(Processors.objects.all().order_by('name'))
+    graphics_cards = list(GraphicsCards.objects.all().order_by('name'))
+    rams = list(Ram.objects.all().order_by('name'))
+    storages = list(Storage.objects.all().order_by('name'))
+    motherboards = list(Motherboards.objects.all().order_by('name'))
+    power_supplies = list(PowerSupplyUnits.objects.all().order_by('name'))
+
+    context = {
+        'processors': processors,
+        'graphics_cards': graphics_cards,
+        'rams': rams,
+        'storages': storages,
+        'motherboards': motherboards,
+        'power_supplies': power_supplies,
+        'comparison_data': comparison_data,
+        'selected_count': len(comparison_data),
+    }
+
+    return render(request, 'viewer/component_selector.html', context)
+
+@require_POST
+def add_to_comparison(request):
+    """AJAX endpoint pro přidání komponenty do porovnání"""
+    try:
+        data = json.loads(request.body)
+        component_type = data.get('component_type')
+        component_id = data.get('component_id')
+
+        if not component_type or not component_id:
+            return JsonResponse({'success': False, 'error': 'Chybí povinné parametry'})
+
+        # Získej session data
+        comparison_data = request.session.get('comparison', {})
+
+        # Limit 3 komponenty
+        if len(comparison_data) >= 3:
+            return JsonResponse({'success': False, 'error': 'Můžete porovnat maximálně 3 komponenty'})
+
+        # Zkontroluj typ komponent - musí být stejný typ
+        if comparison_data:
+            existing_types = set(comp_data['type'] for comp_data in comparison_data.values())
+            if component_type not in existing_types and len(existing_types) > 0:
+                # Přeložit typ pro uživatele
+                type_translations = {
+                    'processor': 'procesory',
+                    'graphics_card': 'grafické karty',
+                    'ram': 'RAM paměti',
+                    'storage': 'úložiště',
+                    'motherboard': 'základní desky',
+                    'power_supply': 'zdroje'
+                }
+                existing_type = list(existing_types)[0]
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Můžete porovnávat pouze komponenty stejného typu. Už máte vybrané {type_translations.get(existing_type, existing_type)}.'
+                })
+
+        # Mapování typů na modely
+        model_mapping = {
+            'processor': Processors,
+            'motherboard': Motherboards,
+            'ram': Ram,
+            'graphics_card': GraphicsCards,
+            'storage': Storage,
+            'power_supply': PowerSupplyUnits,
+        }
+
+        if component_type not in model_mapping:
+            return JsonResponse({'success': False, 'error': 'Neplatný typ komponenty'})
+
+        # Získej komponentu
+        ComponentModel = model_mapping[component_type]
+        component = get_object_or_404(ComponentModel, id=component_id)
+
+        # Vytvoř unique key
+        comparison_key = f"{component_type}_{component_id}"
+
+        # Zkontroluj jestli už není v porovnání
+        if comparison_key in comparison_data:
+            return JsonResponse({'success': False, 'error': 'Komponenta je již v porovnání'})
+
+        # Přidej do session
+        comparison_data[comparison_key] = {
+            'type': component_type,
+            'id': component_id,
+            'name': component.name,
+            'manufacturer': component.manufacturer,
+            'price': float(component.price) if component.price else 0,
+        }
+
+        request.session['comparison'] = comparison_data
+        request.session.modified = True
+
+        return JsonResponse({
+            'success': True,
+            'message': f'{component.name} byl přidán do porovnání',
+            'count': len(comparison_data)
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@require_POST
+def remove_from_comparison(request):
+    """AJAX endpoint pro odebrání komponenty z porovnání"""
+    try:
+        data = json.loads(request.body)
+        comparison_key = data.get('comparison_key')
+
+        if not comparison_key:
+            return JsonResponse({'success': False, 'error': 'Chybí comparison_key'})
+
+        comparison_data = request.session.get('comparison', {})
+
+        if comparison_key in comparison_data:
+            component_name = comparison_data[comparison_key]['name']
+            del comparison_data[comparison_key]
+            request.session['comparison'] = comparison_data
+            request.session.modified = True
+
+            return JsonResponse({
+                'success': True,
+                'message': f'{component_name} byl odebrán z porovnání',
+                'count': len(comparison_data)
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Komponenta není v porovnání'})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def clear_comparison(request):
+    """Vymaže všechny komponenty z porovnání"""
+    request.session['comparison'] = {}
+    request.session.modified = True
+    messages.success(request, 'Porovnání bylo vymazáno')
+    return redirect('component_selector')
+
+def component_comparison_view(request):
+    """Hlavní stránka porovnání komponent"""
+    comparison_data = request.session.get('comparison', {})
+
+    if len(comparison_data) < 2:
+        messages.warning(request, 'Pro porovnání potřebujete alespoň 2 komponenty')
+        return redirect('component_selector')
+
+    # Načti skutečné komponenty z databáze
+    components = []
+
+    model_mapping = {
+        'processor': Processors,
+        'motherboard': Motherboards,
+        'ram': Ram,
+        'graphics_card': GraphicsCards,
+        'storage': Storage,
+        'power_supply': PowerSupplyUnits,
+    }
+
+    for key, comp_data in comparison_data.items():
+        component_type = comp_data['type']
+        component_id = comp_data['id']
+
+        if component_type in model_mapping:
+            ComponentModel = model_mapping[component_type]
+            try:
+                component = ComponentModel.objects.get(id=component_id)
+                components.append({
+                    'object': component,
+                    'type': component_type,
+                    'key': key,
+                })
+            except ComponentModel.DoesNotExist:
+                # Komponenta byla smazána, odeber ze session
+                del comparison_data[key]
+                request.session['comparison'] = comparison_data
+                request.session.modified = True
+
+    if len(components) < 2:
+        messages.warning(request, 'Některé komponenty již nejsou dostupné')
+        return redirect('component_selector')
+
+    # Připrav data pro porovnání
+    try:
+        comparison_specs = prepare_comparison_data(components)
+        print(f"DEBUG: Comparison specs prepared successfully")
+    except Exception as e:
+        print(f"DEBUG ERROR in prepare_comparison_data: {e}")
+        return render(request, 'viewer/debug_comparison_error.html', {'error': str(e)})
+
+    context = {
+        'components': components,
+        'comparison_specs': comparison_specs,
+        'component_count': len(components),
+    }
+
+    print(f"DEBUG: Rendering template with {len(components)} components")
+    return render(request, 'viewer/component_comparison.html', context)
+
+def prepare_comparison_data(components):
+    """Připraví data pro porovnání s označením nejlepších hodnot"""
+
+    if not components:
+        return {}
+
+    # Určí typ porovnání podle prvního komponentu
+    first_type = components[0]['type']
+
+    # Základní specs pro všechny typy
+    common_specs = {
+        'Název': {'values': [], 'type': 'text'},
+        'Výrobce': {'values': [], 'type': 'text'},
+        'Cena': {'values': [], 'type': 'price', 'unit': 'Kč', 'higher_better': False},
+        'Hodnocení': {'values': [], 'type': 'number', 'higher_better': True},
+        'Datum přidání': {'values': [], 'type': 'date'},
+    }
+
+    # Specs podle typu komponenty
+    type_specific_specs = {}
+
+    if first_type == 'processor':
+        type_specific_specs = {
+            'Počet jader': {'values': [], 'type': 'number', 'higher_better': True},
+            'Frekvence': {'values': [], 'type': 'number', 'unit': 'MHz', 'higher_better': True},
+            'TDP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': False},
+            'SMT podpora': {'values': [], 'type': 'boolean'},
+            'Benchmark skóre': {'values': [], 'type': 'number', 'higher_better': True},
+            'Socket': {'values': [], 'type': 'text'},
+        }
+    elif first_type == 'graphics_card':
+        type_specific_specs = {
+            'VRAM': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
+            'TGP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': False},
+        }
+    elif first_type == 'ram':
+        type_specific_specs = {
+            'Kapacita': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
+            'Frekvence': {'values': [], 'type': 'number', 'unit': 'MHz', 'higher_better': True},
+            'Typ': {'values': [], 'type': 'text'},
+        }
+    elif first_type == 'storage':
+        type_specific_specs = {
+            'Kapacita': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
+            'Typ': {'values': [], 'type': 'text'},
+        }
+    elif first_type == 'motherboard':
+        type_specific_specs = {
+            'Socket': {'values': [], 'type': 'text'},
+            'Formát': {'values': [], 'type': 'text'},
+            'Max CPU TDP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': True},
+            'SATA porty': {'values': [], 'type': 'number', 'higher_better': True},
+            'NVMe sloty': {'values': [], 'type': 'number', 'higher_better': True},
+            'PCIe generace': {'values': [], 'type': 'number', 'higher_better': True},
+        }
+    elif first_type == 'power_supply':
+        type_specific_specs = {
+            'Výkon': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': True},
+        }
+
+    # Sloučí common a type-specific specs
+    all_specs = {**common_specs, **type_specific_specs}
+
+    # Naplň hodnoty
+    for component in components:
+        obj = component['object']
+        comp_type = component['type']
+
+        # Common values
+        all_specs['Název']['values'].append(obj.name)
+        all_specs['Výrobce']['values'].append(obj.manufacturer)
+        all_specs['Cena']['values'].append(float(obj.price) if obj.price else 0)
+        all_specs['Hodnocení']['values'].append(obj.rating)
+        all_specs['Datum přidání']['values'].append(obj.dateadded)
+
+        # Type-specific values - pouze pro komponenty stejného typu
+        if comp_type == 'processor' and first_type == 'processor':
+            all_specs['Počet jader']['values'].append(obj.corecount)
+            all_specs['Frekvence']['values'].append(obj.clock)
+            all_specs['TDP']['values'].append(obj.tdp)
+            all_specs['SMT podpora']['values'].append(obj.smt)
+            all_specs['Benchmark skóre']['values'].append(obj.benchresult)
+            all_specs['Socket']['values'].append(str(obj.socket))
+        elif comp_type == 'graphics_card' and first_type == 'graphics_card':
+            all_specs['VRAM']['values'].append(obj.vram)
+            all_specs['TGP']['values'].append(obj.tgp)
+        elif comp_type == 'ram' and first_type == 'ram':
+            all_specs['Kapacita']['values'].append(obj.capacity)
+            all_specs['Frekvence']['values'].append(obj.clock)
+            all_specs['Typ']['values'].append(str(obj.type))
+        elif comp_type == 'storage' and first_type == 'storage':
+            all_specs['Kapacita']['values'].append(obj.capacity)
+            all_specs['Typ']['values'].append(str(obj.type))
+        elif comp_type == 'motherboard' and first_type == 'motherboard':
+            all_specs['Socket']['values'].append(str(obj.socket))
+            all_specs['Formát']['values'].append(str(obj.format))
+            all_specs['Max CPU TDP']['values'].append(obj.maxcputdp)
+            all_specs['SATA porty']['values'].append(obj.satacount)
+            all_specs['NVMe sloty']['values'].append(obj.nvmecount)
+            all_specs['PCIe generace']['values'].append(obj.pciegen)
+        elif comp_type == 'power_supply' and first_type == 'power_supply':
+            all_specs['Výkon']['values'].append(obj.maxpower)
+        else:
+            # Pokud typ nesouhlasí, přidej placeholder hodnoty pro type-specific specs
+            for spec_name in type_specific_specs.keys():
+                all_specs[spec_name]['values'].append('N/A')
+
+    # Označ nejlepší hodnoty
+    for spec_name, spec_data in all_specs.items():
+        if spec_data['type'] in ['number', 'price'] and len(set(spec_data['values'])) > 1:
+            values = spec_data['values']
+            numeric_values = [v for v in values if isinstance(v, (int, float)) and v > 0]
+
+            if numeric_values:
+                if spec_data.get('higher_better', True):
+                    best_value = max(numeric_values)
+                else:
+                    best_value = min(numeric_values)
+
+                spec_data['best_indices'] = [
+                    i for i, v in enumerate(values)
+                    if isinstance(v, (int, float)) and v == best_value
+                ]
+            else:
+                spec_data['best_indices'] = []
+        else:
+            spec_data['best_indices'] = []
+
+    return all_specs
 

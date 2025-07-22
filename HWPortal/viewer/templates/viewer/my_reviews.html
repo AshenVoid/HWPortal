@@ -209,7 +209,7 @@ function toggleVisibility(reviewId, isPublished) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload(); // Jednoduchý reload stránky
+            location.reload();
         } else {
             alert('Chyba při změně viditelnosti: ' + data.error);
         }
