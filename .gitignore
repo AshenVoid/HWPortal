@@ -218,3 +218,7 @@ HWPortal/staticfiles/
 /static/
 *.pyc
 
+/HWPortal/run_scraper.py
+/HWPortal/test_selenium.py
+/HWPortal/generate_more_fixtures.py
+/HWPortal/scripts/component_scraper.py
