@@ -13,90 +13,110 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
-from .models import Processors, Reviews, Ram, Storage, Motherboards, PowerSupplyUnits, GraphicsCards, ReviewVotes, \
-    UserFavorites, COMPONENT_TYPES
+from .models import (
+    Processors,
+    Reviews,
+    Ram,
+    Storage,
+    Motherboards,
+    PowerSupplyUnits,
+    GraphicsCards,
+    ReviewVotes,
+    UserFavorites,
+    COMPONENT_TYPES,
+)
 
 
 # Create your views here.
 def home(request):
-    return render(request, 'viewer/home.html')
+    return render(request, "viewer/home.html")
+
 
 def reviews(request):
-    return render(request, 'viewer/reviews.html')
+    return render(request, "viewer/reviews.html")
+
 
 def components_view(request):
     components = []
 
-    category = request.GET.get('category', '')
-    brand = request.GET.get('brand', '')
-    price_range = request.GET.get('price_range', '')
-    sort_by = request.GET.get('sort', 'name')
+    category = request.GET.get("category", "")
+    brand = request.GET.get("brand", "")
+    price_range = request.GET.get("price_range", "")
+    sort_by = request.GET.get("sort", "name")
 
     # CPU
-    if not category or category == 'cpu':
+    if not category or category == "cpu":
         processors = Processors.objects.all()
         if brand:
             processors = processors.filter(manufacturer__icontains=brand)
 
         for processor in processors:
-            components.append({
-                'type': 'processor',
-                'type_display' : 'Processor',
-                'type_class' : 'bg-blue-100 text-blue-800',
-                'id' : processor.id,
-                'name' : processor.name,
-                'manufacturer' : processor.manufacturer,
-                'description' : f"{processor.corecount} jader, {processor.clock} MHz, TDP {processor.tdp}W",
-                'price' : processor.price,
-                'rating' : processor.rating,
-                'reviews_count' : Reviews.objects.filter(processor=processor).count(),
-                'icon' : 'cpu'
-            })
+            components.append(
+                {
+                    "type": "processor",
+                    "type_display": "Processor",
+                    "type_class": "bg-blue-100 text-blue-800",
+                    "id": processor.id,
+                    "name": processor.name,
+                    "manufacturer": processor.manufacturer,
+                    "description": f"{processor.corecount} jader, {processor.clock} MHz, TDP {processor.tdp}W",
+                    "price": processor.price,
+                    "rating": processor.rating,
+                    "reviews_count": Reviews.objects.filter(
+                        processor=processor
+                    ).count(),
+                    "icon": "cpu",
+                }
+            )
 
     # GPU
-    if not category or category == 'gpu':
+    if not category or category == "gpu":
         graphics_cards = GraphicsCards.objects.all()
         if brand:
             graphics_cards = graphics_cards.filter(manufacturer__icontains=brand)
 
         for gpu in graphics_cards:
-            components.append({
-                'type': 'graphics_card',
-                'type_display': 'Grafická karta',
-                'type_class': 'bg-green-100 text-green-800',
-                'id': gpu.id,
-                'name': gpu.name,
-                'manufacturer': gpu.manufacturer,
-                'description': f"{gpu.vram}GB VRAM, TGP {gpu.tgp}W",
-                'price': gpu.price,
-                'rating': gpu.rating,
-                'reviews_count': Reviews.objects.filter(graphics_card=gpu).count(),
-                'icon': 'gpu'
-            })
+            components.append(
+                {
+                    "type": "graphics_card",
+                    "type_display": "Grafická karta",
+                    "type_class": "bg-green-100 text-green-800",
+                    "id": gpu.id,
+                    "name": gpu.name,
+                    "manufacturer": gpu.manufacturer,
+                    "description": f"{gpu.vram}GB VRAM, TGP {gpu.tgp}W",
+                    "price": gpu.price,
+                    "rating": gpu.rating,
+                    "reviews_count": Reviews.objects.filter(graphics_card=gpu).count(),
+                    "icon": "gpu",
+                }
+            )
 
     # RAM
-    if not category or category == 'ram':
+    if not category or category == "ram":
         ram_modules = Ram.objects.all()
         if brand:
             ram_modules = ram_modules.filter(manufacturer__icontains=brand)
 
         for ram in ram_modules:
-            components.append({
-                'type': 'ram',
-                'type_display': 'Paměť RAM',
-                'type_class': 'bg-purple-100 text-purple-800',
-                'id': ram.id,
-                'name': ram.name,
-                'manufacturer': ram.manufacturer,
-                'description': f"{ram.capacity}GB, {ram.clock} MHz, {ram.type}",
-                'price': ram.price,
-                'rating': ram.rating,
-                'reviews_count': Reviews.objects.filter(ram=ram).count(),
-                'icon': 'ram'
-            })
+            components.append(
+                {
+                    "type": "ram",
+                    "type_display": "Paměť RAM",
+                    "type_class": "bg-purple-100 text-purple-800",
+                    "id": ram.id,
+                    "name": ram.name,
+                    "manufacturer": ram.manufacturer,
+                    "description": f"{ram.capacity}GB, {ram.clock} MHz, {ram.type}",
+                    "price": ram.price,
+                    "rating": ram.rating,
+                    "reviews_count": Reviews.objects.filter(ram=ram).count(),
+                    "icon": "ram",
+                }
+            )
 
     # Storage
-    if not category or category == 'storage':
+    if not category or category == "storage":
         storages = Storage.objects.all()
         if brand:
             storages = storages.filter(manufacturer__icontains=brand)
@@ -106,131 +126,144 @@ def components_view(request):
             if storage.type:
                 storage_type_display = str(storage.type)
 
-            components.append({
-                'type': 'storage',
-                'type_display': 'Úložiště',
-                'type_class': 'bg-orange-100 text-orange-800',
-                'id': storage.id,
-                'name': storage.name,
-                'manufacturer': storage.manufacturer,
-                'description': f"{storage.capacity}GB, {storage_type_display}",
-                'price': storage.price,
-                'rating': storage.rating,
-                'reviews_count': Reviews.objects.filter(storage=storage).count(),
-                'icon': 'storage'
-            })
+            components.append(
+                {
+                    "type": "storage",
+                    "type_display": "Úložiště",
+                    "type_class": "bg-orange-100 text-orange-800",
+                    "id": storage.id,
+                    "name": storage.name,
+                    "manufacturer": storage.manufacturer,
+                    "description": f"{storage.capacity}GB, {storage_type_display}",
+                    "price": storage.price,
+                    "rating": storage.rating,
+                    "reviews_count": Reviews.objects.filter(storage=storage).count(),
+                    "icon": "storage",
+                }
+            )
 
     # Motherboards
-    if not category or category == 'motherboard':
+    if not category or category == "motherboard":
         motherboards = Motherboards.objects.all()
         if brand:
             motherboards = motherboards.filter(manufacturer__icontains=brand)
 
         for mb in motherboards:
-            components.append({
-                'type': 'motherboard',
-                'type_display': 'Základní deska',
-                'type_class': 'bg-red-100 text-red-800',
-                'id': mb.id,
-                'name': mb.name,
-                'manufacturer': mb.manufacturer,
-                'description': f"{mb.socket}, {mb.format}, PCIe {mb.pciegen}",
-                'price': mb.price,
-                'rating': mb.rating,
-                'reviews_count': Reviews.objects.filter(motherboard=mb).count(),
-                'icon': 'motherboard'
-            })
+            components.append(
+                {
+                    "type": "motherboard",
+                    "type_display": "Základní deska",
+                    "type_class": "bg-red-100 text-red-800",
+                    "id": mb.id,
+                    "name": mb.name,
+                    "manufacturer": mb.manufacturer,
+                    "description": f"{mb.socket}, {mb.format}, PCIe {mb.pciegen}",
+                    "price": mb.price,
+                    "rating": mb.rating,
+                    "reviews_count": Reviews.objects.filter(motherboard=mb).count(),
+                    "icon": "motherboard",
+                }
+            )
 
     # Power Supply Units
-    if not category or category == 'psu':
+    if not category or category == "psu":
         psus = PowerSupplyUnits.objects.all()
         if brand:
             psus = psus.filter(manufacturer__icontains=brand)
 
         for psu in psus:
-            components.append({
-                'type': 'power_supply',
-                'type_display': 'Zdroj',
-                'type_class': 'bg-yellow-100 text-yellow-800',
-                'id': psu.id,
-                'name': psu.name,
-                'manufacturer': psu.manufacturer,
-                'description': f"{psu.maxpower}W",
-                'price': psu.price,
-                'rating': psu.rating,
-                'reviews_count': Reviews.objects.filter(power_supply=psu).count(),
-                'icon': 'psu'
-            })
+            components.append(
+                {
+                    "type": "power_supply",
+                    "type_display": "Zdroj",
+                    "type_class": "bg-yellow-100 text-yellow-800",
+                    "id": psu.id,
+                    "name": psu.name,
+                    "manufacturer": psu.manufacturer,
+                    "description": f"{psu.maxpower}W",
+                    "price": psu.price,
+                    "rating": psu.rating,
+                    "reviews_count": Reviews.objects.filter(power_supply=psu).count(),
+                    "icon": "psu",
+                }
+            )
 
     # Aplikace filtrů
     if price_range:
-        if price_range == '0-2000':
-            components = [c for c in components if c['price'] <= 2000]
-        elif price_range == '2000-5000':
-            components = [c for c in components if 2000 < c['price'] <= 5000]
-        elif price_range == '5000-10000':
-            components = [c for c in components if 5000 < c['price'] <= 10000]
-        elif price_range == '10000-20000':
-            components = [c for c in components if 10000 < c['price'] <= 20000]
-        elif price_range == '20000+':
-            components = [c for c in components if c['price'] > 20000]
+        if price_range == "0-2000":
+            components = [c for c in components if c["price"] <= 2000]
+        elif price_range == "2000-5000":
+            components = [c for c in components if 2000 < c["price"] <= 5000]
+        elif price_range == "5000-10000":
+            components = [c for c in components if 5000 < c["price"] <= 10000]
+        elif price_range == "10000-20000":
+            components = [c for c in components if 10000 < c["price"] <= 20000]
+        elif price_range == "20000+":
+            components = [c for c in components if c["price"] > 20000]
 
     # Řazení
-    if sort_by == 'price_asc':
-        components.sort(key=lambda x: x['price'])
-    elif sort_by == 'price_desc':
-        components.sort(key=lambda x: x['price'], reverse=True)
-    elif sort_by == 'rating':
-        components.sort(key=lambda x: x['rating'], reverse=True)
-    elif sort_by == 'name':
-        components.sort(key=lambda x: x['name'])
+    if sort_by == "price_asc":
+        components.sort(key=lambda x: x["price"])
+    elif sort_by == "price_desc":
+        components.sort(key=lambda x: x["price"], reverse=True)
+    elif sort_by == "rating":
+        components.sort(key=lambda x: x["rating"], reverse=True)
+    elif sort_by == "name":
+        components.sort(key=lambda x: x["name"])
 
     # Pagination
     paginator = Paginator(components, 12)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     # Získání všech výrobců pro filter dropdown
     all_manufacturers = set()
-    for model in [Processors, GraphicsCards, Ram, Storage, Motherboards, PowerSupplyUnits]:
-        manufacturers = model.objects.values_list('manufacturer', flat=True).distinct()
+    for model in [
+        Processors,
+        GraphicsCards,
+        Ram,
+        Storage,
+        Motherboards,
+        PowerSupplyUnits,
+    ]:
+        manufacturers = model.objects.values_list("manufacturer", flat=True).distinct()
         all_manufacturers.update(manufacturers)
 
-
     context = {
-        'components': page_obj,
-        'manufacturers': sorted(all_manufacturers),
-        'selected_category': category,
-        'selected_brand': brand,
-        'selected_price_range': price_range,
-        'selected_sort': sort_by,
+        "components": page_obj,
+        "manufacturers": sorted(all_manufacturers),
+        "selected_category": category,
+        "selected_brand": brand,
+        "selected_price_range": price_range,
+        "selected_sort": sort_by,
     }
 
-    return render(request, 'viewer/components.html', context)
+    return render(request, "viewer/components.html", context)
+
 
 def component_detail_view(request, component_type, component_id):
     # Mapování typu na model
     model_mapping = {
-        'processor': Processors,
-        'graphics_card': GraphicsCards,
-        'ram': Ram,
-        'storage': Storage,
-        'motherboard': Motherboards,
-        'power_supply': PowerSupplyUnits,
+        "processor": Processors,
+        "graphics_card": GraphicsCards,
+        "ram": Ram,
+        "storage": Storage,
+        "motherboard": Motherboards,
+        "power_supply": PowerSupplyUnits,
     }
 
     # Mapování typu na pole v Reviews modelu
     reviews_field_mapping = {
-        'processor': 'processor',
-        'graphics_card': 'graphics_card',
-        'ram': 'ram',
-        'storage': 'storage',
-        'motherboard': 'motherboard',
-        'power_supply': 'power_supply',
+        "processor": "processor",
+        "graphics_card": "graphics_card",
+        "ram": "ram",
+        "storage": "storage",
+        "motherboard": "motherboard",
+        "power_supply": "power_supply",
     }
 
     if component_type not in model_mapping:
-        return render(request, '404.html')
+        return render(request, "404.html")
 
     model = model_mapping[component_type]
     component = get_object_or_404(model, id=component_id)
@@ -238,19 +271,20 @@ def component_detail_view(request, component_type, component_id):
     # Opravený filter pro recenze
     reviews_field = reviews_field_mapping[component_type]
     reviews_filter = {reviews_field: component}
-    reviews = Reviews.objects.filter(
-        **reviews_filter,
-        is_published=True
-    ).select_related('author').order_by('-date_created')
+    reviews = (
+        Reviews.objects.filter(**reviews_filter, is_published=True)
+        .select_related("author")
+        .order_by("-date_created")
+    )
 
     # Statistiky recenzí
     review_stats = reviews.aggregate(
-        avg_rating=Avg('rating'),
-        total_reviews=Count('id'),
+        avg_rating=Avg("rating"),
+        total_reviews=Count("id"),
     )
 
-    if review_stats['total_reviews'] > 0:
-        component.calculated_rating = round(review_stats['avg_rating'])
+    if review_stats["total_reviews"] > 0:
+        component.calculated_rating = round(review_stats["avg_rating"])
     else:
         component.calculated_rating = 0
 
@@ -268,336 +302,362 @@ def component_detail_view(request, component_type, component_id):
     specs = get_component_specs(component, component_type)
 
     context = {
-        'component': component,
-        'component_type': component_type,
-        'component_type_display': get_component_type_display(component_type),
-        'specs': specs,
-        'reviews': reviews[:10],  # Prvních 10 recenzí
-        'review_stats': review_stats,
-        'rating_distribution': rating_distribution,
-        'similar_components': similar_components,
-        'breadcrumbs': get_breadcrumbs(component_type, component),
+        "component": component,
+        "component_type": component_type,
+        "component_type_display": get_component_type_display(component_type),
+        "specs": specs,
+        "reviews": reviews[:10],  # Prvních 10 recenzí
+        "review_stats": review_stats,
+        "rating_distribution": rating_distribution,
+        "similar_components": similar_components,
+        "breadcrumbs": get_breadcrumbs(component_type, component),
     }
 
-    return render(request, 'viewer/component_detail.html', context)
+    return render(request, "viewer/component_detail.html", context)
+
 
 def get_component_specs(component, component_type):
 
-    if component_type == 'processor':
+    if component_type == "processor":
         return {
-            'Výrobce': component.manufacturer,
-            'Socket': str(component.socket) if component.socket else 'N/A',
-            'Počet jader': component.corecount,
-            'Frekvence': f"{component.clock} MHz" if component.clock else 'N/A',
-            'TDP': f"{component.tdp} W",
-            'SMT': 'Ano' if component.smt else 'Ne',
-            'Benchmark skóre': component.benchresult,
+            "Výrobce": component.manufacturer,
+            "Socket": str(component.socket) if component.socket else "N/A",
+            "Počet jader": component.corecount,
+            "Frekvence": f"{component.clock} MHz" if component.clock else "N/A",
+            "TDP": f"{component.tdp} W",
+            "SMT": "Ano" if component.smt else "Ne",
+            "Benchmark skóre": component.benchresult,
         }
-    elif component_type == 'graphics_card':
+    elif component_type == "graphics_card":
         return {
-            'Výrobce': component.manufacturer,
-            'VRAM': f"{component.vram} GB",
-            'TGP': f"{component.tgp} W",
+            "Výrobce": component.manufacturer,
+            "VRAM": f"{component.vram} GB",
+            "TGP": f"{component.tgp} W",
         }
-    elif component_type == 'ram':
+    elif component_type == "ram":
         return {
-            'Výrobce': component.manufacturer,
-            'Typ': str(component.type) if component.type else 'N/A',
-            'Kapacita': f"{component.capacity} GB",
-            'Frekvence': f"{component.clock} MHz",
+            "Výrobce": component.manufacturer,
+            "Typ": str(component.type) if component.type else "N/A",
+            "Kapacita": f"{component.capacity} GB",
+            "Frekvence": f"{component.clock} MHz",
         }
-    elif component_type == 'storage':
+    elif component_type == "storage":
         return {
-            'Výrobce': component.manufacturer,
-            'Kapacita': f"{component.capacity} GB",
-            'Typ': str(component.type) if component.type else 'N/A',
-            'Cena': f"{component.price} Kč" if component.price > 0 else 'N/A',
+            "Výrobce": component.manufacturer,
+            "Kapacita": f"{component.capacity} GB",
+            "Typ": str(component.type) if component.type else "N/A",
+            "Cena": f"{component.price} Kč" if component.price > 0 else "N/A",
         }
-    elif component_type == 'motherboard':
+    elif component_type == "motherboard":
         return {
-            'Výrobce': component.manufacturer,
-            'Socket': str(component.socket) if component.socket else 'N/A',
-            'Formát': str(component.format) if component.format else 'N/A',
-            'Max CPU TDP': f"{component.maxcputdp} W",
-            'SATA porty': component.satacount,
-            'NVMe sloty': component.nvmecount,
-            'PCIe generace': component.pciegen,
+            "Výrobce": component.manufacturer,
+            "Socket": str(component.socket) if component.socket else "N/A",
+            "Formát": str(component.format) if component.format else "N/A",
+            "Max CPU TDP": f"{component.maxcputdp} W",
+            "SATA porty": component.satacount,
+            "NVMe sloty": component.nvmecount,
+            "PCIe generace": component.pciegen,
         }
-    elif component_type == 'power_supply':
+    elif component_type == "power_supply":
         return {
-            'Výrobce': component.manufacturer,
-            'Výkon': f"{component.maxpower} W",
+            "Výrobce": component.manufacturer,
+            "Výkon": f"{component.maxpower} W",
         }
 
     return {}
 
+
 def get_component_type_display(component_type):
     # Český název typu komponenty
     mapping = {
-        'processor': 'Procesor',
-        'graphics_card': 'Grafická karta',
-        'ram': 'Paměť RAM',
-        'storage': 'Úložiště',
-        'motherboard': 'Základní deska',
-        'power_supply': 'Zdroj',
+        "processor": "Procesor",
+        "graphics_card": "Grafická karta",
+        "ram": "Paměť RAM",
+        "storage": "Úložiště",
+        "motherboard": "Základní deska",
+        "power_supply": "Zdroj",
     }
     return mapping.get(component_type, component_type)
+
 
 def get_breadcrumbs(component_type, component):
     # Breadcrumbs pro navigaci
     return [
-        {'name': 'Domů', 'url': '/'},
-        {'name': 'Komponenty', 'url': '/components/'},
-        {'name': get_component_type_display(component_type), 'url': f'/components/?category={component_type}'},
-        {'name': component.name, 'url': None},
+        {"name": "Domů", "url": "/"},
+        {"name": "Komponenty", "url": "/components/"},
+        {
+            "name": get_component_type_display(component_type),
+            "url": f"/components/?category={component_type}",
+        },
+        {"name": component.name, "url": None},
     ]
 
+
 def search(request):
-    query = request.GET.get('q', '').strip()
-    selected_types = request.GET.getlist('type')
-    selected_category = request.GET.get('category', '')
-    sort = request.GET.get('sort', 'relevance')
+    query = request.GET.get("q", "").strip()
+    selected_types = request.GET.getlist("type")
+    selected_category = request.GET.get("category", "")
+    sort = request.GET.get("sort", "relevance")
 
     results = []
     results_count = 0
 
     if query:
         # Vyhledávání v komponentách
-        if not selected_types or 'components' in selected_types:
+        if not selected_types or "components" in selected_types:
             # Procesory
-            if not selected_category or selected_category == 'processor':
+            if not selected_category or selected_category == "processor":
                 processors = Processors.objects.filter(
                     name__icontains=query
                 ).select_related()
 
                 for processor in processors:
-                    results.append({
-                        'title': processor.name,
-                        'description': f'{processor.manufacturer} - {processor.corecount} jader, {processor.clock} MHz, TDP {processor.tdp}W',
-                        'url': f'/components/processor/{processor.id}/',
-                        'price': float(processor.price) if processor.price else None,
-                        'rating': processor.rating,
-                        'type': 'Procesor',
-                        'date': processor.dateadded,
-                        'image': None,
-                        'category': 'processor',
-                        'relevance': processor.name.lower().count(query.lower()) + processor.manufacturer.lower().count(
-                            query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": processor.name,
+                            "description": f"{processor.manufacturer} - {processor.corecount} jader, {processor.clock} MHz, TDP {processor.tdp}W",
+                            "url": f"/components/processor/{processor.id}/",
+                            "price": (
+                                float(processor.price) if processor.price else None
+                            ),
+                            "rating": processor.rating,
+                            "type": "Procesor",
+                            "date": processor.dateadded,
+                            "image": None,
+                            "category": "processor",
+                            "relevance": processor.name.lower().count(query.lower())
+                            + processor.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
             # Grafické karty
-            if not selected_category or selected_category == 'graphics_card':
+            if not selected_category or selected_category == "graphics_card":
                 graphics_cards = GraphicsCards.objects.filter(
                     name__icontains=query
                 ).select_related()
 
                 for gpu in graphics_cards:
-                    results.append({
-                        'title': gpu.name,
-                        'description': f'{gpu.manufacturer} - {gpu.vram}GB VRAM, TGP {gpu.tgp}W',
-                        'url': f'/components/graphics_card/{gpu.id}/',
-                        'price': float(gpu.price) if gpu.price else None,
-                        'rating': gpu.rating,
-                        'type': 'Grafická karta',
-                        'date': gpu.dateadded,
-                        'image': None,
-                        'category': 'graphics_card',
-                        'relevance': gpu.name.lower().count(query.lower()) + gpu.manufacturer.lower().count(
-                            query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": gpu.name,
+                            "description": f"{gpu.manufacturer} - {gpu.vram}GB VRAM, TGP {gpu.tgp}W",
+                            "url": f"/components/graphics_card/{gpu.id}/",
+                            "price": float(gpu.price) if gpu.price else None,
+                            "rating": gpu.rating,
+                            "type": "Grafická karta",
+                            "date": gpu.dateadded,
+                            "image": None,
+                            "category": "graphics_card",
+                            "relevance": gpu.name.lower().count(query.lower())
+                            + gpu.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
             # RAM
-            if not selected_category or selected_category == 'ram':
-                ram_modules = Ram.objects.filter(
-                    name__icontains=query
-                ).select_related()
+            if not selected_category or selected_category == "ram":
+                ram_modules = Ram.objects.filter(name__icontains=query).select_related()
 
                 for ram in ram_modules:
-                    results.append({
-                        'title': ram.name,
-                        'description': f'{ram.manufacturer} - {ram.capacity}GB, {ram.clock} MHz, {ram.type}',
-                        'url': f'/components/ram/{ram.id}/',
-                        'price': float(ram.price) if ram.price else None,
-                        'rating': ram.rating,
-                        'type': 'RAM',
-                        'date': ram.dateadded,
-                        'image': None,
-                        'category': 'ram',
-                        'relevance': ram.name.lower().count(query.lower()) + ram.manufacturer.lower().count(
-                            query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": ram.name,
+                            "description": f"{ram.manufacturer} - {ram.capacity}GB, {ram.clock} MHz, {ram.type}",
+                            "url": f"/components/ram/{ram.id}/",
+                            "price": float(ram.price) if ram.price else None,
+                            "rating": ram.rating,
+                            "type": "RAM",
+                            "date": ram.dateadded,
+                            "image": None,
+                            "category": "ram",
+                            "relevance": ram.name.lower().count(query.lower())
+                            + ram.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
             # Storage
-            if not selected_category or selected_category == 'storage':
+            if not selected_category or selected_category == "storage":
                 storages = Storage.objects.filter(
                     name__icontains=query
                 ).select_related()
 
                 for storage in storages:
                     storage_type_display = str(storage.type) if storage.type else "N/A"
-                    results.append({
-                        'title': storage.name,
-                        'description': f'{storage.manufacturer} - {storage.capacity}GB, {storage_type_display}',
-                        'url': f'/components/storage/{storage.id}/',
-                        'price': float(storage.price) if storage.price else None,
-                        'rating': storage.rating,
-                        'type': 'Úložiště',
-                        'date': storage.dateadded,
-                        'image': None,
-                        'category': 'storage',
-                        'relevance': storage.name.lower().count(query.lower()) + storage.manufacturer.lower().count(
-                            query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": storage.name,
+                            "description": f"{storage.manufacturer} - {storage.capacity}GB, {storage_type_display}",
+                            "url": f"/components/storage/{storage.id}/",
+                            "price": float(storage.price) if storage.price else None,
+                            "rating": storage.rating,
+                            "type": "Úložiště",
+                            "date": storage.dateadded,
+                            "image": None,
+                            "category": "storage",
+                            "relevance": storage.name.lower().count(query.lower())
+                            + storage.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
             # Motherboards
-            if not selected_category or selected_category == 'motherboard':
+            if not selected_category or selected_category == "motherboard":
                 motherboards = Motherboards.objects.filter(
                     name__icontains=query
                 ).select_related()
 
                 for mb in motherboards:
-                    results.append({
-                        'title': mb.name,
-                        'description': f'{mb.manufacturer} - Socket {mb.socket}, {mb.format}, PCIe {mb.pciegen}',
-                        'url': f'/components/motherboard/{mb.id}/',
-                        'price': float(mb.price) if mb.price else None,
-                        'rating': mb.rating,
-                        'type': 'Základní deska',
-                        'date': mb.dateadded,
-                        'image': None,
-                        'category': 'motherboard',
-                        'relevance': mb.name.lower().count(query.lower()) + mb.manufacturer.lower().count(query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": mb.name,
+                            "description": f"{mb.manufacturer} - Socket {mb.socket}, {mb.format}, PCIe {mb.pciegen}",
+                            "url": f"/components/motherboard/{mb.id}/",
+                            "price": float(mb.price) if mb.price else None,
+                            "rating": mb.rating,
+                            "type": "Základní deska",
+                            "date": mb.dateadded,
+                            "image": None,
+                            "category": "motherboard",
+                            "relevance": mb.name.lower().count(query.lower())
+                            + mb.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
             # Power Supply Units
-            if not selected_category or selected_category == 'power_supply':
+            if not selected_category or selected_category == "power_supply":
                 psus = PowerSupplyUnits.objects.filter(
                     name__icontains=query
                 ).select_related()
 
                 for psu in psus:
-                    results.append({
-                        'title': psu.name,
-                        'description': f'{psu.manufacturer} - {psu.maxpower}W',
-                        'url': f'/components/power_supply/{psu.id}/',
-                        'price': float(psu.price) if psu.price else None,
-                        'rating': psu.rating,
-                        'type': 'Zdroj',
-                        'date': psu.dateadded,
-                        'image': None,
-                        'category': 'power_supply',
-                        'relevance': psu.name.lower().count(query.lower()) + psu.manufacturer.lower().count(
-                            query.lower())
-                    })
+                    results.append(
+                        {
+                            "title": psu.name,
+                            "description": f"{psu.manufacturer} - {psu.maxpower}W",
+                            "url": f"/components/power_supply/{psu.id}/",
+                            "price": float(psu.price) if psu.price else None,
+                            "rating": psu.rating,
+                            "type": "Zdroj",
+                            "date": psu.dateadded,
+                            "image": None,
+                            "category": "power_supply",
+                            "relevance": psu.name.lower().count(query.lower())
+                            + psu.manufacturer.lower().count(query.lower()),
+                        }
+                    )
 
         # Vyhledávání v recenzích
-        if not selected_types or 'reviews' in selected_types:
-            reviews = Reviews.objects.filter(
-                is_published=True
-            ).filter(
-                title__icontains=query
-            ).select_related('author')
+        if not selected_types or "reviews" in selected_types:
+            reviews = (
+                Reviews.objects.filter(is_published=True)
+                .filter(title__icontains=query)
+                .select_related("author")
+            )
 
             # Filtrování recenzí podle kategorie
             if selected_category:
                 reviews = reviews.filter(component_type=selected_category)
 
             for review in reviews:
-                results.append({
-                    'title': f'Recenze: {review.title}',
-                    'description': review.summary,
-                    'url': f'/reviews/',  # Můžeš přidat detail recenze později
-                    'price': None,
-                    'rating': review.rating,
-                    'type': 'Recenze',
-                    'date': review.date_created,
-                    'image': None,
-                    'category': review.component_type,
-                    'relevance': review.title.lower().count(query.lower()) + review.summary.lower().count(query.lower())
-                })
+                results.append(
+                    {
+                        "title": f"Recenze: {review.title}",
+                        "description": review.summary,
+                        "url": f"/reviews/",  # Můžeš přidat detail recenze později
+                        "price": None,
+                        "rating": review.rating,
+                        "type": "Recenze",
+                        "date": review.date_created,
+                        "image": None,
+                        "category": review.component_type,
+                        "relevance": review.title.lower().count(query.lower())
+                        + review.summary.lower().count(query.lower()),
+                    }
+                )
 
         # Řazení výsledků
-        if sort == 'relevance':
-            results.sort(key=lambda r: r['relevance'], reverse=True)
-        elif sort == 'price_asc':
-            results.sort(key=lambda r: r['price'] or float('inf'))
-        elif sort == 'price_desc':
-            results.sort(key=lambda r: r['price'] or 0, reverse=True)
-        elif sort == 'date':
-            results.sort(key=lambda r: r['date'], reverse=True)
-        elif sort == 'rating':
-            results.sort(key=lambda r: r['rating'] or 0, reverse=True)
+        if sort == "relevance":
+            results.sort(key=lambda r: r["relevance"], reverse=True)
+        elif sort == "price_asc":
+            results.sort(key=lambda r: r["price"] or float("inf"))
+        elif sort == "price_desc":
+            results.sort(key=lambda r: r["price"] or 0, reverse=True)
+        elif sort == "date":
+            results.sort(key=lambda r: r["date"], reverse=True)
+        elif sort == "rating":
+            results.sort(key=lambda r: r["rating"] or 0, reverse=True)
 
         results_count = len(results)
 
         # Paginace
         paginator = Paginator(results, 10)
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
         context = {
-            'query': query,
-            'results': page_obj,
-            'results_count': results_count,
-            'selected_types': selected_types,
-            'selected_category': selected_category,
-            'selected_sort': sort,
+            "query": query,
+            "results": page_obj,
+            "results_count": results_count,
+            "selected_types": selected_types,
+            "selected_category": selected_category,
+            "selected_sort": sort,
         }
     else:
         context = {
-            'query': query,
-            'results': None,
-            'results_count': 0,
-            'selected_types': selected_types,
-            'selected_category': selected_category,
-            'selected_sort': sort,
+            "query": query,
+            "results": None,
+            "results_count": 0,
+            "selected_types": selected_types,
+            "selected_category": selected_category,
+            "selected_sort": sort,
         }
 
-    return render(request, 'viewer/search.html', context)
+    return render(request, "viewer/search.html", context)
+
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
     if not request.user.is_authenticated:
         storage = messages.get_messages(request)
         for message in storage:
             pass
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Vítej zpět, {user.username}!")
-                next_url = request.GET.get('next', '/')
+                next_url = request.GET.get("next", "/")
                 return redirect(next_url)
         else:
-            messages.error(request, 'Nesprávné uživatelské jméno nebo heslo.')
+            messages.error(request, "Nesprávné uživatelské jméno nebo heslo.")
     else:
         form = CustomLoginForm()
 
-    return render(request, 'registration/login.html', {'form': form})
+    return render(request, "registration/login.html", {"form": form})
+
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('/')
+        return redirect("/")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            username = form.cleaned_data.get('username')
+            username = form.cleaned_data.get("username")
             messages.success(request, f"Účet pro {username} byl úspěšně vytvořen!")
             login(request, user)
-            return redirect('home')
+            return redirect("home")
     else:
         form = CustomUserCreationForm()
 
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, "registration/register.html", {"form": form})
+
 
 @login_required
 def logout_view(request):
@@ -607,229 +667,302 @@ def logout_view(request):
     for message in storage:
         pass
     messages.success(request, "Byl jsi úspěšně odhlášen.")
-    return redirect('/')
+    return redirect("/")
+
 
 def home_view(request):
     from django.db.models import Count
 
-    latest_reviews = Reviews.objects.filter(
-        is_published=True,
-    ).select_related('author').order_by('-date_created')[:3]
+    latest_reviews = (
+        Reviews.objects.filter(
+            is_published=True,
+        )
+        .select_related("author")
+        .order_by("-date_created")[:3]
+    )
 
     top_components = []
 
     # Top procesor podle favorites
-    top_processor = Processors.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-benchresult').first()
+    top_processor = (
+        Processors.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating", "-benchresult")
+        .first()
+    )
 
     # Fallback na nejlepší procesor podle ratingu pokud žádný nemá favorites
     if not top_processor:
-        top_processor = Processors.objects.filter(rating__gt=0).order_by('-rating', '-benchresult').first()
+        top_processor = (
+            Processors.objects.filter(rating__gt=0)
+            .order_by("-rating", "-benchresult")
+            .first()
+        )
 
     if top_processor:
-        favorites_count = getattr(top_processor, 'favorites_count', 0)
-        top_components.append({
-            'name': top_processor.name,
-            'manufacturer': top_processor.manufacturer,
-            'price': top_processor.price,
-            'type': 'processor',
-            'id': top_processor.id,
-            'icon_class': 'bg-blue-100 text-blue-600',
-            'icon': 'cpu',
-            'favorites_count': favorites_count
-        })
+        favorites_count = getattr(top_processor, "favorites_count", 0)
+        top_components.append(
+            {
+                "name": top_processor.name,
+                "manufacturer": top_processor.manufacturer,
+                "price": top_processor.price,
+                "type": "processor",
+                "id": top_processor.id,
+                "icon_class": "bg-blue-100 text-blue-600",
+                "icon": "cpu",
+                "favorites_count": favorites_count,
+            }
+        )
 
     # Top GPU podle favorites
-    top_gpu = GraphicsCards.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-vram').first()
+    top_gpu = (
+        GraphicsCards.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating", "-vram")
+        .first()
+    )
 
     # Fallback na nejlepší GPU podle ratingu
     if not top_gpu:
-        top_gpu = GraphicsCards.objects.filter(rating__gt=0).order_by('-rating', '-vram').first()
+        top_gpu = (
+            GraphicsCards.objects.filter(rating__gt=0)
+            .order_by("-rating", "-vram")
+            .first()
+        )
 
     if top_gpu:
-        favorites_count = getattr(top_gpu, 'favorites_count', 0)
-        top_components.append({
-            'name': top_gpu.name,
-            'manufacturer': top_gpu.manufacturer,
-            'price': top_gpu.price,
-            'type': 'graphics_card',
-            'id': top_gpu.id,
-            'icon_class': 'bg-green-100 text-green-600',
-            'icon': 'gpu',
-            'favorites_count': favorites_count
-        })
+        favorites_count = getattr(top_gpu, "favorites_count", 0)
+        top_components.append(
+            {
+                "name": top_gpu.name,
+                "manufacturer": top_gpu.manufacturer,
+                "price": top_gpu.price,
+                "type": "graphics_card",
+                "id": top_gpu.id,
+                "icon_class": "bg-green-100 text-green-600",
+                "icon": "gpu",
+                "favorites_count": favorites_count,
+            }
+        )
 
     # Top RAM podle favorites
-    top_ram = Ram.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-capacity').first()
+    top_ram = (
+        Ram.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating", "-capacity")
+        .first()
+    )
 
     # Fallback na nejlepší RAM podle ratingu
     if not top_ram:
-        top_ram = Ram.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+        top_ram = (
+            Ram.objects.filter(rating__gt=0).order_by("-rating", "-capacity").first()
+        )
 
     if top_ram:
-        favorites_count = getattr(top_ram, 'favorites_count', 0)
-        top_components.append({
-            'name': top_ram.name,
-            'manufacturer': top_ram.manufacturer,
-            'price': top_ram.price,
-            'type': 'ram',
-            'id': top_ram.id,
-            'icon_class': 'bg-purple-100 text-purple-600',
-            'icon': 'ram',
-            'favorites_count': favorites_count
-        })
+        favorites_count = getattr(top_ram, "favorites_count", 0)
+        top_components.append(
+            {
+                "name": top_ram.name,
+                "manufacturer": top_ram.manufacturer,
+                "price": top_ram.price,
+                "type": "ram",
+                "id": top_ram.id,
+                "icon_class": "bg-purple-100 text-purple-600",
+                "icon": "ram",
+                "favorites_count": favorites_count,
+            }
+        )
 
     # Top Storage podle favorites
-    top_storage = Storage.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating', '-capacity').first()
+    top_storage = (
+        Storage.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating", "-capacity")
+        .first()
+    )
 
     # Fallback na nejlepší Storage podle ratingu
     if not top_storage:
-        top_storage = Storage.objects.filter(rating__gt=0).order_by('-rating', '-capacity').first()
+        top_storage = (
+            Storage.objects.filter(rating__gt=0)
+            .order_by("-rating", "-capacity")
+            .first()
+        )
 
     if top_storage:
-        favorites_count = getattr(top_storage, 'favorites_count', 0)
-        top_components.append({
-            'name': top_storage.name,
-            'manufacturer': top_storage.manufacturer,
-            'price': top_storage.price,
-            'type': 'storage',
-            'id': top_storage.id,
-            'icon_class': 'bg-orange-100 text-orange-600',
-            'icon': 'storage',
-            'favorites_count': favorites_count
-        })
+        favorites_count = getattr(top_storage, "favorites_count", 0)
+        top_components.append(
+            {
+                "name": top_storage.name,
+                "manufacturer": top_storage.manufacturer,
+                "price": top_storage.price,
+                "type": "storage",
+                "id": top_storage.id,
+                "icon_class": "bg-orange-100 text-orange-600",
+                "icon": "storage",
+                "favorites_count": favorites_count,
+            }
+        )
 
     # Přidej motherboard a power supply pokud mají favorites
-    top_motherboard = Motherboards.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating').first()
+    top_motherboard = (
+        Motherboards.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating")
+        .first()
+    )
 
     if top_motherboard:
-        top_components.append({
-            'name': top_motherboard.name,
-            'manufacturer': top_motherboard.manufacturer,
-            'price': top_motherboard.price,
-            'type': 'motherboard',
-            'id': top_motherboard.id,
-            'icon_class': 'bg-red-100 text-red-600',
-            'icon': 'motherboard',
-            'favorites_count': top_motherboard.favorites_count
-        })
+        top_components.append(
+            {
+                "name": top_motherboard.name,
+                "manufacturer": top_motherboard.manufacturer,
+                "price": top_motherboard.price,
+                "type": "motherboard",
+                "id": top_motherboard.id,
+                "icon_class": "bg-red-100 text-red-600",
+                "icon": "motherboard",
+                "favorites_count": top_motherboard.favorites_count,
+            }
+        )
 
-    top_psu = PowerSupplyUnits.objects.annotate(
-        favorites_count=Count('userfavorites')
-    ).filter(favorites_count__gt=0).order_by('-favorites_count', '-rating').first()
+    top_psu = (
+        PowerSupplyUnits.objects.annotate(favorites_count=Count("userfavorites"))
+        .filter(favorites_count__gt=0)
+        .order_by("-favorites_count", "-rating")
+        .first()
+    )
 
     if top_psu:
-        top_components.append({
-            'name': top_psu.name,
-            'manufacturer': top_psu.manufacturer,
-            'price': top_psu.price,
-            'type': 'power_supply',
-            'id': top_psu.id,
-            'icon_class': 'bg-yellow-100 text-yellow-600',
-            'icon': 'power',
-            'favorites_count': top_psu.favorites_count
-        })
+        top_components.append(
+            {
+                "name": top_psu.name,
+                "manufacturer": top_psu.manufacturer,
+                "price": top_psu.price,
+                "type": "power_supply",
+                "id": top_psu.id,
+                "icon_class": "bg-yellow-100 text-yellow-600",
+                "icon": "power",
+                "favorites_count": top_psu.favorites_count,
+            }
+        )
 
     # Seřaď komponenty podle favorites a vezmi max 6
-    top_components = sorted(top_components, key=lambda x: x['favorites_count'], reverse=True)[:6]
+    top_components = sorted(
+        top_components, key=lambda x: x["favorites_count"], reverse=True
+    )[:6]
 
     stats = {
-        'total_components': (
-                Processors.objects.count() +
-                GraphicsCards.objects.count() +
-                Ram.objects.count() +
-                Storage.objects.count() +
-                Motherboards.objects.count() +
-                PowerSupplyUnits.objects.count()
+        "total_components": (
+            Processors.objects.count()
+            + GraphicsCards.objects.count()
+            + Ram.objects.count()
+            + Storage.objects.count()
+            + Motherboards.objects.count()
+            + PowerSupplyUnits.objects.count()
         ),
-        'total_reviews': Reviews.objects.filter(is_published=True).count(),
-        'processors_count': Processors.objects.count(),
-        'gpus_count': GraphicsCards.objects.count(),
-        'ram_count': Ram.objects.count(),
-        'total_favorites': UserFavorites.objects.count(),
+        "total_reviews": Reviews.objects.filter(is_published=True).count(),
+        "processors_count": Processors.objects.count(),
+        "gpus_count": GraphicsCards.objects.count(),
+        "ram_count": Ram.objects.count(),
+        "total_favorites": UserFavorites.objects.count(),
     }
 
     context = {
-        'latest_reviews': latest_reviews,
-        'top_components': top_components,
-        'stats': stats,
+        "latest_reviews": latest_reviews,
+        "top_components": top_components,
+        "stats": stats,
     }
 
-    return render(request, 'viewer/home.html', context)
+    return render(request, "viewer/home.html", context)
+
 
 def reviews_view(request):
-    category_filter = request.GET.get('category', '')
-    sort_by = request.GET.get('sort', 'newest')
+    category_filter = request.GET.get("category", "")
+    sort_by = request.GET.get("sort", "newest")
 
     # Standartní query
     reviews = Reviews.objects.filter(is_published=True).select_related(
-        'author', 'processor', 'motherboard', 'storage', 'ram', 'graphics_card', 'power_supply'
+        "author",
+        "processor",
+        "motherboard",
+        "storage",
+        "ram",
+        "graphics_card",
+        "power_supply",
     )
 
     if category_filter:
         reviews = reviews.filter(component_type=category_filter)
 
-    if sort_by == 'newest':
-        reviews = reviews.order_by('-date_created')
-    elif sort_by == 'oldest':
-        reviews = reviews.order_by('date_created')
-    elif sort_by == 'best':
-        reviews = reviews.order_by('-rating', '-helpful_votes')
-    elif sort_by == 'worst':
-        reviews = reviews.order_by('-helpful_votes', '-rating')
-    elif sort_by == 'helpful':
-        reviews = reviews.order_by('helpful_votes', '-rating')
+    if sort_by == "newest":
+        reviews = reviews.order_by("-date_created")
+    elif sort_by == "oldest":
+        reviews = reviews.order_by("date_created")
+    elif sort_by == "best":
+        reviews = reviews.order_by("-rating", "-helpful_votes")
+    elif sort_by == "worst":
+        reviews = reviews.order_by("-helpful_votes", "-rating")
+    elif sort_by == "helpful":
+        reviews = reviews.order_by("helpful_votes", "-rating")
     else:
-        reviews = reviews.order_by('-date_created')
+        reviews = reviews.order_by("-date_created")
 
     # Paginace
     paginator = Paginator(reviews, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     # Statistiky
     stats = {
-        'total_reviews': Reviews.objects.filter(is_published=True).count(),
-        'avg_rating': Reviews.objects.filter(is_published=True).aggregate(Avg('rating'))['rating__avg'] or 0,
-        'categories_count': {
-            'processor': Reviews.objects.filter(is_published=True, component_type='processor').count(),
-            'graphics_card': Reviews.objects.filter(is_published=True, component_type='graphics_card').count(),
-            'ram': Reviews.objects.filter(is_published=True, component_type='ram').count(),
-            'storage': Reviews.objects.filter(is_published=True, component_type='storage').count(),
-            'motherboard': Reviews.objects.filter(is_published=True, component_type='motherboard').count(),
-            'power_supply': Reviews.objects.filter(is_published=True, component_type='power_supply').count(),
-        }
+        "total_reviews": Reviews.objects.filter(is_published=True).count(),
+        "avg_rating": Reviews.objects.filter(is_published=True).aggregate(
+            Avg("rating")
+        )["rating__avg"]
+        or 0,
+        "categories_count": {
+            "processor": Reviews.objects.filter(
+                is_published=True, component_type="processor"
+            ).count(),
+            "graphics_card": Reviews.objects.filter(
+                is_published=True, component_type="graphics_card"
+            ).count(),
+            "ram": Reviews.objects.filter(
+                is_published=True, component_type="ram"
+            ).count(),
+            "storage": Reviews.objects.filter(
+                is_published=True, component_type="storage"
+            ).count(),
+            "motherboard": Reviews.objects.filter(
+                is_published=True, component_type="motherboard"
+            ).count(),
+            "power_supply": Reviews.objects.filter(
+                is_published=True, component_type="power_supply"
+            ).count(),
+        },
     }
 
     # IKONKY
     def get_component_icon_class(component_type):
         icons = {
-            'processor': 'bg-blue-100 text-blue-800',
-            'graphics_card': 'bg-green-100 text-green-800',
-            'ram': 'bg-purple-100 text-purple-800',
-            'storage': 'bg-orange-100 text-orange-800',
-            'motherboard': 'bg-red-100 text-red-800',
-            'power_supply': 'bg-yellow-100 text-yellow-800',
+            "processor": "bg-blue-100 text-blue-800",
+            "graphics_card": "bg-green-100 text-green-800",
+            "ram": "bg-purple-100 text-purple-800",
+            "storage": "bg-orange-100 text-orange-800",
+            "motherboard": "bg-red-100 text-red-800",
+            "power_supply": "bg-yellow-100 text-yellow-800",
         }
-        return icons.get(component_type, 'bg-gray-100 text-gray-800')
+        return icons.get(component_type, "bg-gray-100 text-gray-800")
 
     def get_component_display_name(component_type):
         names = {
-            'processor': 'Procesor',
-            'graphics_card': 'Grafická karta',
-            'ram': 'Paměť RAM',
-            'storage': 'Úložiště',
-            'motherboard': 'Základní deska',
-            'power_supply': 'Zdroj',
+            "processor": "Procesor",
+            "graphics_card": "Grafická karta",
+            "ram": "Paměť RAM",
+            "storage": "Úložiště",
+            "motherboard": "Základní deska",
+            "power_supply": "Zdroj",
         }
         return names.get(component_type, component_type)
 
@@ -839,53 +972,62 @@ def reviews_view(request):
         review.type_display = get_component_display_name(review.component_type)
 
         # Parse pros a cons na seznam
-        review.pros_list = [p.strip() for p in review.pros.split('\n') if p.strip()] if review.pros else []
-        review.cons_list = [c.strip() for c in review.cons.split('\n') if c.strip()] if review.cons else []
+        review.pros_list = (
+            [p.strip() for p in review.pros.split("\n") if p.strip()]
+            if review.pros
+            else []
+        )
+        review.cons_list = (
+            [c.strip() for c in review.cons.split("\n") if c.strip()]
+            if review.cons
+            else []
+        )
 
     context = {
-        'reviews': page_obj,
-        'stats': stats,
-        'selected_category': category_filter,
-        'selected_sort': sort_by,
-        'category_choices': [
-            ('', 'Všechny kategorie'),
-            ('processor', 'Procesory'),
-            ('graphics_card', 'Grafické karty'),
-            ('ram', 'Paměti RAM'),
-            ('storage', 'Úložiště'),
-            ('motherboard', 'Základní desky'),
-            ('power_supply', 'Zdroje'),
+        "reviews": page_obj,
+        "stats": stats,
+        "selected_category": category_filter,
+        "selected_sort": sort_by,
+        "category_choices": [
+            ("", "Všechny kategorie"),
+            ("processor", "Procesory"),
+            ("graphics_card", "Grafické karty"),
+            ("ram", "Paměti RAM"),
+            ("storage", "Úložiště"),
+            ("motherboard", "Základní desky"),
+            ("power_supply", "Zdroje"),
         ],
-        'sort_choices': [
-            ('newest', 'Nejnovější'),
-            ('oldest', 'Nejstarší'),
-            ('best', 'Nejlepší hodnocení'),
-            ('worst', 'Nejhorší hodnocení'),
-            ('helpful', 'Nejužitečnější'),
-        ]
+        "sort_choices": [
+            ("newest", "Nejnovější"),
+            ("oldest", "Nejstarší"),
+            ("best", "Nejlepší hodnocení"),
+            ("worst", "Nejhorší hodnocení"),
+            ("helpful", "Nejužitečnější"),
+        ],
     }
 
-    return render(request, 'viewer/reviews.html', context)
+    return render(request, "viewer/reviews.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 @require_POST
 def vote_review_ajax(request):
     try:
         data = json.loads(request.body)
-        review_id = data.get('review_id')
-        is_helpful = data.get('is_helpful')
+        review_id = data.get("review_id")
+        is_helpful = data.get("is_helpful")
 
         if not review_id or is_helpful is None:
-            return JsonResponse({'error': 'Chybí povinné parametry'}, status=400)
+            return JsonResponse({"error": "Chybí povinné parametry"}, status=400)
 
         review = get_object_or_404(Reviews, id=review_id, is_published=True)
 
         # Kontrola jestli uživatel nehlasuje na vlastní recenzi
         if review.author == request.user:
-            return JsonResponse({
-                'error': 'Nemůžete hlasovat o vlastní recenzi',
-                'success': False
-            }, status=403)
+            return JsonResponse(
+                {"error": "Nemůžete hlasovat o vlastní recenzi", "success": False},
+                status=403,
+            )
 
         # Kontrola jestli už hlasoval
         existing_vote = ReviewVotes.objects.filter(
@@ -924,15 +1066,17 @@ def vote_review_ajax(request):
         else:
             # Kontrola rate limiting (max 10 hlasů za hodinu)
             recent_votes = ReviewVotes.objects.filter(
-                user=request.user,
-                date_voted__gte=timezone.now() - timedelta(hours=1)
+                user=request.user, date_voted__gte=timezone.now() - timedelta(hours=1)
             ).count()
 
             if recent_votes >= 10:
-                return JsonResponse({
-                    'error': 'Příliš mnoho hlasů za krátký čas. Zkuste to později.',
-                    'success': False
-                }, status=429)
+                return JsonResponse(
+                    {
+                        "error": "Příliš mnoho hlasů za krátký čas. Zkuste to později.",
+                        "success": False,
+                    },
+                    status=429,
+                )
 
             # Nový hlas
             ReviewVotes.objects.create(
@@ -952,47 +1096,51 @@ def vote_review_ajax(request):
         # Spočítej unhelpful votes
         unhelpful_votes = review.total_votes - review.helpful_votes
 
-        return JsonResponse({
-            'success': True,
-            'message': message,
-            'helpful_votes': review.helpful_votes,
-            'unhelpful_votes': unhelpful_votes,
-            'total_votes': review.total_votes,
-            'user_vote': user_vote,
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "message": message,
+                "helpful_votes": review.helpful_votes,
+                "unhelpful_votes": unhelpful_votes,
+                "total_votes": review.total_votes,
+                "user_vote": user_vote,
+            }
+        )
 
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Neplatná JSON data'}, status=400)
+        return JsonResponse({"error": "Neplatná JSON data"}, status=400)
     except Exception as e:
         # Log error for debugging
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Vote error: {str(e)}")
 
-        return JsonResponse({'error': 'Došlo k chybě při hlasování'}, status=500)
+        return JsonResponse({"error": "Došlo k chybě při hlasování"}, status=500)
+
 
 @login_required
 def get_user_votes(request):
-    review_ids = request.GET.get('review_ids', '').split(',')
+    review_ids = request.GET.get("review_ids", "").split(",")
 
-    if not review_ids or review_ids == ['']:
-        return JsonResponse({'votes': {}})
+    if not review_ids or review_ids == [""]:
+        return JsonResponse({"votes": {}})
 
     try:
         review_ids = [int(rid) for rid in review_ids if rid.isdigit()]
     except ValueError:
-        return JsonResponse({'error': 'Neplatná ID recenzí'}, status=400)
+        return JsonResponse({"error": "Neplatná ID recenzí"}, status=400)
 
     votes = ReviewVotes.objects.filter(
-        user=request.user,
-        review_id__in=review_ids
-    ).values('review_id', 'is_helpful')
+        user=request.user, review_id__in=review_ids
+    ).values("review_id", "is_helpful")
 
-    user_votes = {vote['review_id']: vote['is_helpful'] for vote in votes}
+    user_votes = {vote["review_id"]: vote["is_helpful"] for vote in votes}
 
-    return JsonResponse({'votes': user_votes})
+    return JsonResponse({"votes": user_votes})
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def profile_view(request):
 
     user = request.user
@@ -1001,101 +1149,114 @@ def profile_view(request):
     user_votes = ReviewVotes.objects.filter(user=user)
 
     stats = {
-        'total_reviews': user_reviews.count(),
-        'avg_rating': user_reviews.aggregate(avg=Avg('rating'))['avg'] or 0,
-        'total_votes_cast': user_votes.count(),
-        'helpful_votes_received': user_reviews.aggregate(
-            total_helpful=Sum('helpful_votes')
-        )['total_helpful'] or 0,
+        "total_reviews": user_reviews.count(),
+        "avg_rating": user_reviews.aggregate(avg=Avg("rating"))["avg"] or 0,
+        "total_votes_cast": user_votes.count(),
+        "helpful_votes_received": user_reviews.aggregate(
+            total_helpful=Sum("helpful_votes")
+        )["total_helpful"]
+        or 0,
     }
 
-    recent_reviews = user_reviews.order_by('-date_created')[:5]
+    recent_reviews = user_reviews.order_by("-date_created")[:5]
 
-    top_reviews = user_reviews.filter(helpful_votes__gt=0).order_by('-helpful_votes')[:5]
+    top_reviews = user_reviews.filter(helpful_votes__gt=0).order_by("-helpful_votes")[
+        :5
+    ]
 
     context = {
-        'user_stats': stats,
-        'recent_reviews': recent_reviews,
-        'top_reviews': top_reviews,
+        "user_stats": stats,
+        "recent_reviews": recent_reviews,
+        "top_reviews": top_reviews,
     }
 
-    return render(request, 'viewer/profile.html', context)
+    return render(request, "viewer/profile.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def profile_edit_view(request):
 
-    if request.method == 'POST':
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
-        email = request.POST.get('email', '').strip()
+    if request.method == "POST":
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
 
-        if email and User.objects.filter(email=email).exclude(id=request.user.id).exists():
-            messages.error(request, 'Tento email už používá jiný uživatel.')
+        if (
+            email
+            and User.objects.filter(email=email).exclude(id=request.user.id).exists()
+        ):
+            messages.error(request, "Tento email už používá jiný uživatel.")
         else:
             request.user.first_name = first_name
             request.user.last_name = last_name
             request.user.email = email
             request.user.save()
 
-            messages.success(request, 'Profil byl úspěšně aktualizován!')
-            return redirect('profile')
+            messages.success(request, "Profil byl úspěšně aktualizován!")
+            return redirect("profile")
 
-    return render(request, 'viewer/profile_edit.html')
+    return render(request, "viewer/profile_edit.html")
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def change_password_view(request):
 
-    if request.method == 'POST':
-        old_password = request.POST.get('old_password')
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
+    if request.method == "POST":
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
 
         if not request.user.check_password(old_password):
-            messages.error(request, 'Současné heslo není správné.')
+            messages.error(request, "Současné heslo není správné.")
         elif new_password != confirm_password:
-            messages.error(request, 'Nová hesla se neshodují.')
+            messages.error(request, "Nová hesla se neshodují.")
         elif len(new_password) < 8:
-            messages.error(request, 'Heslo musí mít alespoň 8 znaků.')
+            messages.error(request, "Heslo musí mít alespoň 8 znaků.")
         else:
             request.user.set_password(new_password)
             request.user.save()
 
             from django.contrib.auth import update_session_auth_hash
+
             update_session_auth_hash(request, request.user)
 
-            messages.success(request, 'Heslo bylo úspěšně změněno!')
-            return redirect('profile')
+            messages.success(request, "Heslo bylo úspěšně změněno!")
+            return redirect("profile")
 
-    return render(request, 'viewer/change_password.html')
+    return render(request, "viewer/change_password.html")
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def my_reviews_view(request):
 
-    user_reviews = Reviews.objects.filter(
-        author=request.user
-    ).select_related().order_by('-date_created')
+    user_reviews = (
+        Reviews.objects.filter(author=request.user)
+        .select_related()
+        .order_by("-date_created")
+    )
 
     paginator = Paginator(user_reviews, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'reviews': page_obj,
-        'total_reviews': user_reviews.count(),
+        "reviews": page_obj,
+        "total_reviews": user_reviews.count(),
     }
 
-    return render(request, 'viewer/my_reviews.html', context)
+    return render(request, "viewer/my_reviews.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def create_review_view(request, component_type=None, component_id=None):
     # Model mapping pro získání komponenty
     model_mapping = {
-        'processor': Processors,
-        'graphics_card': GraphicsCards,
-        'ram': Ram,
-        'storage': Storage,
-        'motherboard': Motherboards,
-        'power_supply': PowerSupplyUnits,
+        "processor": Processors,
+        "graphics_card": GraphicsCards,
+        "ram": Ram,
+        "storage": Storage,
+        "motherboard": Motherboards,
+        "power_supply": PowerSupplyUnits,
     }
 
     component = None
@@ -1104,83 +1265,96 @@ def create_review_view(request, component_type=None, component_id=None):
             model = model_mapping[component_type]
             component = get_object_or_404(model, id=component_id)
 
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, component_type=component_type, component_id=component_id)
+    if request.method == "POST":
+        form = ReviewForm(
+            request.POST, component_type=component_type, component_id=component_id
+        )
 
         if form.is_valid():
             review = form.save(commit=False)
             review.author = request.user
 
             # Zpracování vybrané komponenty
-            component_choice = form.cleaned_data.get('component_choice')
+            component_choice = form.cleaned_data.get("component_choice")
             if component_choice:
-                choice_type, choice_id = component_choice.rsplit('_', 1)
+                choice_type, choice_id = component_choice.rsplit("_", 1)
 
                 # Nastavení příslušné komponenty podle typu
-                if choice_type == 'processor':
+                if choice_type == "processor":
                     review.processor = get_object_or_404(Processors, id=choice_id)
-                elif choice_type == 'graphics_card':
-                    review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
-                elif choice_type == 'ram':
+                elif choice_type == "graphics_card":
+                    review.graphics_card = get_object_or_404(
+                        GraphicsCards, id=choice_id
+                    )
+                elif choice_type == "ram":
                     review.ram = get_object_or_404(Ram, id=choice_id)
-                elif choice_type == 'storage':
+                elif choice_type == "storage":
                     review.storage = get_object_or_404(Storage, id=choice_id)
-                elif choice_type == 'motherboard':
+                elif choice_type == "motherboard":
                     review.motherboard = get_object_or_404(Motherboards, id=choice_id)
-                elif choice_type == 'power_supply':
-                    review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+                elif choice_type == "power_supply":
+                    review.power_supply = get_object_or_404(
+                        PowerSupplyUnits, id=choice_id
+                    )
 
             review.save()
 
-            messages.success(request, 'Recenze byla úspěšně vytvořena!')
-            return redirect('reviews')
+            messages.success(request, "Recenze byla úspěšně vytvořena!")
+            return redirect("reviews")
     else:
-        initial_data = {'user': request.user}
+        initial_data = {"user": request.user}
         form = ReviewForm(
             initial=initial_data,
             component_type=component_type,
-            component_id=component_id
+            component_id=component_id,
         )
 
     context = {
-        'form': form,
-        'component': component,
-        'component_type': component_type,
-        'component_type_display': get_component_type_display(component_type) if component_type else None,
+        "form": form,
+        "component": component,
+        "component_type": component_type,
+        "component_type_display": (
+            get_component_type_display(component_type) if component_type else None
+        ),
     }
 
-    return render(request, 'viewer/create_review.html', context)
+    return render(request, "viewer/create_review.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def get_components_ajax(request):
-    component_type = request.GET.get('type')
+    component_type = request.GET.get("type")
 
     model_mapping = {
-        'processor': Processors,
-        'graphics_card': GraphicsCards,
-        'ram': Ram,
-        'storage': Storage,
-        'motherboard': Motherboards,
-        'power_supply': PowerSupplyUnits,
+        "processor": Processors,
+        "graphics_card": GraphicsCards,
+        "ram": Ram,
+        "storage": Storage,
+        "motherboard": Motherboards,
+        "power_supply": PowerSupplyUnits,
     }
 
     components = []
 
     if component_type in model_mapping:
         model = model_mapping[component_type]
-        for comp in model.objects.all().order_by('manufacturer', 'name'):
-            components.append({
-                'id': f'{component_type}_{comp.id}',
-                'name': f'{comp.manufacturer} {comp.name}'
-            })
+        for comp in model.objects.all().order_by("manufacturer", "name"):
+            components.append(
+                {
+                    "id": f"{component_type}_{comp.id}",
+                    "name": f"{comp.manufacturer} {comp.name}",
+                }
+            )
 
-    return JsonResponse({'components': components})
+    return JsonResponse({"components": components})
+
 
 @login_required
 def create_review_for_component(request, component_type, component_id):
     return create_review_view(request, component_type, component_id)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def edit_review_view(request, review_id):
     review = get_object_or_404(Reviews, id=review_id, author=request.user)
 
@@ -1189,20 +1363,20 @@ def edit_review_view(request, review_id):
     component = review.component
     component_id = component.id if component else None
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ReviewForm(
             request.POST,
             instance=review,
             component_type=component_type,
-            component_id=component_id
+            component_id=component_id,
         )
 
         if form.is_valid():
             updated_review = form.save(commit=False)
 
-            component_choice = form.cleaned_data.get('component_choice')
+            component_choice = form.cleaned_data.get("component_choice")
             if component_choice:
-                choice_type, choice_id = component_choice.rsplit('_', 1)
+                choice_type, choice_id = component_choice.rsplit("_", 1)
 
                 updated_review.processor = None
                 updated_review.graphics_card = None
@@ -1211,83 +1385,94 @@ def edit_review_view(request, review_id):
                 updated_review.motherboard = None
                 updated_review.power_supply = None
 
-                if choice_type == 'processor':
-                    updated_review.processor = get_object_or_404(Processors, id=choice_id)
-                elif choice_type == 'graphics_card':
-                    updated_review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
-                elif choice_type == 'ram':
+                if choice_type == "processor":
+                    updated_review.processor = get_object_or_404(
+                        Processors, id=choice_id
+                    )
+                elif choice_type == "graphics_card":
+                    updated_review.graphics_card = get_object_or_404(
+                        GraphicsCards, id=choice_id
+                    )
+                elif choice_type == "ram":
                     updated_review.ram = get_object_or_404(Ram, id=choice_id)
-                elif choice_type == 'storage':
+                elif choice_type == "storage":
                     updated_review.storage = get_object_or_404(Storage, id=choice_id)
-                elif choice_type == 'motherboard':
-                    updated_review.motherboard = get_object_or_404(Motherboards, id=choice_id)
-                elif choice_type == 'power_supply':
-                    updated_review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+                elif choice_type == "motherboard":
+                    updated_review.motherboard = get_object_or_404(
+                        Motherboards, id=choice_id
+                    )
+                elif choice_type == "power_supply":
+                    updated_review.power_supply = get_object_or_404(
+                        PowerSupplyUnits, id=choice_id
+                    )
 
             updated_review.save()
 
-            messages.success(request, 'Recenze byla úspěšně aktualizována!')
-            return redirect('my_reviews')
+            messages.success(request, "Recenze byla úspěšně aktualizována!")
+            return redirect("my_reviews")
     else:
-        initial_data = {
-            'user': request.user
-        }
+        initial_data = {"user": request.user}
 
         if component:
-            initial_data['component_choice'] = f'{component_type}_{component.id}'
+            initial_data["component_choice"] = f"{component_type}_{component.id}"
 
         form = ReviewForm(
             instance=review,
             initial=initial_data,
             component_type=component_type,
-            component_id=component_id
+            component_id=component_id,
         )
 
     context = {
-        'form': form,
-        'review': review,
-        'component': component,
-        'component_type': component_type,
-        'component_type_display': get_component_type_display(component_type),
-        'is_edit': True,
+        "form": form,
+        "review": review,
+        "component": component,
+        "component_type": component_type,
+        "component_type_display": get_component_type_display(component_type),
+        "is_edit": True,
     }
 
-    return render(request, 'viewer/edit_review.html', context)
+    return render(request, "viewer/edit_review.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def delete_review_view(request, review_id):
     review = get_object_or_404(Reviews, id=review_id, author=request.user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         review_title = review.title
         review.delete()
         messages.success(request, f'Recenze "{review_title}" byla úspěšně smazána.')
-        return redirect('my_reviews')
+        return redirect("my_reviews")
 
     context = {
-        'review': review,
+        "review": review,
     }
 
-    return render(request, 'viewer/delete_review.html', context)
+    return render(request, "viewer/delete_review.html", context)
 
-@login_required(login_url='/login/')
+
+@login_required(login_url="/login/")
 def toggle_review_visibility(request, review_id):
-    if request.method == 'POST':
+    if request.method == "POST":
         review = get_object_or_404(Reviews, id=review_id, author=request.user)
 
         review.is_published = not review.is_published
         review.save()
 
         status = "publikována" if review.is_published else "skryta"
-        messages.success(request, f'Recenze byla {status}.')
+        messages.success(request, f"Recenze byla {status}.")
 
-        return JsonResponse({
-            'success': True,
-            'is_published': review.is_published,
-            'message': f'Recenze byla {status}.'
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "is_published": review.is_published,
+                "message": f"Recenze byla {status}.",
+            }
+        )
 
-    return JsonResponse({'success': False, 'error': 'Neplatný požadavek'})
+    return JsonResponse({"success": False, "error": "Neplatný požadavek"})
+
 
 @login_required
 @require_POST
@@ -1295,24 +1480,24 @@ def toggle_favorite_ajax(request):
     """AJAX endpoint pro přidání/odebrání komponenty z oblíbených"""
     try:
         data = json.loads(request.body)
-        component_type = data.get('component_type')
-        component_id = data.get('component_id')
+        component_type = data.get("component_type")
+        component_id = data.get("component_id")
 
         if not component_type or not component_id:
-            return JsonResponse({'success': False, 'error': 'Chybí povinné parametry'})
+            return JsonResponse({"success": False, "error": "Chybí povinné parametry"})
 
         # Mapování typů komponent na modely
         model_mapping = {
-            'processor': Processors,
-            'motherboard': Motherboards,
-            'ram': Ram,
-            'graphics_card': GraphicsCards,
-            'storage': Storage,
-            'power_supply': PowerSupplyUnits,
+            "processor": Processors,
+            "motherboard": Motherboards,
+            "ram": Ram,
+            "graphics_card": GraphicsCards,
+            "storage": Storage,
+            "power_supply": PowerSupplyUnits,
         }
 
         if component_type not in model_mapping:
-            return JsonResponse({'success': False, 'error': 'Neplatný typ komponenty'})
+            return JsonResponse({"success": False, "error": "Neplatný typ komponenty"})
 
         # Získej komponentu
         ComponentModel = model_mapping[component_type]
@@ -1321,9 +1506,9 @@ def toggle_favorite_ajax(request):
         # Zkontroluj jestli už je v oblíbených
         field_name = component_type
         filter_kwargs = {
-            'user': request.user,
+            "user": request.user,
             field_name: component,
-            'component_type': component_type
+            "component_type": component_type,
         }
 
         existing_favorite = UserFavorites.objects.filter(**filter_kwargs).first()
@@ -1336,59 +1521,59 @@ def toggle_favorite_ajax(request):
         else:
             # Přidej do oblíbených
             create_kwargs = {
-                'user': request.user,
-                'component_type': component_type,
-                field_name: component
+                "user": request.user,
+                "component_type": component_type,
+                field_name: component,
             }
             UserFavorites.objects.create(**create_kwargs)
             is_favorite = True
             message = f"{component.name} byl přidán do oblíbených"
 
-        return JsonResponse({
-            'success': True,
-            'is_favorite': is_favorite,
-            'message': message
-        })
+        return JsonResponse(
+            {"success": True, "is_favorite": is_favorite, "message": message}
+        )
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({"success": False, "error": str(e)})
+
 
 @login_required
 def check_favorite_status(request, component_type, component_id):
     """Kontrola jestli je komponenta v oblíbených"""
     try:
         model_mapping = {
-            'processor': Processors,
-            'motherboard': Motherboards,
-            'ram': Ram,
-            'graphics_card': GraphicsCards,
-            'storage': Storage,
-            'power_supply': PowerSupplyUnits,
+            "processor": Processors,
+            "motherboard": Motherboards,
+            "ram": Ram,
+            "graphics_card": GraphicsCards,
+            "storage": Storage,
+            "power_supply": PowerSupplyUnits,
         }
 
         if component_type not in model_mapping:
-            return JsonResponse({'is_favorite': False})
+            return JsonResponse({"is_favorite": False})
 
         ComponentModel = model_mapping[component_type]
         component = get_object_or_404(ComponentModel, id=component_id)
 
         filter_kwargs = {
-            'user': request.user,
+            "user": request.user,
             component_type: component,
-            'component_type': component_type
+            "component_type": component_type,
         }
 
         is_favorite = UserFavorites.objects.filter(**filter_kwargs).exists()
 
-        return JsonResponse({'is_favorite': is_favorite})
+        return JsonResponse({"is_favorite": is_favorite})
 
     except Exception:
-        return JsonResponse({'is_favorite': False})
+        return JsonResponse({"is_favorite": False})
+
 
 @login_required
 def my_favorites_view(request):
     favorites = UserFavorites.objects.filter(user=request.user).select_related(
-        'processor', 'motherboard', 'ram', 'graphics_card', 'storage', 'power_supply'
+        "processor", "motherboard", "ram", "graphics_card", "storage", "power_supply"
     )
 
     # Seskupení podle typu komponenty
@@ -1401,17 +1586,21 @@ def my_favorites_view(request):
 
     # Statistiky
     stats = {
-        'total_favorites': favorites.count(),
-        'by_type': {component_type: len(favs) for component_type, favs in favorites_by_type.items()}
+        "total_favorites": favorites.count(),
+        "by_type": {
+            component_type: len(favs)
+            for component_type, favs in favorites_by_type.items()
+        },
     }
 
     context = {
-        'favorites_by_type': favorites_by_type,
-        'stats': stats,
-        'component_types': COMPONENT_TYPES,
+        "favorites_by_type": favorites_by_type,
+        "stats": stats,
+        "component_types": COMPONENT_TYPES,
     }
 
-    return render(request, 'viewer/my_favorites.html', context)
+    return render(request, "viewer/my_favorites.html", context)
+
 
 @login_required
 def remove_favorite_view(request, favorite_id):
@@ -1420,112 +1609,125 @@ def remove_favorite_view(request, favorite_id):
     component_name = favorite.component_name
 
     favorite.delete()
-    messages.success(request, f'Komponenta "{component_name}" byla odebrána z oblíbených.')
+    messages.success(
+        request, f'Komponenta "{component_name}" byla odebrána z oblíbených.'
+    )
 
-    return redirect('my_favorites')
+    return redirect("my_favorites")
+
 
 def get_user_favorites(request):
     if not request.user.is_authenticated:
-        return JsonResponse({'favorites': []})
+        return JsonResponse({"favorites": []})
 
-    component_ids = request.GET.get('component_ids', '').split(',')
-    component_type = request.GET.get('component_type', '')
+    component_ids = request.GET.get("component_ids", "").split(",")
+    component_type = request.GET.get("component_type", "")
 
     if not component_ids or not component_type:
-        return JsonResponse({'favorites': []})
+        return JsonResponse({"favorites": []})
 
     try:
         component_ids = [int(cid) for cid in component_ids if cid.isdigit()]
     except ValueError:
-        return JsonResponse({'favorites': []})
+        return JsonResponse({"favorites": []})
 
     # Filtruj oblíbené podle typu a ID
     filter_kwargs = {
-        'user': request.user,
-        'component_type': component_type,
-        f'{component_type}__id__in': component_ids
+        "user": request.user,
+        "component_type": component_type,
+        f"{component_type}__id__in": component_ids,
     }
 
-    favorites = UserFavorites.objects.filter(**filter_kwargs).values_list(f'{component_type}__id', flat=True)
+    favorites = UserFavorites.objects.filter(**filter_kwargs).values_list(
+        f"{component_type}__id", flat=True
+    )
 
-    return JsonResponse({'favorites': list(favorites)})
+    return JsonResponse({"favorites": list(favorites)})
+
 
 def component_selector_view(request):
     """Stránka pro výběr komponent k porovnání"""
 
     # Získej aktuální selection ze session
-    comparison_data = request.session.get('comparison', {})
+    comparison_data = request.session.get("comparison", {})
 
     # Získej všechny komponenty podle typu - explicitně jako list
-    processors = list(Processors.objects.all().order_by('name'))
-    graphics_cards = list(GraphicsCards.objects.all().order_by('name'))
-    rams = list(Ram.objects.all().order_by('name'))
-    storages = list(Storage.objects.all().order_by('name'))
-    motherboards = list(Motherboards.objects.all().order_by('name'))
-    power_supplies = list(PowerSupplyUnits.objects.all().order_by('name'))
+    processors = list(Processors.objects.all().order_by("name"))
+    graphics_cards = list(GraphicsCards.objects.all().order_by("name"))
+    rams = list(Ram.objects.all().order_by("name"))
+    storages = list(Storage.objects.all().order_by("name"))
+    motherboards = list(Motherboards.objects.all().order_by("name"))
+    power_supplies = list(PowerSupplyUnits.objects.all().order_by("name"))
 
     context = {
-        'processors': processors,
-        'graphics_cards': graphics_cards,
-        'rams': rams,
-        'storages': storages,
-        'motherboards': motherboards,
-        'power_supplies': power_supplies,
-        'comparison_data': comparison_data,
-        'selected_count': len(comparison_data),
+        "processors": processors,
+        "graphics_cards": graphics_cards,
+        "rams": rams,
+        "storages": storages,
+        "motherboards": motherboards,
+        "power_supplies": power_supplies,
+        "comparison_data": comparison_data,
+        "selected_count": len(comparison_data),
     }
 
-    return render(request, 'viewer/component_selector.html', context)
+    return render(request, "viewer/component_selector.html", context)
+
 
 @require_POST
 def add_to_comparison(request):
     """AJAX endpoint pro přidání komponenty do porovnání"""
     try:
         data = json.loads(request.body)
-        component_type = data.get('component_type')
-        component_id = data.get('component_id')
+        component_type = data.get("component_type")
+        component_id = data.get("component_id")
 
         if not component_type or not component_id:
-            return JsonResponse({'success': False, 'error': 'Chybí povinné parametry'})
+            return JsonResponse({"success": False, "error": "Chybí povinné parametry"})
 
         # Získej session data
-        comparison_data = request.session.get('comparison', {})
+        comparison_data = request.session.get("comparison", {})
 
         # Limit 3 komponenty
         if len(comparison_data) >= 3:
-            return JsonResponse({'success': False, 'error': 'Můžete porovnat maximálně 3 komponenty'})
+            return JsonResponse(
+                {"success": False, "error": "Můžete porovnat maximálně 3 komponenty"}
+            )
 
         # Zkontroluj typ komponent - musí být stejný typ
         if comparison_data:
-            existing_types = set(comp_data['type'] for comp_data in comparison_data.values())
+            existing_types = set(
+                comp_data["type"] for comp_data in comparison_data.values()
+            )
             if component_type not in existing_types and len(existing_types) > 0:
                 # Přeložit typ pro uživatele
                 type_translations = {
-                    'processor': 'procesory',
-                    'graphics_card': 'grafické karty',
-                    'ram': 'RAM paměti',
-                    'storage': 'úložiště',
-                    'motherboard': 'základní desky',
-                    'power_supply': 'zdroje'
+                    "processor": "procesory",
+                    "graphics_card": "grafické karty",
+                    "ram": "RAM paměti",
+                    "storage": "úložiště",
+                    "motherboard": "základní desky",
+                    "power_supply": "zdroje",
                 }
                 existing_type = list(existing_types)[0]
-                return JsonResponse({
-                    'success': False,
-                    'error': f'Můžete porovnávat pouze komponenty stejného typu. Už máte vybrané {type_translations.get(existing_type, existing_type)}.'
-                })
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error": f"Můžete porovnávat pouze komponenty stejného typu. Už máte vybrané {type_translations.get(existing_type, existing_type)}.",
+                    }
+                )
 
         # Mapování typů na modely
         model_mapping = {
-            'processor': Processors,
-            'motherboard': Motherboards,
-            'ram': Ram,
-            'graphics_card': GraphicsCards,
-            'storage': Storage,
-            'power_supply': PowerSupplyUnits,
+            "processor": Processors,
+            "motherboard": Motherboards,
+            "ram": Ram,
+            "graphics_card": GraphicsCards,
+            "storage": Storage,
+            "power_supply": PowerSupplyUnits,
         }
 
         if component_type not in model_mapping:
-            return JsonResponse({'success': False, 'error': 'Neplatný typ komponenty'})
+            return JsonResponse({"success": False, "error": "Neplatný typ komponenty"})
 
         # Získej komponentu
         ComponentModel = model_mapping[component_type]
@@ -1536,107 +1738,120 @@ def add_to_comparison(request):
 
         # Zkontroluj jestli už není v porovnání
         if comparison_key in comparison_data:
-            return JsonResponse({'success': False, 'error': 'Komponenta je již v porovnání'})
+            return JsonResponse(
+                {"success": False, "error": "Komponenta je již v porovnání"}
+            )
 
         # Přidej do session
         comparison_data[comparison_key] = {
-            'type': component_type,
-            'id': component_id,
-            'name': component.name,
-            'manufacturer': component.manufacturer,
-            'price': float(component.price) if component.price else 0,
+            "type": component_type,
+            "id": component_id,
+            "name": component.name,
+            "manufacturer": component.manufacturer,
+            "price": float(component.price) if component.price else 0,
         }
 
-        request.session['comparison'] = comparison_data
+        request.session["comparison"] = comparison_data
         request.session.modified = True
 
-        return JsonResponse({
-            'success': True,
-            'message': f'{component.name} byl přidán do porovnání',
-            'count': len(comparison_data)
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"{component.name} byl přidán do porovnání",
+                "count": len(comparison_data),
+            }
+        )
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({"success": False, "error": str(e)})
+
 
 @require_POST
 def remove_from_comparison(request):
     """AJAX endpoint pro odebrání komponenty z porovnání"""
     try:
         data = json.loads(request.body)
-        comparison_key = data.get('comparison_key')
+        comparison_key = data.get("comparison_key")
 
         if not comparison_key:
-            return JsonResponse({'success': False, 'error': 'Chybí comparison_key'})
+            return JsonResponse({"success": False, "error": "Chybí comparison_key"})
 
-        comparison_data = request.session.get('comparison', {})
+        comparison_data = request.session.get("comparison", {})
 
         if comparison_key in comparison_data:
-            component_name = comparison_data[comparison_key]['name']
+            component_name = comparison_data[comparison_key]["name"]
             del comparison_data[comparison_key]
-            request.session['comparison'] = comparison_data
+            request.session["comparison"] = comparison_data
             request.session.modified = True
 
-            return JsonResponse({
-                'success': True,
-                'message': f'{component_name} byl odebrán z porovnání',
-                'count': len(comparison_data)
-            })
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"{component_name} byl odebrán z porovnání",
+                    "count": len(comparison_data),
+                }
+            )
         else:
-            return JsonResponse({'success': False, 'error': 'Komponenta není v porovnání'})
+            return JsonResponse(
+                {"success": False, "error": "Komponenta není v porovnání"}
+            )
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({"success": False, "error": str(e)})
+
 
 def clear_comparison(request):
     """Vymaže všechny komponenty z porovnání"""
-    request.session['comparison'] = {}
+    request.session["comparison"] = {}
     request.session.modified = True
-    messages.success(request, 'Porovnání bylo vymazáno')
-    return redirect('component_selector')
+    messages.success(request, "Porovnání bylo vymazáno")
+    return redirect("component_selector")
+
 
 def component_comparison_view(request):
     """Hlavní stránka porovnání komponent"""
-    comparison_data = request.session.get('comparison', {})
+    comparison_data = request.session.get("comparison", {})
 
     if len(comparison_data) < 2:
-        messages.warning(request, 'Pro porovnání potřebujete alespoň 2 komponenty')
-        return redirect('component_selector')
+        messages.warning(request, "Pro porovnání potřebujete alespoň 2 komponenty")
+        return redirect("component_selector")
 
     # Načti skutečné komponenty z databáze
     components = []
 
     model_mapping = {
-        'processor': Processors,
-        'motherboard': Motherboards,
-        'ram': Ram,
-        'graphics_card': GraphicsCards,
-        'storage': Storage,
-        'power_supply': PowerSupplyUnits,
+        "processor": Processors,
+        "motherboard": Motherboards,
+        "ram": Ram,
+        "graphics_card": GraphicsCards,
+        "storage": Storage,
+        "power_supply": PowerSupplyUnits,
     }
 
     for key, comp_data in comparison_data.items():
-        component_type = comp_data['type']
-        component_id = comp_data['id']
+        component_type = comp_data["type"]
+        component_id = comp_data["id"]
 
         if component_type in model_mapping:
             ComponentModel = model_mapping[component_type]
             try:
                 component = ComponentModel.objects.get(id=component_id)
-                components.append({
-                    'object': component,
-                    'type': component_type,
-                    'key': key,
-                })
+                components.append(
+                    {
+                        "object": component,
+                        "type": component_type,
+                        "key": key,
+                    }
+                )
             except ComponentModel.DoesNotExist:
                 # Komponenta byla smazána, odeber ze session
                 del comparison_data[key]
-                request.session['comparison'] = comparison_data
+                request.session["comparison"] = comparison_data
                 request.session.modified = True
 
     if len(components) < 2:
-        messages.warning(request, 'Některé komponenty již nejsou dostupné')
-        return redirect('component_selector')
+        messages.warning(request, "Některé komponenty již nejsou dostupné")
+        return redirect("component_selector")
 
     # Připrav data pro porovnání
     try:
@@ -1644,16 +1859,17 @@ def component_comparison_view(request):
         print(f"DEBUG: Comparison specs prepared successfully")
     except Exception as e:
         print(f"DEBUG ERROR in prepare_comparison_data: {e}")
-        return render(request, 'viewer/debug_comparison_error.html', {'error': str(e)})
+        return render(request, "viewer/debug_comparison_error.html", {"error": str(e)})
 
     context = {
-        'components': components,
-        'comparison_specs': comparison_specs,
-        'component_count': len(components),
+        "components": components,
+        "comparison_specs": comparison_specs,
+        "component_count": len(components),
     }
 
     print(f"DEBUG: Rendering template with {len(components)} components")
-    return render(request, 'viewer/component_comparison.html', context)
+    return render(request, "viewer/component_comparison.html", context)
+
 
 def prepare_comparison_data(components):
     """Připraví data pro porovnání s označením nejlepších hodnot"""
@@ -1662,57 +1878,102 @@ def prepare_comparison_data(components):
         return {}
 
     # Určí typ porovnání podle prvního komponentu
-    first_type = components[0]['type']
+    first_type = components[0]["type"]
 
     # Základní specs pro všechny typy
     common_specs = {
-        'Název': {'values': [], 'type': 'text'},
-        'Výrobce': {'values': [], 'type': 'text'},
-        'Cena': {'values': [], 'type': 'price', 'unit': 'Kč', 'higher_better': False},
-        'Hodnocení': {'values': [], 'type': 'number', 'higher_better': True},
-        'Datum přidání': {'values': [], 'type': 'date'},
+        "Název": {"values": [], "type": "text"},
+        "Výrobce": {"values": [], "type": "text"},
+        "Cena": {"values": [], "type": "price", "unit": "Kč", "higher_better": False},
+        "Hodnocení": {"values": [], "type": "number", "higher_better": True},
+        "Datum přidání": {"values": [], "type": "date"},
     }
 
     # Specs podle typu komponenty
     type_specific_specs = {}
 
-    if first_type == 'processor':
+    if first_type == "processor":
         type_specific_specs = {
-            'Počet jader': {'values': [], 'type': 'number', 'higher_better': True},
-            'Frekvence': {'values': [], 'type': 'number', 'unit': 'MHz', 'higher_better': True},
-            'TDP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': False},
-            'SMT podpora': {'values': [], 'type': 'boolean'},
-            'Benchmark skóre': {'values': [], 'type': 'number', 'higher_better': True},
-            'Socket': {'values': [], 'type': 'text'},
+            "Počet jader": {"values": [], "type": "number", "higher_better": True},
+            "Frekvence": {
+                "values": [],
+                "type": "number",
+                "unit": "MHz",
+                "higher_better": True,
+            },
+            "TDP": {
+                "values": [],
+                "type": "number",
+                "unit": "W",
+                "higher_better": False,
+            },
+            "SMT podpora": {"values": [], "type": "boolean"},
+            "Benchmark skóre": {"values": [], "type": "number", "higher_better": True},
+            "Socket": {"values": [], "type": "text"},
         }
-    elif first_type == 'graphics_card':
+    elif first_type == "graphics_card":
         type_specific_specs = {
-            'VRAM': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
-            'TGP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': False},
+            "VRAM": {
+                "values": [],
+                "type": "number",
+                "unit": "GB",
+                "higher_better": True,
+            },
+            "TGP": {
+                "values": [],
+                "type": "number",
+                "unit": "W",
+                "higher_better": False,
+            },
         }
-    elif first_type == 'ram':
+    elif first_type == "ram":
         type_specific_specs = {
-            'Kapacita': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
-            'Frekvence': {'values': [], 'type': 'number', 'unit': 'MHz', 'higher_better': True},
-            'Typ': {'values': [], 'type': 'text'},
+            "Kapacita": {
+                "values": [],
+                "type": "number",
+                "unit": "GB",
+                "higher_better": True,
+            },
+            "Frekvence": {
+                "values": [],
+                "type": "number",
+                "unit": "MHz",
+                "higher_better": True,
+            },
+            "Typ": {"values": [], "type": "text"},
         }
-    elif first_type == 'storage':
+    elif first_type == "storage":
         type_specific_specs = {
-            'Kapacita': {'values': [], 'type': 'number', 'unit': 'GB', 'higher_better': True},
-            'Typ': {'values': [], 'type': 'text'},
+            "Kapacita": {
+                "values": [],
+                "type": "number",
+                "unit": "GB",
+                "higher_better": True,
+            },
+            "Typ": {"values": [], "type": "text"},
         }
-    elif first_type == 'motherboard':
+    elif first_type == "motherboard":
         type_specific_specs = {
-            'Socket': {'values': [], 'type': 'text'},
-            'Formát': {'values': [], 'type': 'text'},
-            'Max CPU TDP': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': True},
-            'SATA porty': {'values': [], 'type': 'number', 'higher_better': True},
-            'NVMe sloty': {'values': [], 'type': 'number', 'higher_better': True},
-            'PCIe generace': {'values': [], 'type': 'number', 'higher_better': True},
+            "Socket": {"values": [], "type": "text"},
+            "Formát": {"values": [], "type": "text"},
+            "Max CPU TDP": {
+                "values": [],
+                "type": "number",
+                "unit": "W",
+                "higher_better": True,
+            },
+            "SATA porty": {"values": [], "type": "number", "higher_better": True},
+            "NVMe sloty": {"values": [], "type": "number", "higher_better": True},
+            "PCIe generace": {"values": [], "type": "number", "higher_better": True},
         }
-    elif first_type == 'power_supply':
+    elif first_type == "power_supply":
         type_specific_specs = {
-            'Výkon': {'values': [], 'type': 'number', 'unit': 'W', 'higher_better': True},
+            "Výkon": {
+                "values": [],
+                "type": "number",
+                "unit": "W",
+                "higher_better": True,
+            },
         }
 
     # Sloučí common a type-specific specs
@@ -1720,68 +1981,73 @@ def prepare_comparison_data(components):
 
     # Naplň hodnoty
     for component in components:
-        obj = component['object']
-        comp_type = component['type']
+        obj = component["object"]
+        comp_type = component["type"]
 
         # Common values
-        all_specs['Název']['values'].append(obj.name)
-        all_specs['Výrobce']['values'].append(obj.manufacturer)
-        all_specs['Cena']['values'].append(float(obj.price) if obj.price else 0)
-        all_specs['Hodnocení']['values'].append(obj.rating)
-        all_specs['Datum přidání']['values'].append(obj.dateadded)
+        all_specs["Název"]["values"].append(obj.name)
+        all_specs["Výrobce"]["values"].append(obj.manufacturer)
+        all_specs["Cena"]["values"].append(float(obj.price) if obj.price else 0)
+        all_specs["Hodnocení"]["values"].append(obj.rating)
+        all_specs["Datum přidání"]["values"].append(obj.dateadded)
 
         # Type-specific values - pouze pro komponenty stejného typu
-        if comp_type == 'processor' and first_type == 'processor':
-            all_specs['Počet jader']['values'].append(obj.corecount)
-            all_specs['Frekvence']['values'].append(obj.clock)
-            all_specs['TDP']['values'].append(obj.tdp)
-            all_specs['SMT podpora']['values'].append(obj.smt)
-            all_specs['Benchmark skóre']['values'].append(obj.benchresult)
-            all_specs['Socket']['values'].append(str(obj.socket))
-        elif comp_type == 'graphics_card' and first_type == 'graphics_card':
-            all_specs['VRAM']['values'].append(obj.vram)
-            all_specs['TGP']['values'].append(obj.tgp)
-        elif comp_type == 'ram' and first_type == 'ram':
-            all_specs['Kapacita']['values'].append(obj.capacity)
-            all_specs['Frekvence']['values'].append(obj.clock)
-            all_specs['Typ']['values'].append(str(obj.type))
-        elif comp_type == 'storage' and first_type == 'storage':
-            all_specs['Kapacita']['values'].append(obj.capacity)
-            all_specs['Typ']['values'].append(str(obj.type))
-        elif comp_type == 'motherboard' and first_type == 'motherboard':
-            all_specs['Socket']['values'].append(str(obj.socket))
-            all_specs['Formát']['values'].append(str(obj.format))
-            all_specs['Max CPU TDP']['values'].append(obj.maxcputdp)
-            all_specs['SATA porty']['values'].append(obj.satacount)
-            all_specs['NVMe sloty']['values'].append(obj.nvmecount)
-            all_specs['PCIe generace']['values'].append(obj.pciegen)
-        elif comp_type == 'power_supply' and first_type == 'power_supply':
-            all_specs['Výkon']['values'].append(obj.maxpower)
+        if comp_type == "processor" and first_type == "processor":
+            all_specs["Počet jader"]["values"].append(obj.corecount)
+            all_specs["Frekvence"]["values"].append(obj.clock)
+            all_specs["TDP"]["values"].append(obj.tdp)
+            all_specs["SMT podpora"]["values"].append(obj.smt)
+            all_specs["Benchmark skóre"]["values"].append(obj.benchresult)
+            all_specs["Socket"]["values"].append(str(obj.socket))
+        elif comp_type == "graphics_card" and first_type == "graphics_card":
+            all_specs["VRAM"]["values"].append(obj.vram)
+            all_specs["TGP"]["values"].append(obj.tgp)
+        elif comp_type == "ram" and first_type == "ram":
+            all_specs["Kapacita"]["values"].append(obj.capacity)
+            all_specs["Frekvence"]["values"].append(obj.clock)
+            all_specs["Typ"]["values"].append(str(obj.type))
+        elif comp_type == "storage" and first_type == "storage":
+            all_specs["Kapacita"]["values"].append(obj.capacity)
+            all_specs["Typ"]["values"].append(str(obj.type))
+        elif comp_type == "motherboard" and first_type == "motherboard":
+            all_specs["Socket"]["values"].append(str(obj.socket))
+            all_specs["Formát"]["values"].append(str(obj.format))
+            all_specs["Max CPU TDP"]["values"].append(obj.maxcputdp)
+            all_specs["SATA porty"]["values"].append(obj.satacount)
+            all_specs["NVMe sloty"]["values"].append(obj.nvmecount)
+            all_specs["PCIe generace"]["values"].append(obj.pciegen)
+        elif comp_type == "power_supply" and first_type == "power_supply":
+            all_specs["Výkon"]["values"].append(obj.maxpower)
         else:
             # Pokud typ nesouhlasí, přidej placeholder hodnoty pro type-specific specs
             for spec_name in type_specific_specs.keys():
-                all_specs[spec_name]['values'].append('N/A')
+                all_specs[spec_name]["values"].append("N/A")
 
     # Označ nejlepší hodnoty
     for spec_name, spec_data in all_specs.items():
-        if spec_data['type'] in ['number', 'price'] and len(set(spec_data['values'])) > 1:
-            values = spec_data['values']
-            numeric_values = [v for v in values if isinstance(v, (int, float)) and v > 0]
+        if (
+            spec_data["type"] in ["number", "price"]
+            and len(set(spec_data["values"])) > 1
+        ):
+            values = spec_data["values"]
+            numeric_values = [
+                v for v in values if isinstance(v, (int, float)) and v > 0
+            ]
 
             if numeric_values:
-                if spec_data.get('higher_better', True):
+                if spec_data.get("higher_better", True):
                     best_value = max(numeric_values)
                 else:
                     best_value = min(numeric_values)
 
-                spec_data['best_indices'] = [
-                    i for i, v in enumerate(values)
+                spec_data["best_indices"] = [
+                    i
+                    for i, v in enumerate(values)
                     if isinstance(v, (int, float)) and v == best_value
                 ]
             else:
-                spec_data['best_indices'] = []
+                spec_data["best_indices"] = []
         else:
-            spec_data['best_indices'] = []
+            spec_data["best_indices"] = []
 
     return all_specs
-

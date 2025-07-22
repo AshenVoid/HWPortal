@@ -1,6 +1,18 @@
 from django.db import models
-from django.db.models import Model, CharField, DateField, ForeignKey, SET_NULL, \
-    TextField, DateTimeField, ManyToManyField, IntegerField, ImageField, DecimalField, CASCADE
+from django.db.models import (
+    Model,
+    CharField,
+    DateField,
+    ForeignKey,
+    SET_NULL,
+    TextField,
+    DateTimeField,
+    ManyToManyField,
+    IntegerField,
+    ImageField,
+    DecimalField,
+    CASCADE,
+)
 from django.db.models.fields import BooleanField
 from django.db.models.functions import datetime
 from django.contrib.auth.models import User
@@ -12,30 +24,40 @@ class Sockets(Model):
 
     def __repr__(self):
         return self.type
+
     def __str__(self):
         return self.type
 
+
 class BoardFormats(Model):
     format = CharField(max_length=32)
+
     def __repr__(self):
         return self.format
+
     def __str__(self):
         return self.format
 
 
 class RamTypes(Model):
     type = CharField(max_length=32)
+
     def __repr__(self):
         return self.type
+
     def __str__(self):
         return self.type
 
+
 class StorageTypes(Model):
     type = CharField(max_length=32)
+
     def __repr__(self):
         return self.type
+
     def __str__(self):
         return self.type
+
 
 class Processors(Model):
     name = CharField(max_length=100)
@@ -51,23 +73,26 @@ class Processors(Model):
     rating = IntegerField(default=0)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __repr__(self):
-        return (f"Processor (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"socket={self.socket}, "
-                f"tdp={self.tdp}, "
-                f"corecount={self.corecount}, "
-                f"smt={self.smt}, "
-                f"price={self.price}, "
-                f"benchresult={self.benchresult}), "
-                f"clock={self.clock}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}")
+        return (
+            f"Processor (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"socket={self.socket}, "
+            f"tdp={self.tdp}, "
+            f"corecount={self.corecount}, "
+            f"smt={self.smt}, "
+            f"price={self.price}, "
+            f"benchresult={self.benchresult}), "
+            f"clock={self.clock}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}"
+        )
 
     def __str__(self):
         return self.__repr__()
+
 
 class Motherboards(Model):
     name = CharField(max_length=100)
@@ -83,18 +108,21 @@ class Motherboards(Model):
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
-        return (f"Motherboard (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"format={self.format}, "
-                f"maxcputdp={self.maxcputdp}, "
-                f"satacount={self.satacount}, "
-                f"nvmecount={self.nvmecount}, "
-                f"pciegen={self.pciegen}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}")
+        return (
+            f"Motherboard (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"format={self.format}, "
+            f"maxcputdp={self.maxcputdp}, "
+            f"satacount={self.satacount}, "
+            f"nvmecount={self.nvmecount}, "
+            f"pciegen={self.pciegen}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}"
+        )
 
     def __str__(self):
         return self.__repr__()
+
 
 class Ram(Model):
     name = CharField(max_length=100)
@@ -107,16 +135,19 @@ class Ram(Model):
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
-        return (f"Ram (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"type={self.type}, "
-                f"capacity={self.capacity}, "
-                f"clock={self.clock}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}, ")
+        return (
+            f"Ram (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"type={self.type}, "
+            f"capacity={self.capacity}, "
+            f"clock={self.clock}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}, "
+        )
 
     def __str__(self):
         return self.__repr__()
+
 
 class GraphicsCards(Model):
     name = CharField(max_length=100)
@@ -128,16 +159,17 @@ class GraphicsCards(Model):
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
-        return (f"Graphics card (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"vram={self.vram}, "
-                f"tgp={self.tgp}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}, ")
+        return (
+            f"Graphics card (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"vram={self.vram}, "
+            f"tgp={self.tgp}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}, "
+        )
 
     def __str__(self):
         return self.__repr__()
-
 
 
 class Storage(Model):
@@ -150,15 +182,18 @@ class Storage(Model):
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
-        return (f"Storage (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"capacity={self.capacity}, "
-                f"type={self.type}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}, ")
+        return (
+            f"Storage (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"capacity={self.capacity}, "
+            f"type={self.type}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}, "
+        )
 
     def __str__(self):
         return self.__repr__()
+
 
 class PowerSupplyUnits(Model):
     name = CharField(max_length=100)
@@ -169,22 +204,25 @@ class PowerSupplyUnits(Model):
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
     def __repr__(self):
-        return (f"PowerSupply (name={self.name}, "
-                f"manufacturer={self.manufacturer}, "
-                f"maxpower={self.maxpower}, "
-                f"dateadded={self.dateadded}, "
-                f"rating={self.rating}, ")
+        return (
+            f"PowerSupply (name={self.name}, "
+            f"manufacturer={self.manufacturer}, "
+            f"maxpower={self.maxpower}, "
+            f"dateadded={self.dateadded}, "
+            f"rating={self.rating}, "
+        )
 
     def __str__(self):
         return self.__repr__()
 
+
 COMPONENT_TYPES = (
-    ('processor', 'Procesor'),
-    ('motherboard', 'Základní deska'),
-    ('ram', 'RAM'),
-    ('graphics_card', 'Grafická karta'),
-    ('storage', 'Úložiště'),
-    ('power_supply', 'Zdroj'),
+    ("processor", "Procesor"),
+    ("motherboard", "Základní deska"),
+    ("ram", "RAM"),
+    ("graphics_card", "Grafická karta"),
+    ("storage", "Úložiště"),
+    ("power_supply", "Zdroj"),
 )
 
 
@@ -192,23 +230,33 @@ class Reviews(Model):
     # Základní informace
     title = CharField(max_length=200, verbose_name="Název recenze")
     author = ForeignKey(User, on_delete=CASCADE, verbose_name="Autor")
-    reviewer_name = CharField(max_length=100, verbose_name="Jméno recensenta", help_text="Např. TechMaster")
+    reviewer_name = CharField(
+        max_length=100, verbose_name="Jméno recensenta", help_text="Např. TechMaster"
+    )
 
     # Obsah recenze
     content = TextField(verbose_name="Obsah recenze")
-    summary = CharField(max_length=500, verbose_name="Shrnutí", help_text="Krátké shrnutí recenze")
+    summary = CharField(
+        max_length=500, verbose_name="Shrnutí", help_text="Krátké shrnutí recenze"
+    )
 
     # Hodnocení
     rating = IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="Hodnocení",
-        help_text="Hodnocení 1-5 hvězdiček"
+        help_text="Hodnocení 1-5 hvězdiček",
     )
 
-    pros = TextField(verbose_name="Klady", blank=True, help_text="Pozitivní stránky produktu")
-    cons = TextField(verbose_name="Zápory", blank=True, help_text="Negativní stránky produktu")
+    pros = TextField(
+        verbose_name="Klady", blank=True, help_text="Pozitivní stránky produktu"
+    )
+    cons = TextField(
+        verbose_name="Zápory", blank=True, help_text="Negativní stránky produktu"
+    )
 
-    component_type = CharField(max_length=20, choices=COMPONENT_TYPES, verbose_name="Typ komponenty")
+    component_type = CharField(
+        max_length=20, choices=COMPONENT_TYPES, verbose_name="Typ komponenty"
+    )
 
     # Foreign keys na jednotlivé komponenty (nullable, protože recenze může být jen pro jeden typ)
     processor = ForeignKey(Processors, on_delete=CASCADE, null=True, blank=True)
@@ -216,7 +264,9 @@ class Reviews(Model):
     ram = ForeignKey(Ram, on_delete=CASCADE, null=True, blank=True)
     graphics_card = ForeignKey(GraphicsCards, on_delete=CASCADE, null=True, blank=True)
     storage = ForeignKey(Storage, on_delete=CASCADE, null=True, blank=True)
-    power_supply = ForeignKey(PowerSupplyUnits, on_delete=CASCADE, null=True, blank=True)
+    power_supply = ForeignKey(
+        PowerSupplyUnits, on_delete=CASCADE, null=True, blank=True
+    )
 
     # Metadata
     date_created = DateTimeField(auto_now_add=True, verbose_name="Datum vytvoření")
@@ -228,7 +278,7 @@ class Reviews(Model):
     total_votes = IntegerField(default=0, verbose_name="Celkem hlasů")
 
     class Meta:
-        ordering = ['-date_created']
+        ordering = ["-date_created"]
         verbose_name = "Recenze"
         verbose_name_plural = "Recenze"
 
@@ -236,26 +286,28 @@ class Reviews(Model):
         return f"{self.title} - {self.reviewer_name} ({self.rating}/5)"
 
     def __repr__(self):
-        return (f"Review(title={self.title}, "
-                f"author={self.author}, "
-                f"rating={self.rating}, "
-                f"component_type={self.component_type}, "
-                f"date_created={self.date_created})")
+        return (
+            f"Review(title={self.title}, "
+            f"author={self.author}, "
+            f"rating={self.rating}, "
+            f"component_type={self.component_type}, "
+            f"date_created={self.date_created})"
+        )
 
     @property
     def component(self):
         """Vrátí komponentu na kterou se recenze vztahuje"""
-        if self.component_type == 'processor' and self.processor:
+        if self.component_type == "processor" and self.processor:
             return self.processor
-        elif self.component_type == 'motherboard' and self.motherboard:
+        elif self.component_type == "motherboard" and self.motherboard:
             return self.motherboard
-        elif self.component_type == 'ram' and self.ram:
+        elif self.component_type == "ram" and self.ram:
             return self.ram
-        elif self.component_type == 'graphics_card' and self.graphics_card:
+        elif self.component_type == "graphics_card" and self.graphics_card:
             return self.graphics_card
-        elif self.component_type == 'storage' and self.storage:
+        elif self.component_type == "storage" and self.storage:
             return self.storage
-        elif self.component_type == 'power_supply' and self.power_supply:
+        elif self.component_type == "power_supply" and self.power_supply:
             return self.power_supply
         return None
 
@@ -280,13 +332,13 @@ class Reviews(Model):
 
 # Model pro hlasování o užitečnosti recenze
 class ReviewVotes(Model):
-    review = ForeignKey(Reviews, on_delete=CASCADE, related_name='votes')
+    review = ForeignKey(Reviews, on_delete=CASCADE, related_name="votes")
     user = ForeignKey(User, on_delete=CASCADE)
     is_helpful = BooleanField(verbose_name="Užitečné")
     date_voted = DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('review', 'user')  # Jeden uživatel může hlasovat jen jednou
+        unique_together = ("review", "user")  # Jeden uživatel může hlasovat jen jednou
         verbose_name = "Hlasování o recenzi"
         verbose_name_plural = "Hlasování o recenzích"
 
@@ -296,7 +348,9 @@ class ReviewVotes(Model):
 
 class UserFavorites(Model):
     user = ForeignKey(User, on_delete=CASCADE, verbose_name="Uživatel")
-    component_type = CharField(max_length=20, choices=COMPONENT_TYPES, verbose_name="Typ komponenty")
+    component_type = CharField(
+        max_length=20, choices=COMPONENT_TYPES, verbose_name="Typ komponenty"
+    )
 
     # Foreign keys na jednotlivé komponenty (pouze jedna bude vyplněná)
     processor = ForeignKey(Processors, on_delete=CASCADE, null=True, blank=True)
@@ -304,7 +358,9 @@ class UserFavorites(Model):
     ram = ForeignKey(Ram, on_delete=CASCADE, null=True, blank=True)
     graphics_card = ForeignKey(GraphicsCards, on_delete=CASCADE, null=True, blank=True)
     storage = ForeignKey(Storage, on_delete=CASCADE, null=True, blank=True)
-    power_supply = ForeignKey(PowerSupplyUnits, on_delete=CASCADE, null=True, blank=True)
+    power_supply = ForeignKey(
+        PowerSupplyUnits, on_delete=CASCADE, null=True, blank=True
+    )
 
     # Metadata
     date_added = DateTimeField(auto_now_add=True, verbose_name="Datum přidání")
@@ -315,19 +371,19 @@ class UserFavorites(Model):
 
     class Meta:
         unique_together = [
-            ('user', 'processor'),
-            ('user', 'motherboard'),
-            ('user', 'ram'),
-            ('user', 'graphics_card'),
-            ('user', 'storage'),
-            ('user', 'power_supply'),
+            ("user", "processor"),
+            ("user", "motherboard"),
+            ("user", "ram"),
+            ("user", "graphics_card"),
+            ("user", "storage"),
+            ("user", "power_supply"),
         ]
-        ordering = ['-date_added']
+        ordering = ["-date_added"]
         verbose_name = "Oblíbená komponenta"
         verbose_name_plural = "Oblíbené komponenty"
         indexes = [
             # Index pro rychlé vyhledávání oblíbených podle uživatele a typu
-            models.Index(fields=['user', 'component_type']),
+            models.Index(fields=["user", "component_type"]),
         ]
 
     def __str__(self):
@@ -337,17 +393,17 @@ class UserFavorites(Model):
     @property
     def component(self):
         """Vrátí komponentu podle typu"""
-        if self.component_type == 'processor' and self.processor:
+        if self.component_type == "processor" and self.processor:
             return self.processor
-        elif self.component_type == 'motherboard' and self.motherboard:
+        elif self.component_type == "motherboard" and self.motherboard:
             return self.motherboard
-        elif self.component_type == 'ram' and self.ram:
+        elif self.component_type == "ram" and self.ram:
             return self.ram
-        elif self.component_type == 'graphics_card' and self.graphics_card:
+        elif self.component_type == "graphics_card" and self.graphics_card:
             return self.graphics_card
-        elif self.component_type == 'storage' and self.storage:
+        elif self.component_type == "storage" and self.storage:
             return self.storage
-        elif self.component_type == 'power_supply' and self.power_supply:
+        elif self.component_type == "power_supply" and self.power_supply:
             return self.power_supply
         return None
 
@@ -366,6 +422,7 @@ class UserFavorites(Model):
     @property
     def recent_reviews_count(self):
         from datetime import datetime, timedelta
+
         week_ago = datetime.now() - timedelta(days=7)
 
         component = self.component
@@ -375,8 +432,8 @@ class UserFavorites(Model):
         # Počítej recenze pro tuto komponentu za poslední týden
         filter_kwargs = {
             self.component_type: component,
-            'date_created__gte': week_ago,
-            'is_published': True
+            "date_created__gte": week_ago,
+            "is_published": True,
         }
 
         return Reviews.objects.filter(**filter_kwargs).count()
@@ -389,14 +446,16 @@ class UserFavorites(Model):
 class FavoriteActivity(Model):
 
     ACTIVITY_TYPES = (
-        ('new_review', 'Nová recenze'),
-        ('price_change', 'Změna ceny'),
-        ('rating_change', 'Změna hodnocení'),
-        ('new_helpful_review', 'Nová užitečná recenze'),
+        ("new_review", "Nová recenze"),
+        ("price_change", "Změna ceny"),
+        ("rating_change", "Změna hodnocení"),
+        ("new_helpful_review", "Nová užitečná recenze"),
     )
 
-    favorite = ForeignKey(UserFavorites, on_delete=CASCADE, related_name='activities')
-    activity_type = CharField(max_length=20, choices=ACTIVITY_TYPES, verbose_name="Typ aktivity")
+    favorite = ForeignKey(UserFavorites, on_delete=CASCADE, related_name="activities")
+    activity_type = CharField(
+        max_length=20, choices=ACTIVITY_TYPES, verbose_name="Typ aktivity"
+    )
 
     # Popis aktivity
     title = CharField(max_length=200, verbose_name="Název aktivity")
@@ -407,14 +466,20 @@ class FavoriteActivity(Model):
     new_value = CharField(max_length=100, blank=True, verbose_name="Nová hodnota")
 
     # Reference na související objekty
-    related_review = ForeignKey(Reviews, on_delete=CASCADE, null=True, blank=True, verbose_name="Související recenze")
+    related_review = ForeignKey(
+        Reviews,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Související recenze",
+    )
 
     # Metadata
     date_created = DateTimeField(auto_now_add=True, verbose_name="Datum vytvoření")
     is_read = BooleanField(default=False, verbose_name="Přečteno")
 
     class Meta:
-        ordering = ['-date_created']
+        ordering = ["-date_created"]
         verbose_name = "Aktivita oblíbené komponenty"
         verbose_name_plural = "Aktivity oblíbených komponent"
 
@@ -424,4 +489,3 @@ class FavoriteActivity(Model):
     @property
     def component_name(self):
         return self.favorite.component_name
-

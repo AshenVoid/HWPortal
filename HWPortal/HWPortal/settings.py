@@ -1,7 +1,9 @@
-import environ
+"""
+Konfigurační nastavení pro HWPortal aplikaci.
+"""
 import os
-
 from pathlib import Path
+import environ
 
 from django.contrib.messages import constants as message_constants
 
