@@ -393,6 +393,36 @@ def get_breadcrumbs(component_type, component):
     ]
 
 
+def get_random_suggestions():
+    """Jednoduché návrhy - náhodné komponenty"""
+    suggestions = []
+
+    try:
+        # Náhodné procesory - vezmi první slovo z názvu
+        random_processors = Processors.objects.order_by('?')[:2]
+        for proc in random_processors:
+            first_word = proc.name.split()[0]
+            suggestions.append(first_word)
+
+        # Náhodné grafické karty - vezmi první slovo z názvu
+        random_graphics = GraphicsCards.objects.order_by('?')[:2]
+        for gpu in random_graphics:
+            first_word = gpu.name.split()[0]
+            suggestions.append(first_word)
+
+        # Populární výrobci jako fallback
+        manufacturers = ['AMD', 'Intel', 'NVIDIA', 'Corsair']
+        suggestions.extend(manufacturers[:2])
+
+    except Exception as e:
+        # Fallback suggestions pokud databáze není dostupná
+        suggestions = ['AMD', 'Intel', 'NVIDIA', 'Corsair', 'MSI', 'ASUS']
+
+    # Odstraň duplicity a vrať max 6
+    unique_suggestions = list(dict.fromkeys(suggestions))
+    return unique_suggestions[:6]
+
+
 def search(request):
     query = request.GET.get("q", "").strip()
     selected_types = request.GET.getlist("type")
@@ -426,7 +456,7 @@ def search(request):
                             "image": None,
                             "category": "processor",
                             "relevance": processor.name.lower().count(query.lower())
-                            + processor.manufacturer.lower().count(query.lower()),
+                                         + processor.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -449,7 +479,7 @@ def search(request):
                             "image": None,
                             "category": "graphics_card",
                             "relevance": gpu.name.lower().count(query.lower())
-                            + gpu.manufacturer.lower().count(query.lower()),
+                                         + gpu.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -470,7 +500,7 @@ def search(request):
                             "image": None,
                             "category": "ram",
                             "relevance": ram.name.lower().count(query.lower())
-                            + ram.manufacturer.lower().count(query.lower()),
+                                         + ram.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -494,7 +524,7 @@ def search(request):
                             "image": None,
                             "category": "storage",
                             "relevance": storage.name.lower().count(query.lower())
-                            + storage.manufacturer.lower().count(query.lower()),
+                                         + storage.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -517,7 +547,7 @@ def search(request):
                             "image": None,
                             "category": "motherboard",
                             "relevance": mb.name.lower().count(query.lower())
-                            + mb.manufacturer.lower().count(query.lower()),
+                                         + mb.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -540,7 +570,7 @@ def search(request):
                             "image": None,
                             "category": "power_supply",
                             "relevance": psu.name.lower().count(query.lower())
-                            + psu.manufacturer.lower().count(query.lower()),
+                                         + psu.manufacturer.lower().count(query.lower()),
                         }
                     )
 
@@ -561,7 +591,7 @@ def search(request):
                     {
                         "title": f"Recenze: {review.title}",
                         "description": review.summary,
-                        "url": f"/reviews/",  # Můžeš přidat detail recenze později
+                        "url": f"/reviews/",
                         "price": None,
                         "rating": review.rating,
                         "type": "Recenze",
@@ -569,7 +599,7 @@ def search(request):
                         "image": None,
                         "category": review.component_type,
                         "relevance": review.title.lower().count(query.lower())
-                        + review.summary.lower().count(query.lower()),
+                                     + review.summary.lower().count(query.lower()),
                     }
                 )
 
@@ -601,6 +631,9 @@ def search(request):
             "selected_sort": sort,
         }
     else:
+        # Pokud není query, načti náhodné suggestions
+        suggestions = get_random_suggestions()
+
         context = {
             "query": query,
             "results": None,
@@ -608,6 +641,7 @@ def search(request):
             "selected_types": selected_types,
             "selected_category": selected_category,
             "selected_sort": sort,
+            "suggestions": suggestions,
         }
 
     return render(request, "viewer/search.html", context)

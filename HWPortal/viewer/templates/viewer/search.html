@@ -218,47 +218,42 @@
 {% endif %}
 
 {% else %}
-<!-- Suggestions When Empty -->
+<!-- Dynamic Random Suggestions When Empty -->
 <div class="bg-white rounded-lg shadow-md p-6">
-  <h2 class="text-lg font-semibold text-gray-800 mb-4">Populární vyhledávání</h2>
-  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <a href="?q=RTX 4080" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <h2 class="text-lg font-semibold text-gray-800 mb-4">Návrhy vyhledávání</h2>
+
+  {% if suggestions %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for suggestion in suggestions %}
+        <a href="?q={{ suggestion|urlencode }}"
+           class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <span class="text-sm">{{ suggestion }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Refresh button pro nové návrhy -->
+    <div class="mt-4 text-center">
+      <a href="{% url 'search' %}"
+         class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Obnovit návrhy
+      </a>
+    </div>
+  {% else %}
+    <!-- Fallback když nejsou data -->
+    <div class="text-center py-8">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
-      <span class="text-sm">RTX 4080</span>
-    </a>
-    <a href="?q=AMD Ryzen 7" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">AMD Ryzen 7</span>
-    </a>
-    <a href="?q=DDR5 pamět" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">DDR5 pamět</span>
-    </a>
-    <a href="?q=SSD NVMe" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">SSD NVMe</span>
-    </a>
-    <a href="?q=MSI MAG B650" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">MSI MAG B650</span>
-    </a>
-    <a href="?q=Corsair" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">Corsair</span>
-    </a>
-  </div>
+      <p class="text-gray-500">Začněte vyhledáváním komponent nebo výrobců</p>
+    </div>
+  {% endif %}
 </div>
 {% endif %}
 
