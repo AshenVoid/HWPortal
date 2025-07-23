@@ -151,45 +151,49 @@
     {% endfor %}
 </div>
 
-<!-- Pagination -->
+<!-- Simple Pagination -->
 {% if components.has_other_pages %}
 <div class="flex justify-center items-center space-x-4 mt-12">
+    <!-- Previous Button -->
     {% if components.has_previous %}
+        <a href="?page={{ components.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            ← Předchozí
+        </a>
     {% endif %}
 
+    <!-- Page Numbers -->
     <div class="flex space-x-2">
-        {% for num in components.paginator.page_range %}
-            {% if components.number == num %}
-                <span class="px-4 py-2 bg-blue-600 text-white rounded-lg">{{ num }}</span>
-            {% elif num > components.number|add:'-3' and num < components.number|add:'3' %}
-                <a href="?page={{ num }}&{{ request.GET.urlencode }}"
-                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">{{ num }}</a>
-            {% elif num == 1 %}
-                <a href="?page=1&{{ request.GET.urlencode }}"
-                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">1</a>
-                {% if components.number > 4 %}
-                    <span class="px-4 py-2 text-gray-500">...</span>
-                {% endif %}
-            {% elif num == components.paginator.num_pages %}
-                {% if components.number < components.paginator.num_pages|add:'-3' %}
-                    <span class="px-4 py-2 text-gray-500">...</span>
-                {% endif %}
-                <a href="?page={{ components.paginator.num_pages }}&{{ request.GET.urlencode }}"
-                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">{{ components.paginator.num_pages }}</a>
-            {% endif %}
-        {% endfor %}
+        {% with ''|center:components.paginator.num_pages as range %}
+            {% for i in range %}
+                {% with page_num=forloop.counter %}
+                    {% if page_num == components.number %}
+                        <span class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold">{{ page_num }}</span>
+                    {% elif page_num == 1 or page_num == components.paginator.num_pages or page_num >= components.number|add:'-2' and page_num <= components.number|add:'2' %}
+                        <a href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                           class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">{{ page_num }}</a>
+                    {% elif page_num == 2 and components.number > 4 %}
+                        <span class="px-2 py-2 text-gray-500">...</span>
+                    {% elif page_num == components.paginator.num_pages|add:'-1' and components.number < components.paginator.num_pages|add:'-3' %}
+                        <span class="px-2 py-2 text-gray-500">...</span>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        {% endwith %}
     </div>
 
+    <!-- Next Button -->
     {% if components.has_next %}
-        <a href="?page={{ components.next_page_number }}&{{ request.GET.urlencode }}"
+        <a href="?page={{ components.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Další
+            Další →
         </a>
-    {% else %}
-        <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed">
-            Další
-        </span>
     {% endif %}
+
+    <!-- Page Info -->
+    <div class="text-sm text-gray-600 ml-4">
+        Stránka {{ components.number }} z {{ components.paginator.num_pages }}
+    </div>
 </div>
 {% endif %}
 {% endblock %}
