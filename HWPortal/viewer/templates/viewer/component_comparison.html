@@ -153,12 +153,10 @@
             <div class="bg-white rounded-lg p-4 border-l-4 border-green-500">
                 <h4 class="font-semibold text-gray-900 mb-2">💰 Nejlevnější</h4>
                 {% for spec_name, spec_data in comparison_specs.items %}
-                    {% if spec_name == 'Cena' and spec_data.best_indices %}
-                        {% for index in spec_data.best_indices %}
-                            {% with component=components|slice:index|first %}
+                    {% if spec_name == 'Cena' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
                             <p class="text-green-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
-                            <p class="text-sm text-gray-600">{{ spec_data.values|slice:index|first }} Kč</p>
-                            {% endwith %}
+                            <p class="text-sm text-gray-600">{{ component.object.price|floatformat:0 }} Kč</p>
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     {% endif %}
@@ -168,12 +166,10 @@
             <div class="bg-white rounded-lg p-4 border-l-4 border-blue-500">
                 <h4 class="font-semibold text-gray-900 mb-2">⭐ Nejvyšší hodnocení</h4>
                 {% for spec_name, spec_data in comparison_specs.items %}
-                    {% if spec_name == 'Hodnocení' and spec_data.best_indices %}
-                        {% for index in spec_data.best_indices %}
-                            {% with component=components|slice:index|first %}
+                    {% if spec_name == 'Hodnocení' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
                             <p class="text-blue-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
-                            <p class="text-sm text-gray-600">{{ spec_data.values|slice:index|first }}/5 hvězd</p>
-                            {% endwith %}
+                            <p class="text-sm text-gray-600">{{ component.object.rating }}/5 hvězd</p>
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     {% endif %}
@@ -184,12 +180,10 @@
             <div class="bg-white rounded-lg p-4 border-l-4 border-purple-500">
                 <h4 class="font-semibold text-gray-900 mb-2">🚀 Nejvýkonnější</h4>
                 {% for spec_name, spec_data in comparison_specs.items %}
-                    {% if spec_name == 'Benchmark skóre' and spec_data.best_indices %}
-                        {% for index in spec_data.best_indices %}
-                            {% with component=components|slice:index|first %}
+                    {% if spec_name == 'Benchmark skóre' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
                             <p class="text-purple-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
-                            <p class="text-sm text-gray-600">{{ spec_data.values|slice:index|first }} bodů</p>
-                            {% endwith %}
+                            <p class="text-sm text-gray-600">{{ component.object.benchresult }} bodů</p>
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     {% endif %}

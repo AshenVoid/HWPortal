@@ -59,162 +59,186 @@
     {% endif %}
 
     <!-- Component Categories -->
-    <div class="grid gap-6">
+    <section class="grid gap-6">
         <!-- Procesory -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">Procesory</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for processor in processors %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'processor' processor.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ processor.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ processor.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ processor.corecount }} jader, {{ processor.clock }} MHz</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ processor.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('processor', {{ processor.id }})"
-                                class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('processor', {{ processor.id }})">
+                            <svg class="w-4 hover:text-blue-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- Grafické karty -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">Grafické karty</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for gpu in graphics_cards %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'graphics_card' gpu.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ gpu.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ gpu.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ gpu.vram }}GB VRAM, {{ gpu.tgp }}W</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ gpu.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('graphics_card', {{ gpu.id }})"
-                                class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('graphics_card', {{ gpu.id }})">
+                            <svg class="w-4 hover:text-green-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- RAM -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">RAM paměti</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for ram in rams %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'ram' ram.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ ram.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ ram.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ ram.capacity }}GB {{ ram.type }}, {{ ram.clock }} MHz</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ ram.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('ram', {{ ram.id }})"
-                                class="bg-purple-600 text-white px-3 py-1 rounded text-xs hover:bg-purple-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('ram', {{ ram.id }})">
+                            <svg class="w-4 hover:text-purple-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- Úložiště -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">Úložiště</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for storage in storages %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'storage' storage.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ storage.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ storage.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ storage.capacity }}GB {{ storage.type }}</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ storage.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('storage', {{ storage.id }})"
-                                class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('storage', {{ storage.id }})">
+                            <svg class="w-4 hover:text-orange-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- Základní desky -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">Základní desky</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for motherboard in motherboards %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-red-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-red-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'motherboard' motherboard.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ motherboard.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ motherboard.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ motherboard.socket }}, {{ motherboard.format }}</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ motherboard.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('motherboard', {{ motherboard.id }})"
-                                class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('motherboard', {{ motherboard.id }})">
+                            <svg class="w-4 hover:text-red-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <!-- Zdroje -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center mb-4">
+        <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
+            <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 <h2 class="text-xl font-semibold text-gray-900">Zdroje</h2>
-            </div>
+            </header>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {% for psu in power_supplies %}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-yellow-300 transition">
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-yellow-300 transition cursor-pointer" onclick="window.location.href='{% url 'component_detail' 'power_supply' psu.id %}'">
                     <h3 class="font-semibold text-gray-900 mb-1 text-sm">{{ psu.name|truncatechars:30 }}</h3>
                     <p class="text-xs text-gray-600 mb-2">{{ psu.manufacturer }}</p>
                     <p class="text-xs text-gray-500 mb-3">{{ psu.maxpower }}W</p>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-semibold text-gray-900">{{ psu.price|floatformat:0 }} Kč</span>
-                        <button onclick="addToComparison('power_supply', {{ psu.id }})"
-                                class="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700 transition">
-                            Přidat
+                        <button onclick="event.stopPropagation(); addToComparison('power_supply', {{ psu.id }})">
+                            <svg class="w-4 hover:text-yellow-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 122.88 102.72" xml:space="preserve">
+                                <style type="text/css">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style>
+                                <g>
+                                    <path class="st0" d="M65.61,20.91v72.74h35.63c0.38,0,0.68,0.31,0.68,0.69v7.7c0,0.38-0.31,0.69-0.68,0.69H22.84 c-0.38,0-0.69-0.31-0.69-0.69v-7.7c0-0.38,0.31-0.69,0.69-0.69h35.63l0-72.71c-3.1-1.08-5.56-3.53-6.64-6.63H29.3v3.43 c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43h-5.73c-0.44,0-0.8-0.31-0.8-0.68V7.84 c0-0.38,0.36-0.69,0.8-0.69h35.43C53.33,2.99,57.31,0,61.99,0c4.68,0,8.66,2.99,10.14,7.16h35.53c0.44,0,0.8,0.31,0.8,0.69v5.78 c0,0.38-0.36,0.68-0.8,0.68h-6.46v3.43c0,0.38-0.31,0.68-0.68,0.68h-5.78c-0.38,0-0.69-0.31-0.69-0.68v-3.43H72.16 C71.09,17.38,68.67,19.81,65.61,20.91L65.61,20.91z M99.66,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02c0,0.05,0,0.1,0,0.15 c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15c-0.04-0.16-0.06-0.34-0.06-0.51c0-0.44,0.14-0.86,0.37-1.2 l23.43-40.43c0.59-1.02,1.89-1.37,2.91-0.78C99.2,21.65,99.48,21.95,99.66,22.3L99.66,22.3z M99.75,31.11v30.6h17.32L99.75,31.11 L99.75,31.11z M95.67,61.7V31.16L77.96,61.7H95.67L95.67,61.7z M27.54,22.3l22.91,40.48c0.2,0.35,0.29,0.73,0.28,1.1h0.02 c0,0.05,0,0.1,0,0.15c0,9.64-11.35,17.46-25.35,17.46c-13.85,0-25.1-7.65-25.34-17.15C0.02,64.19,0,64.02,0,63.84 c0-0.44,0.14-0.86,0.37-1.2L23.8,22.21c0.59-1.02,1.89-1.37,2.91-0.78C27.08,21.65,27.36,21.95,27.54,22.3L27.54,22.3z M27.63,31.11v30.6h17.32L27.63,31.11L27.63,31.11z M23.54,61.7V31.16L5.84,61.7H23.54L23.54,61.7z M61.99,6.07 c2.59,0,4.69,2.1,4.69,4.69c0,2.59-2.1,4.69-4.69,4.69c-2.59,0-4.69-2.1-4.69-4.69C57.3,8.17,59.4,6.07,61.99,6.07L61.99,6.07z" fill="currentColor"/>
+                                </g>
+                            </svg>
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
     </div>
 </div>
 
@@ -241,7 +265,6 @@ function addToComparison(componentType, componentId) {
         if (data.success) {
             showMessage(data.message, 'success');
             updateSelectedCount(data.count);
-            // Reload stránku pro aktualizaci vybraných komponent
             setTimeout(() => location.reload(), 1000);
         } else {
             showMessage(data.error, 'error');

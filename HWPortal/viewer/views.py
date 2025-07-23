@@ -2026,8 +2026,8 @@ def prepare_comparison_data(components):
     # Označ nejlepší hodnoty
     for spec_name, spec_data in all_specs.items():
         if (
-            spec_data["type"] in ["number", "price"]
-            and len(set(spec_data["values"])) > 1
+                spec_data["type"] in ["number", "price"]
+                and len(set(spec_data["values"])) > 1
         ):
             values = spec_data["values"]
             numeric_values = [
@@ -2045,9 +2045,15 @@ def prepare_comparison_data(components):
                     for i, v in enumerate(values)
                     if isinstance(v, (int, float)) and v == best_value
                 ]
+
+                spec_data["best_components"] = [
+                    components[i] for i in spec_data["best_indices"]
+                ]
             else:
                 spec_data["best_indices"] = []
+                spec_data["best_components"] = []
         else:
             spec_data["best_indices"] = []
+            spec_data["best_components"] = []
 
     return all_specs
