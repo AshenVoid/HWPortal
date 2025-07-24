@@ -7,20 +7,22 @@ from django.db.models import (
     SET_NULL,
     TextField,
     DateTimeField,
-    ManyToManyField,
     IntegerField,
-    ImageField,
     DecimalField,
     CASCADE,
 )
 from django.db.models.fields import BooleanField
-from django.db.models.functions import datetime
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Sockets(Model):
     type = CharField(max_length=32)
+
+    class Meta:
+        verbose_name = "Socket"
+        verbose_name_plural = "Sockety"
+        ordering = ["type"]
 
     def __repr__(self):
         return self.type
@@ -32,6 +34,11 @@ class Sockets(Model):
 class BoardFormats(Model):
     format = CharField(max_length=32)
 
+    class Meta:
+        verbose_name = "Formát základní desky"
+        verbose_name_plural = "Formáty základních desek"
+        ordering = ["format"]
+
     def __repr__(self):
         return self.format
 
@@ -42,6 +49,11 @@ class BoardFormats(Model):
 class RamTypes(Model):
     type = CharField(max_length=32)
 
+    class Meta:
+        verbose_name = "Typ RAM"
+        verbose_name_plural = "Typy RAM"
+        ordering = ["type"]
+
     def __repr__(self):
         return self.type
 
@@ -51,6 +63,11 @@ class RamTypes(Model):
 
 class StorageTypes(Model):
     type = CharField(max_length=32)
+
+    class Meta:
+        verbose_name = "Typ úložiště"
+        verbose_name_plural = "Typy úložiště"
+        ordering = ["type"]
 
     def __repr__(self):
         return self.type
@@ -73,7 +90,14 @@ class Processors(Model):
     rating = IntegerField(default=0)
 
     class Meta:
-        ordering = ["name"]
+        verbose_name = "Procesor"
+        verbose_name_plural = "Procesory"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['socket']),
+            models.Index(fields=['price']),
+        ]
 
     def __repr__(self):
         return (
@@ -107,6 +131,16 @@ class Motherboards(Model):
     rating = IntegerField(default=0)
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
+    class Meta:
+        verbose_name = "Základní deska"
+        verbose_name_plural = "Základní desky"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['socket']),
+            models.Index(fields=['format']),
+        ]
+
     def __repr__(self):
         return (
             f"Motherboard (name={self.name}, "
@@ -134,6 +168,16 @@ class Ram(Model):
     rating = IntegerField(default=0)
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
+    class Meta:
+        verbose_name = "RAM paměť"
+        verbose_name_plural = "RAM paměti"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['type']),
+            models.Index(fields=['capacity']),
+        ]
+
     def __repr__(self):
         return (
             f"Ram (name={self.name}, "
@@ -158,6 +202,17 @@ class GraphicsCards(Model):
     rating = IntegerField(default=0)
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
+    class Meta:
+        verbose_name = "Grafická karta"
+        verbose_name_plural = "Grafické karty"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['vram']),
+            models.Index(fields=['price']),
+        ]
+
+
     def __repr__(self):
         return (
             f"Graphics card (name={self.name}, "
@@ -181,6 +236,16 @@ class Storage(Model):
     rating = IntegerField(default=0)
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
 
+    class Meta:
+        verbose_name = "Úložiště"
+        verbose_name_plural = "Úložiště"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['type']),
+            models.Index(fields=['capacity']),
+        ]
+
     def __repr__(self):
         return (
             f"Storage (name={self.name}, "
@@ -202,6 +267,15 @@ class PowerSupplyUnits(Model):
     dateadded = DateField(auto_now=True)
     rating = IntegerField(default=0)
     price = DecimalField(default=0, decimal_places=0, max_digits=10)
+
+    class Meta:
+        verbose_name = "Zdroj"
+        verbose_name_plural = "Zdroje"
+        ordering = ["manufacturer", "name"]
+        indexes = [
+            models.Index(fields=['manufacturer']),
+            models.Index(fields=['maxpower']),
+        ]
 
     def __repr__(self):
         return (
@@ -501,12 +575,13 @@ class HeurekaClick(Model):
     timestamp = DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-timestamp']
         verbose_name = "Heureka klik"
         verbose_name_plural = "Heureka kliky"
+        ordering = ['-timestamp']
         indexes = [
             models.Index(fields=['component_type', 'component_id']),
             models.Index(fields=['timestamp']),
+            models.Index(fields=['user']),
         ]
 
     def __str__(self):
