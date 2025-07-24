@@ -96,33 +96,26 @@
                 </button>
             </div>
 
-            <!-- Quick Stats širší layout -->
-            <div class="p-4 bg-gray-50 rounded-lg">
-                <h4 class="font-medium text-gray-900 mb-3">Rychlé info</h4>
-                <div class="space-y-2 text-sm">
-                    <div class="grid grid-cols-1 gap-2">
-                        <div class="flex justify-between items-start">
-                            <span class="text-gray-600 text-xs leading-tight">Hodnocení:</span>
-                            <div class="text-right">
-                                <div class="flex items-center justify-end">
-                                    <div class="flex text-yellow-400 text-xs mr-1">
-                                        {% for i in "12345" %}
-                                            {% if forloop.counter <= review_stats.avg_rating|default:0 %}★{% else %}☆{% endif %}
-                                        {% endfor %}
-                                    </div>
-                                    <span class="font-medium text-xs">{{ review_stats.avg_rating|default:0|floatformat:0 }}/5</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600 text-xs">Recenze:</span>
-                            <span class="font-medium text-xs">{{ review_stats.total_reviews|default:0 }}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600 text-xs">Přidáno:</span>
-                            <span class="font-medium text-xs">{{ component.dateadded|date:"j.n.Y" }}</span>
-                        </div>
+            <!-- Quick Stats -->
+            <div class="p-6 bg-gray-50 rounded-lg w-full max-w-sm mx-auto">
+                <h4 class="font-semibold text-gray-900 mb-4 text-lg text-center">Rychlé info</h4>
+                <div class="grid grid-cols-2 gap-y-4 text-base text-gray-700">
+                    <span class="text-right pr-4 font-medium">Hodnocení:</span>
+                    <div class="flex text-yellow-400">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= review_stats.avg_rating|default:0 %}
+                        ★
+                        {% else %}
+                        ☆
+                        {% endif %}
+                        {% endfor %}
                     </div>
+
+                    <span class="text-right pr-4 font-medium">Recenzí:</span>
+                    <span>{{ review_stats.total_reviews|default:0 }}</span>
+
+                    <span class="text-right pr-4 font-medium">Přidáno:</span>
+                    <span>{{ component.dateadded|date:"j.n.Y" }}</span>
                 </div>
             </div>
         </div>
@@ -214,10 +207,16 @@
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                     </svg>
                     Zobrazit všechny nabídky na Heureka.cz
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
                 </button>
                 <button onclick="togglePriceAlerts()" class="sm:w-auto px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
-                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5V2l5 5h-5a7 7 0 100 14z"/>
+                    <svg class="w-4 h-4 inline mr-2 relative -top-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                     </svg>
                     Sledovat cenu
                 </button>
