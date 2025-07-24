@@ -1,7 +1,10 @@
 import json
 import logging
+import random
+import time
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -2098,11 +2101,149 @@ def prepare_comparison_data(components):
 logger = logging.getLogger(__name__)
 
 
+def get_component_by_type_and_id(component_type, component_id):
+    """Pomocná funkce pro získání komponenty"""
+    from .models import Processors, Motherboards, Ram, GraphicsCards, Storage, PowerSupplyUnits
+
+    model_map = {
+        'processor': Processors,
+        'motherboard': Motherboards,
+        'ram': Ram,
+        'graphics_card': GraphicsCards,
+        'storage': Storage,
+        'power_supply': PowerSupplyUnits,
+    }
+
+    model = model_map.get(component_type)
+    if not model:
+        return None
+
+    try:
+        return model.objects.get(id=component_id)
+    except model.DoesNotExist:
+        return None
+
+
+def generate_fake_products(component):
+    """Generuje fake produkty pro Heureka"""
+    base_price = float(component.price) if component.price > 0 else random.randint(1000, 50000)
+
+    fake_shops = [
+        'Alza.cz', 'CZC.cz', 'Mall.cz', 'Electroworld.cz',
+        'Datart.cz', 'TSBohemia.cz', 'Smarty.cz', 'GIGACOMPUTER.cz',
+        'Počítače.cz', 'Mironet.cz'
+    ]
+
+    products = []
+    num_products = random.randint(3, 8)
+
+    for i in range(num_products):
+        price_variation = random.uniform(0.7, 1.3)
+        price = int(base_price * price_variation)
+
+        product_names = [
+            component.name,
+            f"{component.name} - BOX",
+            f"{component.name} (OEM)",
+            f"{component.manufacturer} {component.name}",
+            f"{component.name} + doprava zdarma"
+        ]
+
+        shop = random.choice(fake_shops)
+        product_name = random.choice(product_names)
+
+        availability_options = [
+            {"status": "skladem", "text": "Skladem", "delivery_days": 0},
+            {"status": "skladem", "text": "Skladem", "delivery_days": 1},
+            {"status": "dostupny", "text": "Do 2 dnů", "delivery_days": 2},
+            {"status": "dostupny", "text": "Do týdne", "delivery_days": 7},
+        ]
+
+        availability = random.choice(availability_options)
+        shop_rating = round(random.uniform(4.0, 4.9), 1)
+        shop_reviews = random.randint(500, 15000)
+        delivery_price = random.choice([0, 99, 149, 199])
+
+        products.append({
+            'id': f'fake_{i}_{component.id}',
+            'name': product_name,
+            'price': price,
+            'price_formatted': f"{price:,} Kč".replace(',', ' '),
+            'currency': 'CZK',
+            'shop_name': shop,
+            'shop_url': f"https://www.{shop.lower().replace('.cz', '')}.cz",
+            'product_url': f"https://www.{shop.lower().replace('.cz', '')}.cz/product/{component.id}",
+            'availability': availability,
+            'shop_rating': shop_rating,
+            'shop_reviews_count': shop_reviews,
+            'delivery_price': delivery_price,
+            'delivery_price_formatted': f"{delivery_price} Kč" if delivery_price > 0 else "Zdarma",
+            'is_marketplace': random.choice([True, False]),
+            'last_update': timezone.now().strftime('%Y-%m-%d')
+        })
+
+    products.sort(key=lambda x: x['price'])
+    return products
+
+
+def get_heureka_data(request, component_type, component_id):
+    """Hlavní funkce pro získání Heureka dat"""
+    try:
+        component = get_component_by_type_and_id(component_type, component_id)
+        if not component:
+            return JsonResponse({'error': 'Komponenta nenalezena'}, status=404)
+
+        # Simuluj API delay
+        if getattr(settings, 'FAKE_API_SETTINGS', {}).get('simulate_delays', True):
+            time.sleep(random.uniform(0.1, 0.5))
+
+        fake_products = generate_fake_products(component)
+
+        return JsonResponse({
+            'success': True,
+            'products': fake_products,
+            'search_query': f"{component.manufacturer} {component.name}",
+            'total_found': len(fake_products),
+            'api_status': 'fake'
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': f'API Error: {str(e)}'}, status=500)
+
+
+def get_fake_price_history(request, component_type, component_id):
+    """Fake historie cen"""
+    component = get_component_by_type_and_id(component_type, component_id)
+    if not component:
+        return JsonResponse({'error': 'Komponenta nenalezena'}, status=404)
+
+    base_price = float(component.price) if component.price > 0 else random.randint(1000, 50000)
+
+    price_history = []
+    current_date = timezone.now() - timedelta(days=30)
+    current_price = base_price
+
+    for day in range(30):
+        price_change = random.uniform(-0.05, 0.05)
+        current_price = max(current_price * (1 + price_change), base_price * 0.7)
+
+        price_history.append({
+            'date': (current_date + timedelta(days=day)).strftime('%Y-%m-%d'),
+            'min_price': int(current_price * 0.95),
+            'avg_price': int(current_price),
+            'max_price': int(current_price * 1.1)
+        })
+
+    return JsonResponse({
+        'success': True,
+        'price_history': price_history,
+        'component_name': component.name
+    })
+
+
 @csrf_exempt
 def track_heureka_click(request):
-    """
-    Trackuje kliky na Heureka tlačítko pro analytics
-    """
+    """Tracking Heureka kliků"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -2110,12 +2251,25 @@ def track_heureka_click(request):
             component_id = data.get('component_id')
             search_query = data.get('search_query')
 
-            # Jednoduché logování
-            logger.info(f"Heureka click: {component_type} {component_id} - {search_query}")
+            component = get_component_by_type_and_id(component_type, component_id)
+            if not component:
+                return JsonResponse({'error': 'Component not found'}, status=404)
+
+            # Import zde aby se předešlo circular import
+            from .models import HeurekaClick
+
+            HeurekaClick.objects.create(
+                component_type=component_type,
+                component_id=component_id,
+                component_name=component.name,
+                search_query=search_query,
+                user=request.user if request.user.is_authenticated else None,
+                session_key=request.session.session_key or ''
+            )
 
             return JsonResponse({'success': True})
+
         except Exception as e:
-            logger.error(f"Heureka tracking error: {e}")
             return JsonResponse({'error': 'Tracking failed'}, status=500)
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)

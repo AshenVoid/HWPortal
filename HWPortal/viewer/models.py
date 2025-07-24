@@ -489,3 +489,27 @@ class FavoriteActivity(Model):
     @property
     def component_name(self):
         return self.favorite.component_name
+
+
+class HeurekaClick(Model):
+    component_type = CharField(max_length=20, choices=COMPONENT_TYPES)
+    component_id = IntegerField()
+    component_name = CharField(max_length=200)
+    search_query = CharField(max_length=500)
+    user = ForeignKey(User, on_delete=SET_NULL, null=True, blank=True)
+    session_key = CharField(max_length=40, blank=True)
+    timestamp = DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = "Heureka klik"
+        verbose_name_plural = "Heureka kliky"
+        indexes = [
+            models.Index(fields=['component_type', 'component_id']),
+            models.Index(fields=['timestamp']),
+        ]
+
+    def __str__(self):
+        return f"{self.component_name} - {self.timestamp.strftime('%d.%m.%Y %H:%M')}"
+
+

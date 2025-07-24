@@ -18,6 +18,20 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
+# Development fake heureka API
+USE_FAKE_HEUREKA_API = True
+
+# Pro production - když bude API klíč ( drahý :(  )
+HEUREKA_API_KEY = None
+
+# Fake API nastavení
+FAKE_API_SETTINGS = {
+    'simulate_delays': True,
+    'min_products': 3,
+    'max_products': 8,
+    'price_variation': 0.3,
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
