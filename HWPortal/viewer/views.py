@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import timedelta
 
 from django.contrib import messages
@@ -10,6 +11,7 @@ from django.db.models import Count, Avg, Sum
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
@@ -2091,3 +2093,30 @@ def prepare_comparison_data(components):
             spec_data["best_components"] = []
 
     return all_specs
+
+
+logger = logging.getLogger(__name__)
+
+
+@csrf_exempt
+def track_heureka_click(request):
+    """
+    Trackuje kliky na Heureka tlačítko pro analytics
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            component_type = data.get('component_type')
+            component_id = data.get('component_id')
+            search_query = data.get('search_query')
+
+            # Jednoduché logování
+            logger.info(f"Heureka click: {component_type} {component_id} - {search_query}")
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            logger.error(f"Heureka tracking error: {e}")
+            return JsonResponse({'error': 'Tracking failed'}, status=500)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+

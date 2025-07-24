@@ -75,6 +75,15 @@
                             </svg>
                             <span id="share-text">Sdílet</span>
                         </button>
+
+                        <button onclick="openHeureka('{{ component.manufacturer|escapejs }}', '{{ component.name|escapejs }}')"
+                                class="w-full flex items-center justify-center px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm mt-2">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <!-- Heureka logo/ikona ? -->
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            Najít na Heureka.cz
+                        </button>
                     </div>
                 </div>
             </div>
@@ -732,6 +741,52 @@ function copyLink(url) {
         .catch(() => {
             showMessage('Nepodařilo se zkopírovat link', 'error');
         });
+}
+
+function openHeureka(manufacturer, productName) {
+    // Vytvoř vyhledávací dotaz kombinující výrobce a název
+    const searchQuery = `${manufacturer} ${productName}`;
+
+    // URL encode pro bezpečnost
+    const encodedQuery = encodeURIComponent(searchQuery);
+
+    // Vytvoř Heureka URL
+    const heurekaUrl = `https://www.heureka.cz/hledej/?h%5Bfraze%5D=${encodedQuery}`;
+
+    // Otevři v novém okně/tabu
+    window.open(heurekaUrl, '_blank', 'noopener,noreferrer');
+
+    // Zaloguj pro analytics
+    console.log(`Heureka search: ${searchQuery}`);
+
+    // Tracking kliknutí (asynchronně, aby neblokoval otevření)
+    trackHeurekaClick(searchQuery);
+}
+
+// Funkce pro tracking kliků
+function trackHeurekaClick(searchQuery) {
+    fetch('{% url "track_heureka_click" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            component_type: '{{ component_type }}',
+            component_id: {{ component.id }},
+            search_query: searchQuery
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Heureka click tracked successfully');
+        }
+    })
+    .catch(error => {
+        // Tichá chyba - nechceme rušit uživatele
+        console.log('Tracking error:', error);
+    });
 }
 </script>
 
