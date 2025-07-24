@@ -4,12 +4,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .models import (
     Reviews,
-    Processors,
-    GraphicsCards,
-    Ram,
-    Storage,
-    Motherboards,
-    PowerSupplyUnits,
 )
 
 
@@ -132,6 +126,7 @@ class ReviewForm(forms.ModelForm):
             }
         ),
         label="Vyberte komponentu",
+        required=False
     )
 
     class Meta:
@@ -237,6 +232,8 @@ class ReviewForm(forms.ModelForm):
                 self.fields["component_choice"].initial = (
                     f"{self.instance.component_type}_{component.id}"
                 )
+                # Načti správné choices při editaci
+                self.fields["component_choice"].choices = self.get_components_by_type(self.instance.component_type)
 
             # Místo disabled použij hidden field pro component_type
             self.fields["component_type"].widget = forms.HiddenInput()
@@ -265,6 +262,9 @@ class ReviewForm(forms.ModelForm):
 
     def get_components_by_type(self, component_type):
         """Vrací komponenty podle typu"""
+        # IMPORT zde aby se předešlo circular import
+        from .models import Processors, GraphicsCards, Ram, Storage, Motherboards, PowerSupplyUnits
+
         components = [("", "Vyberte komponentu...")]
 
         if component_type == "processor":
@@ -312,15 +312,52 @@ class ReviewForm(forms.ModelForm):
             component_type = self.component_type_param
             cleaned_data["component_type"] = component_type
 
-        if component_choice and component_choice != "":
-            try:
-                choice_type, choice_id = component_choice.rsplit("_", 1)
+        # Dynamicky aktualizuj choices před validací
+        if component_type:
+            self.fields["component_choice"].choices = self.get_components_by_type(component_type)
 
-                if choice_type != component_type:
-                    raise forms.ValidationError(
-                        f"Vybraná komponenta ({choice_type}) neodpovídá typu komponenty ({component_type})."
-                    )
-            except ValueError:
-                raise forms.ValidationError("Neplatná komponenta.")
+        # Validace component_choice
+        if not component_choice or component_choice == "":
+            raise forms.ValidationError("Musíte vybrat komponentu.")
+
+        try:
+            choice_type, choice_id = component_choice.rsplit("_", 1)
+            choice_id = int(choice_id)  # Ověř že je to číslo
+
+            if choice_type != component_type:
+                raise forms.ValidationError(
+                    f"Vybraná komponenta ({choice_type}) neodpovídá typu komponenty ({component_type})."
+                )
+
+            # Ověř že komponenta existuje
+            component = self.get_component_instance(choice_type, choice_id)
+            if not component:
+                raise forms.ValidationError("Vybraná komponenta neexistuje.")
+
+        except (ValueError, TypeError):
+            raise forms.ValidationError("Neplatná komponenta.")
 
         return cleaned_data
+
+    def get_component_instance(self, component_type, component_id):
+        """Získá instanci komponenty podle typu a ID"""
+        from .models import Processors, GraphicsCards, Ram, Storage, Motherboards, PowerSupplyUnits
+
+        model_map = {
+            'processor': Processors,
+            'graphics_card': GraphicsCards,
+            'ram': Ram,
+            'storage': Storage,
+            'motherboard': Motherboards,
+            'power_supply': PowerSupplyUnits,
+        }
+
+        model = model_map.get(component_type)
+        if not model:
+            return None
+
+        try:
+            return model.objects.get(id=component_id)
+        except model.DoesNotExist:
+            return None
+

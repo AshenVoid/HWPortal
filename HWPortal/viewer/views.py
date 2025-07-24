@@ -1304,9 +1304,15 @@ def create_review_view(request, component_type=None, component_id=None):
             model = model_mapping[component_type]
             component = get_object_or_404(model, id=component_id)
 
+    # Zkontroluj GET parametr pro typ komponenty
+    if not component_type and request.GET.get('type'):
+        component_type = request.GET.get('type')
+
     if request.method == "POST":
         form = ReviewForm(
-            request.POST, component_type=component_type, component_id=component_id
+            request.POST,
+            component_type=component_type,
+            component_id=component_id
         )
 
         if form.is_valid():
@@ -1318,13 +1324,14 @@ def create_review_view(request, component_type=None, component_id=None):
             if component_choice:
                 choice_type, choice_id = component_choice.rsplit("_", 1)
 
+                # Nastav component_type na review objektu
+                review.component_type = choice_type
+
                 # Nastavení příslušné komponenty podle typu
                 if choice_type == "processor":
                     review.processor = get_object_or_404(Processors, id=choice_id)
                 elif choice_type == "graphics_card":
-                    review.graphics_card = get_object_or_404(
-                        GraphicsCards, id=choice_id
-                    )
+                    review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
                 elif choice_type == "ram":
                     review.ram = get_object_or_404(Ram, id=choice_id)
                 elif choice_type == "storage":
@@ -1332,14 +1339,18 @@ def create_review_view(request, component_type=None, component_id=None):
                 elif choice_type == "motherboard":
                     review.motherboard = get_object_or_404(Motherboards, id=choice_id)
                 elif choice_type == "power_supply":
-                    review.power_supply = get_object_or_404(
-                        PowerSupplyUnits, id=choice_id
-                    )
+                    review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
 
             review.save()
 
             messages.success(request, "Recenze byla úspěšně vytvořena!")
-            return redirect("reviews")
+
+            # Přesměruj na detail komponenty
+            if component_choice:
+                choice_type, choice_id = component_choice.rsplit("_", 1)
+                return redirect("component_detail", component_type=choice_type, component_id=choice_id)
+            else:
+                return redirect("reviews")
     else:
         initial_data = {"user": request.user}
         form = ReviewForm(
@@ -1358,6 +1369,55 @@ def create_review_view(request, component_type=None, component_id=None):
     }
 
     return render(request, "viewer/create_review.html", context)
+
+
+def get_components_ajax(request):
+    """AJAX endpoint pro získání komponent podle typu"""
+    component_type = request.GET.get('type')
+
+    if not component_type:
+        return JsonResponse({'components': []})
+
+    components = []
+
+    if component_type == "processor":
+        for proc in Processors.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"processor_{proc.id}",
+                'name': f"{proc.manufacturer} {proc.name}"
+            })
+    elif component_type == "graphics_card":
+        for gpu in GraphicsCards.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"graphics_card_{gpu.id}",
+                'name': f"{gpu.manufacturer} {gpu.name}"
+            })
+    elif component_type == "ram":
+        for ram in Ram.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"ram_{ram.id}",
+                'name': f"{ram.manufacturer} {ram.name}"
+            })
+    elif component_type == "storage":
+        for storage in Storage.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"storage_{storage.id}",
+                'name': f"{storage.manufacturer} {storage.name}"
+            })
+    elif component_type == "motherboard":
+        for mb in Motherboards.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"motherboard_{mb.id}",
+                'name': f"{mb.manufacturer} {mb.name}"
+            })
+    elif component_type == "power_supply":
+        for psu in PowerSupplyUnits.objects.all().order_by("manufacturer", "name"):
+            components.append({
+                'id': f"power_supply_{psu.id}",
+                'name': f"{psu.manufacturer} {psu.name}"
+            })
+
+    return JsonResponse({'components': components})
 
 
 @login_required(login_url="/login/")

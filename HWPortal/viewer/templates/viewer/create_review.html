@@ -249,34 +249,15 @@
 <!-- JavaScript pouze pro obecný formulář (když není komponenta vybrána) -->
 {% if not component %}
 <script>
-// AJAX pro dynamické načítání komponent podle typu
+// Rreload stránky s parametrem
 document.getElementById('component_type').addEventListener('change', function() {
     const componentType = this.value;
-    const componentChoice = document.getElementById('component_choice');
 
     if (componentType) {
-        // Zobraz loading
-        componentChoice.innerHTML = '<option>Načítá komponenty...</option>';
-
-        // AJAX požadavek
-        fetch(`/get-components/?type=${componentType}`)
-            .then(response => response.json())
-            .then(data => {
-                componentChoice.innerHTML = '<option value="">Vyberte komponentu...</option>';
-
-                data.components.forEach(component => {
-                    const option = document.createElement('option');
-                    option.value = component.id;
-                    option.textContent = component.name;
-                    componentChoice.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                componentChoice.innerHTML = '<option>Chyba při načítání komponent</option>';
-            });
-    } else {
-        componentChoice.innerHTML = '<option value="">Nejdříve vyberte typ komponenty...</option>';
+        // Prostě reload stránky s GET parametrem
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('type', componentType);
+        window.location.href = currentUrl.toString();
     }
 });
 </script>

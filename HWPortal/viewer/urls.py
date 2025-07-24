@@ -33,7 +33,7 @@ urlpatterns = [
         views.create_review_for_component,
         name="create_review_for_component",
     ),
-    path("get-components/", views.get_components_ajax, name="get_components_ajax"),
+    path('get-components/', views.get_components_ajax, name='get_components_ajax'),
     path("review/edit/<int:review_id>/", views.edit_review_view, name="edit_review"),
     path(
         "review/delete/<int:review_id>/", views.delete_review_view, name="delete_review"
