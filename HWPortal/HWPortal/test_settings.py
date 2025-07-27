@@ -1,6 +1,7 @@
+# test_settings.py
 from .settings import *
 
-# SQLite pro testy
+# Pro testy použití SQLite v paměti
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -8,13 +9,43 @@ DATABASES = {
     }
 }
 
+# Zrychli testy
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+]
 
-class DisableMigrations:
-    def __contains__(self, item):
-        return True
+# Vypni migrace cache pro testy
+MIGRATION_MODULES = {
+    'viewer': None,
+}
 
-    def __getitem__(self, item):
-        return None
+# Debug pro testy
+DEBUG = True
 
+# Zjednodušené logování pro testy
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
 
-MIGRATION_MODULES = DisableMigrations()
+# Vypni některé middleware pro rychlejší testy
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
+
+# Pro Selenium testy
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
