@@ -162,10 +162,8 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
             # Ověř že se buď zůstává na login stránce NEBO se zobrazuje chyba
             current_url = self.selenium.current_url
 
-            # Pokud došlo k přesměrování, zkontroluj jestli není na search (což může být defaultní chování)
+            # Pokud došlo k přesměrování, zkontroluj jestli není na search (defaultní chování)
             if '/search/' in current_url:
-                # Možná vaše aplikace přesměrovává neúspěšné přihlášení jinam
-                # V tom případě považujeme test za úspěšný, protože uživatel není přihlášen
                 pass
             else:
                 # Pokud zůstáváme na login stránce, měla by být chyba
