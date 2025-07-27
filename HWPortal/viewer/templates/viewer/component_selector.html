@@ -59,7 +59,7 @@
     {% endif %}
 
     <!-- Component Categories -->
-    <section class="grid gap-6">
+    <div class="grid gap-6">
         <!-- Procesory -->
         <section class="bg-white rounded-lg shadow-md px-6 py-4 relative">
             <header class="bg-white flex items-center mb-4 sticky top-20 py-2">
@@ -263,7 +263,7 @@ function addToComparison(componentType, componentId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showMessage(data.message, 'success');
+            showMessage(data.message + ' - ' + data.count + '/3', 'success');
             updateSelectedCount(data.count);
             setTimeout(() => location.reload(), 1000);
         } else {
@@ -310,6 +310,7 @@ function removeFromComparison(comparisonKey) {
 
 function clearComparison() {
     if (confirm('Opravdu chcete vymazat všechny vybrané komponenty?')) {
+        showMessage('Vymazávám porovnání...', 'info');
         window.location.href = '{% url "clear_comparison" %}';
     }
 }
@@ -318,25 +319,187 @@ function updateSelectedCount(count) {
     document.getElementById('selected-count').textContent = count;
 }
 
-// Message toast helper
-function showMessage(message, type) {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 transition-opacity duration-300 ${
-        type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`;
-    toast.textContent = message;
+class ToastManager {
+    constructor() {
+        this.toasts = [];
+        this.container = null;
+        this.init();
+    }
 
-    document.body.appendChild(toast);
+    init() {
+        // Vytvoř container pro toast zprávy
+        this.container = document.createElement('div');
+        this.container.id = 'toast-container';
+        this.container.className = 'fixed top-6 right-6 z-50 space-y-3 pointer-events-none';
+        document.body.appendChild(this.container);
 
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => {
-            if (document.body.contains(toast)) {
-                document.body.removeChild(toast);
+        // Přidej CSS
+        this.addStyles();
+    }
+
+    show(message, type = 'info', duration = 4000) {
+        const toast = this.createToast(message, type, duration);
+        this.container.appendChild(toast);
+        this.toasts.push(toast);
+
+        // Animace vstupu
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0', 'scale-95');
+            toast.classList.add('translate-x-0', 'opacity-100', 'scale-100');
+        });
+
+        // Auto hide
+        setTimeout(() => this.hide(toast), duration);
+
+        return toast;
+    }
+
+    createToast(message, type, duration) {
+        const id = 'toast-' + Date.now() + Math.random().toString(36).substr(2, 9);
+
+        const configs = {
+            success: {
+                bg: 'bg-gradient-to-r from-green-500 to-emerald-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                       </svg>`
+            },
+            error: {
+                bg: 'bg-gradient-to-r from-red-500 to-rose-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                       </svg>`
+            },
+            warning: {
+                bg: 'bg-gradient-to-r from-yellow-500 to-orange-500',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                       </svg>`
+            },
+            info: {
+                bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                       </svg>`
             }
-        }, 300);
-    }, 3000);
+        };
+
+        const config = configs[type] || configs.info;
+
+        const toast = document.createElement('div');
+        toast.id = id;
+        toast.className = 'toast-item pointer-events-auto max-w-sm w-full transform translate-x-full opacity-0 scale-95 transition-all duration-500 ease-out';
+
+        toast.innerHTML = `
+            <div class="${config.bg} text-white rounded-xl shadow-2xl overflow-hidden">
+                <div class="p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-0.5">
+                            ${config.icon}
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium leading-5">
+                                ${message}
+                            </p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <button onclick="toastManager.hide(document.getElementById('${id}'))"
+                                    class="inline-flex text-white/70 hover:text-white focus:outline-none transition-colors p-1 rounded-md hover:bg-white/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="h-1 bg-black/20">
+                    <div class="toast-progress h-1 bg-white/30 transition-all ease-linear"
+                         style="width: 100%; animation: shrinkBar ${duration}ms linear forwards;"></div>
+                </div>
+            </div>
+        `;
+
+        // Pause progress on hover
+        toast.addEventListener('mouseenter', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'paused';
+        });
+
+        toast.addEventListener('mouseleave', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'running';
+        });
+
+        return toast;
+    }
+
+    hide(toast) {
+        if (!toast || !document.body.contains(toast)) return;
+
+        // Animace výstupu
+        toast.classList.remove('translate-x-0', 'opacity-100', 'scale-100');
+        toast.classList.add('translate-x-full', 'opacity-0', 'scale-95');
+
+        // Odeber z pole a DOMu
+        setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t !== toast);
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 500);
+    }
+
+    addStyles() {
+        if (document.getElementById('ultra-toast-styles')) return;
+
+        const styles = document.createElement('style');
+        styles.id = 'ultra-toast-styles';
+        styles.textContent = `
+            @keyframes shrinkBar {
+                from { width: 100%; }
+                to { width: 0%; }
+            }
+
+            .toast-item:hover {
+                transform: translateX(0) translateY(-2px) scale(1.02);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            }
+
+            @media (max-width: 640px) {
+                #toast-container {
+                    right: 1rem;
+                    left: 1rem;
+                }
+
+                .toast-item {
+                    max-width: none;
+                }
+            }
+
+            /* Smooth animations pro multiple toasts */
+            .toast-item:nth-child(n+4) {
+                opacity: 0.7;
+                transform: scale(0.95) translateX(0);
+            }
+        `;
+
+        document.head.appendChild(styles);
+    }
 }
+
+// Vytvoř globální instanci
+const toastManager = new ToastManager();
+
+function showMessage(message, type = 'info', duration = 4000) {
+    return toastManager.show(message, type, duration);
+}
+
+// Inicializace při načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Component comparison page loaded with enhanced toast system');
+});
 </script>
 
 {% endblock %}
