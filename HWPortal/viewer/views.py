@@ -1267,20 +1267,62 @@ def change_password_view(request):
 
 @login_required(login_url="/login/")
 def my_reviews_view(request):
+    # Získání parametrů filtru z URL
+    status_filter = request.GET.get("status", "all")  # all, published, unpublished
+    sort_by = request.GET.get("sort", "newest")  # newest, oldest, helpful, rating_high, rating_low
 
-    user_reviews = (
-        Reviews.objects.filter(author=request.user)
-        .select_related()
-        .order_by("-date_created")
+    # Základní query - pouze recenze aktuálního uživatele
+    user_reviews = Reviews.objects.filter(author=request.user).select_related(
+        "processor", "motherboard", "storage", "ram", "graphics_card", "power_supply"
     )
 
+    # Aplikace filtru podle stavu publikace
+    if status_filter == "published":
+        user_reviews = user_reviews.filter(is_published=True)
+    elif status_filter == "unpublished":
+        user_reviews = user_reviews.filter(is_published=False)
+    # Pro "all" nefiltrujeme
+
+    # Aplikace řazení
+    if sort_by == "newest":
+        user_reviews = user_reviews.order_by("-date_created")
+    elif sort_by == "oldest":
+        user_reviews = user_reviews.order_by("date_created")
+    elif sort_by == "helpful":
+        user_reviews = user_reviews.order_by("-helpful_votes", "-date_created")
+    elif sort_by == "rating_high":
+        user_reviews = user_reviews.order_by("-rating", "-date_created")
+    elif sort_by == "rating_low":
+        user_reviews = user_reviews.order_by("rating", "-date_created")
+    else:
+        user_reviews = user_reviews.order_by("-date_created")
+
+    # Statistiky pro header
+    total_reviews = Reviews.objects.filter(author=request.user).count()
+    published_reviews = Reviews.objects.filter(author=request.user, is_published=True).count()
+    avg_rating = Reviews.objects.filter(author=request.user).aggregate(Avg("rating"))["rating__avg"]
+    total_helpful_votes = Reviews.objects.filter(author=request.user).aggregate(
+        Sum("helpful_votes")
+    )["helpful_votes__sum"] or 0
+
+    # Paginace
     paginator = Paginator(user_reviews, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # Připrav kontext pro template
     context = {
         "reviews": page_obj,
-        "total_reviews": user_reviews.count(),
+        "total_reviews": total_reviews,
+        "published_reviews": published_reviews,
+        "avg_rating": avg_rating,
+        "total_helpful_votes": total_helpful_votes,
+        # Filtry pro template
+        "selected_status": status_filter,
+        "selected_sort": sort_by,
+        # Pro počítání v tlačítkách
+        "published_count": published_reviews,
+        "unpublished_count": total_reviews - published_reviews,
     }
 
     return render(request, "viewer/my_reviews.html", context)

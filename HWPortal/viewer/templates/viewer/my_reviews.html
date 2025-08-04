@@ -3,165 +3,291 @@
 {% block title %}Moje recenze - Hardware Portal{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-6xl mx-auto">
     <!-- Breadcrumbs -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="{% url 'profile' %}" class="hover:text-blue-600">Můj profil</a></li>
+            <li><a href="{% url 'profile' %}" class="hover:text-blue-600 transition-colors">Můj profil</a></li>
             <li class="text-gray-300">/</li>
             <li class="text-gray-800 font-medium">Moje recenze</li>
         </ol>
     </nav>
 
-    <!-- Header -->
+    <!-- Header s statistikami -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Moje recenze</h1>
-        <p class="text-gray-600">
-            Celkem máte <span class="font-semibold">{{ total_reviews }}</span> recenzí
-        </p>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-3">Moje recenze</h1>
+                <p class="text-lg text-gray-600">
+                    Spravujte své hodnocení a sdílejte zkušenosti s komunitou
+                </p>
+            </div>
+
+            <!-- Statistiky -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600">{{ total_reviews }}</div>
+                    <div class="text-xs text-gray-600">Celkem recenzí</div>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600">{{ published_reviews|default:0 }}</div>
+                    <div class="text-xs text-gray-600">Publikováno</div>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-600">{{ avg_rating|default:0|floatformat:1 }}</div>
+                    <div class="text-xs text-gray-600">Průměr ★</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600">{{ total_helpful_votes|default:0 }}</div>
+                    <div class="text-xs text-gray-600">Užitečných</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtr a řazení -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex flex-wrap gap-2">
+                <!-- Všechny recenze -->
+                <a href="?status=all&sort={{ selected_sort }}"
+                   class="px-4 py-2 {% if selected_status == 'all' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg text-sm font-medium transition-colors">
+                    Všechny ({{ total_reviews }})
+                </a>
+
+                <!-- Publikované -->
+                <a href="?status=published&sort={{ selected_sort }}"
+                   class="px-4 py-2 {% if selected_status == 'published' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg text-sm font-medium transition-colors">
+                    Publikované ({{ published_count }})
+                </a>
+
+                <!-- Nepublikované -->
+                <a href="?status=unpublished&sort={{ selected_sort }}"
+                   class="px-4 py-2 {% if selected_status == 'unpublished' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %} rounded-lg text-sm font-medium transition-colors">
+                    Nepublikované ({{ unpublished_count }})
+                </a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Dropdown řazení -->
+                <select id="sortSelect" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Nejnovější</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Nejstarší</option>
+                    <option value="helpful" {% if selected_sort == 'helpful' %}selected{% endif %}>Nejvíce užitečné</option>
+                    <option value="rating_high" {% if selected_sort == 'rating_high' %}selected{% endif %}>Nejlepší hodnocení</option>
+                    <option value="rating_low" {% if selected_sort == 'rating_low' %}selected{% endif %}>Nejhorší hodnocení</option>
+                </select>
+
+                <a href="{% url 'components' %}" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Nová recenze
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Seznam recenzí -->
     <div class="space-y-6">
         {% if reviews %}
             {% for review in reviews %}
-            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex-1">
-                        <div class="flex items-center mb-2">
-                            <h3 class="text-xl font-semibold text-gray-800 mr-3">{{ review.title }}</h3>
-                            <div class="flex text-yellow-400 text-sm">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="text-sm text-gray-500 ml-2">({{ review.rating }}/5)</span>
-                        </div>
-                        
-                        <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                {{ review.get_component_type_display }}
-                            </span>
-                            <span>{{ review.component_name }}</span>
-                            <span>{{ review.date_created|date:"j. n. Y" }}</span>
-                        </div>
-                        
-                        <p class="text-gray-700 mb-4">{{ review.summary }}</p>
-                        
-                        <!-- Statistiky recenze -->
-                        <div class="flex items-center space-x-4 text-sm">
-                            <div class="flex items-center text-blue-600">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                                </svg>
-                                <span>{{ review.helpful_votes }} užitečných</span>
-                            </div>
-                            <div class="flex items-center text-gray-500">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                                </svg>
-                                <span>{{ review.total_votes }} celkem hlasů</span>
-                            </div>
-                            {% if not review.is_published %}
-                                <span class="inline-block px-2 py-1 bg-red-100 text-red-800 rounded text-xs">
-                                    Nepublikováno
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden group">
+                <!-- Header s gradientem podle hodnocení -->
+                <div class="h-1 bg-gradient-to-r {% if review.rating >= 4 %}from-green-400 to-green-600{% elif review.rating >= 3 %}from-yellow-400 to-yellow-600{% else %}from-red-400 to-red-600{% endif %}"></div>
+
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1 min-w-0">
+                            <!-- Komponenta badge a datum -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full text-sm font-medium text-blue-800">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                                    </svg>
+                                    {{ review.get_component_type_display }}
                                 </span>
-                            {% endif %}
+
+                                <span class="text-sm text-gray-500">{{ review.date_created|date:"j. n. Y" }}</span>
+
+                                {% if not review.is_published %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/>
+                                            <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>
+                                        </svg>
+                                        Nepublikováno
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Název komponenty a hodnocení -->
+                            <div class="flex items-start gap-4 mb-3">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                                        {{ review.title }}
+                                    </h3>
+                                    <p class="text-gray-600 font-medium">{{ review.component_name }}</p>
+                                </div>
+
+                                <div class="flex flex-col items-end">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="flex text-yellow-400 text-lg">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="text-lg font-bold text-gray-900">{{ review.rating }}/5</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shrnutí -->
+                            <p class="text-gray-700 leading-relaxed mb-4">{{ review.summary }}</p>
+
+                            <!-- Statistiky interakcí -->
+                            <div class="flex items-center gap-6 text-sm">
+                                <div class="flex items-center text-green-600">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h1.096c.142 0 .284.021.42.06L12 12m-2 4v4h6v-4"/>
+                                    </svg>
+                                    <span class="font-medium">{{ review.helpful_votes }}</span>
+                                    <span class="text-gray-500 ml-1">užitečných</span>
+                                </div>
+
+                                <div class="flex items-center text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                    </svg>
+                                    <span class="font-medium">{{ review.total_votes }}</span>
+                                    <span class="ml-1">celkem hlasů</span>
+                                </div>
+
+                                {% if review.is_published %}
+                                    <div class="flex items-center text-blue-600">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        <span class="font-medium">Publikováno</span>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Akční tlačítka -->
-                    <div class="flex flex-col space-y-2 ml-4 min-w-[120px]">
-                        <!-- Upravit tlačítko -->
-                        <a href="{% url 'edit_review' review.id %}"
-                           class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                            Upravit
-                        </a>
 
-                        <!-- Smazat tlačítko -->
-                        <a href="{% url 'delete_review' review.id %}"
-                           class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Smazat
-                        </a>
-
-                        <!-- Publikovat/Skrýt tlačítko -->
-                        <button onclick="toggleVisibility({{ review.id }}, {{ review.is_published|yesno:'true,false' }})"
-                                class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium transition-all rounded-lg border {% if review.is_published %}text-orange-700 bg-orange-50 border-orange-200 hover:bg-orange-100 hover:border-orange-300{% else %}text-green-700 bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300{% endif %}">
-                            {% if review.is_published %}
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.465 8.465M9.878 9.878L8.465 8.465"/>
+                        <!-- Akční tlačítka - nový design -->
+                        <div class="flex flex-col gap-2 ml-6 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <!-- Upravit -->
+                            <a href="{% url 'edit_review' review.id %}"
+                               class="flex items-center justify-center w-10 h-10 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-110 rounded-lg transition-all group/btn"
+                               title="Upravit recenzi">
+                                <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
-                                Skrýt
-                            {% else %}
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                Publikovat
-                            {% endif %}
-                        </button>
-
-                        <!-- Zobrazit komponentu tlačítko -->
-                        {% if review.component %}
-                            <a href="{% url 'component_detail' review.component_type review.component.id %}"
-                               class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7h10v10"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6L21 6l-5-5"/>
-                                </svg>
-                                Komponenta
                             </a>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Klady a zápory -->
-                {% if review.pros or review.cons %}
-                <div class="border-t border-gray-200 pt-4">
-                    <div class="grid md:grid-cols-2 gap-4">
-                        {% if review.pros %}
-                        <div>
-                            <h4 class="font-medium text-green-800 mb-2">👍 Klady:</h4>
-                            <div class="text-sm text-gray-700">
-                                {{ review.pros|linebreaks }}
-                            </div>
+
+                            <!-- Toggle viditelnost -->
+                            <button onclick="toggleVisibility({{ review.id }}, {{ review.is_published|yesno:'true,false' }})"
+                                    class="flex items-center justify-center w-10 h-10 {% if review.is_published %}bg-orange-50 text-orange-600 hover:bg-orange-100{% else %}bg-green-50 text-green-600 hover:bg-green-100{% endif %} hover:scale-110 rounded-lg transition-all group/btn"
+                                    title="{% if review.is_published %}Skrýt recenzi{% else %}Publikovat recenzi{% endif %}">
+                                {% if review.is_published %}
+                                    <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.465 8.465"/>
+                                    </svg>
+                                {% else %}
+                                    <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                {% endif %}
+                            </button>
+
+                            <!-- Zobrazit komponentu -->
+                            {% if review.component %}
+                                <a href="{% url 'component_detail' review.component_type review.component.id %}"
+                                   class="flex items-center justify-center w-10 h-10 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:scale-110 rounded-lg transition-all group/btn"
+                                   title="Zobrazit komponentu">
+                                    <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </a>
+                            {% endif %}
+
+                            <!-- Smazat -->
+                            <button onclick="confirmDelete({{ review.id }})"
+                                    class="flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 hover:bg-red-100 hover:scale-110 rounded-lg transition-all group/btn"
+                                    title="Smazat recenzi">
+                                <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
                         </div>
-                        {% endif %}
-                        
-                        {% if review.cons %}
-                        <div>
-                            <h4 class="font-medium text-red-800 mb-2">👎 Zápory:</h4>
-                            <div class="text-sm text-gray-700">
-                                {{ review.cons|linebreaks }}
-                            </div>
-                        </div>
-                        {% endif %}
                     </div>
+
+                    <!-- Klady a zápory -->
+                    {% if review.pros or review.cons %}
+                    <div class="border-t border-gray-100 pt-4 mt-4">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            {% if review.pros %}
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <h4 class="font-semibold text-green-800 mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-2 4h1.096c.142 0 .284.021.42.06L12 12m-2 4v4h6v-4"/>
+                                    </svg>
+                                    Klady
+                                </h4>
+                                <div class="text-sm text-green-700 leading-relaxed">
+                                    {{ review.pros|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if review.cons %}
+                            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                                <h4 class="font-semibold text-red-800 mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L15 18v-4m-4-4h-1.096c-.142 0-.284-.021-.42-.06L12 12m2-4v-4H8v4"/>
+                                    </svg>
+                                    Zápory
+                                </h4>
+                                <div class="text-sm text-red-700 leading-relaxed">
+                                    {{ review.cons|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
             {% endfor %}
         {% else %}
-            <!-- Žádné recenze -->
-            <div class="bg-white rounded-lg shadow-md p-12 text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Žádné recenze - vylepšený empty state -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-12 text-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Zatím žádné recenze</h3>
-                <p class="text-gray-500 mb-4">
-                    Ještě jste nenapsali žádnou recenzi. Začněte sdílet své zkušenosti s komunitou!
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">Zatím žádné recenze</h3>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                    Ještě jste nenapsali žádnou recenzi. Začněte sdílet své zkušenosti s komunitou a pomozte ostatním při výběru komponent!
                 </p>
-                <a href="{% url 'components' %}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                    Prohlédnout komponenty
-                </a>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="{% url 'components' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Napsat první recenzi
+                    </a>
+                    <a href="{% url 'components' %}" class="inline-flex items-center px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        Prohlédnout komponenty
+                    </a>
+                </div>
             </div>
         {% endif %}
     </div>
@@ -171,7 +297,7 @@
     <div class="flex justify-center items-center space-x-4 mt-12">
         {% if reviews.has_previous %}
             <a href="?page={{ reviews.previous_page_number }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+               class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md font-medium">
                 ← Předchozí
             </a>
         {% endif %}
@@ -179,17 +305,17 @@
         <div class="flex space-x-2">
             {% for num in reviews.paginator.page_range %}
                 {% if reviews.number == num %}
-                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg">{{ num }}</span>
+                    <span class="px-4 py-3 bg-blue-600 text-white rounded-lg font-medium shadow-md">{{ num }}</span>
                 {% elif num > reviews.number|add:'-3' and num < reviews.number|add:'3' %}
                     <a href="?page={{ num }}"
-                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">{{ num }}</a>
+                       class="px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all font-medium">{{ num }}</a>
                 {% endif %}
             {% endfor %}
         </div>
 
         {% if reviews.has_next %}
             <a href="?page={{ reviews.next_page_number }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+               class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 shadow-md font-medium">
                 Další →
             </a>
         {% endif %}
@@ -198,7 +324,15 @@
 </div>
 
 <script>
+// CSRF Token helper
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
 function toggleVisibility(reviewId, isPublished) {
+    const action = isPublished ? 'skrývám' : 'publikujem';
+    showMessage(`Recenzi ${action}...`, 'info');
+
     fetch(`/review/toggle-visibility/${reviewId}/`, {
         method: 'POST',
         headers: {
@@ -209,20 +343,202 @@ function toggleVisibility(reviewId, isPublished) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            showMessage(data.message || `Recenze byla úspěšně ${isPublished ? 'skryta' : 'publikována'}!`, 'success');
+            setTimeout(() => location.reload(), 1500);
         } else {
-            alert('Chyba při změně viditelnosti: ' + data.error);
+            showMessage('Chyba při změně viditelnosti: ' + (data.error || 'Neznámá chyba'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Došlo k chybě při změně viditelnosti');
+        showMessage('Došlo k chybě při změně viditelnosti', 'error');
     });
 }
 
-function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+function confirmDelete(reviewId) {
+    if (confirm('Opravdu chcete smazat tuto recenzi? Tato akce je nevratná.')) {
+        showMessage('Mažu recenzi...', 'warning');
+        window.location.href = `/review/delete/${reviewId}/`;
+    }
 }
+
+class ToastManager {
+    constructor() {
+        this.toasts = [];
+        this.container = null;
+        this.init();
+    }
+
+    init() {
+        this.container = document.createElement('div');
+        this.container.id = 'toast-container';
+        this.container.className = 'fixed top-6 right-6 z-50 space-y-3 pointer-events-none';
+        document.body.appendChild(this.container);
+        this.addStyles();
+    }
+
+    show(message, type = 'info', duration = 4000) {
+        const toast = this.createToast(message, type, duration);
+        this.container.appendChild(toast);
+        this.toasts.push(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0', 'scale-95');
+            toast.classList.add('translate-x-0', 'opacity-100', 'scale-100');
+        });
+
+        setTimeout(() => this.hide(toast), duration);
+        return toast;
+    }
+
+    createToast(message, type, duration) {
+        const id = 'toast-' + Date.now() + Math.random().toString(36).substr(2, 9);
+
+        const configs = {
+            success: {
+                bg: 'bg-gradient-to-r from-green-500 to-emerald-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                       </svg>`
+            },
+            error: {
+                bg: 'bg-gradient-to-r from-red-500 to-rose-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                       </svg>`
+            },
+            warning: {
+                bg: 'bg-gradient-to-r from-yellow-500 to-orange-500',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                       </svg>`
+            },
+            info: {
+                bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                       </svg>`
+            }
+        };
+
+        const config = configs[type] || configs.info;
+
+        const toast = document.createElement('div');
+        toast.id = id;
+        toast.className = 'toast-item pointer-events-auto max-w-sm w-full transform translate-x-full opacity-0 scale-95 transition-all duration-500 ease-out';
+
+        toast.innerHTML = `
+            <div class="${config.bg} text-white rounded-xl shadow-2xl overflow-hidden">
+                <div class="p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-0.5">
+                            ${config.icon}
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium leading-5">
+                                ${message}
+                            </p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <button onclick="toastManager.hide(document.getElementById('${id}'))"
+                                    class="inline-flex text-white/70 hover:text-white focus:outline-none transition-colors p-1 rounded-md hover:bg-white/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-1 bg-black/20">
+                    <div class="toast-progress h-1 bg-white/30 transition-all ease-linear"
+                         style="width: 100%; animation: shrinkBar ${duration}ms linear forwards;"></div>
+                </div>
+            </div>
+        `;
+
+        toast.addEventListener('mouseenter', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'paused';
+        });
+
+        toast.addEventListener('mouseleave', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'running';
+        });
+
+        return toast;
+    }
+
+    hide(toast) {
+        if (!toast || !document.body.contains(toast)) return;
+
+        toast.classList.remove('translate-x-0', 'opacity-100', 'scale-100');
+        toast.classList.add('translate-x-full', 'opacity-0', 'scale-95');
+
+        setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t !== toast);
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 500);
+    }
+
+    addStyles() {
+        if (document.getElementById('ultra-toast-styles')) return;
+
+        const styles = document.createElement('style');
+        styles.id = 'ultra-toast-styles';
+        styles.textContent = `
+            @keyframes shrinkBar {
+                from { width: 100%; }
+                to { width: 0%; }
+            }
+
+            .toast-item:hover {
+                transform: translateX(0) translateY(-2px) scale(1.02);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            }
+
+            @media (max-width: 640px) {
+                #toast-container {
+                    right: 1rem;
+                    left: 1rem;
+                }
+
+                .toast-item {
+                    max-width: none;
+                }
+            }
+
+            .toast-item:nth-child(n+4) {
+                opacity: 0.7;
+                transform: scale(0.95) translateX(0);
+            }
+        `;
+
+        document.head.appendChild(styles);
+    }
+}
+
+// Vytvoř globální instanci
+const toastManager = new ToastManager();
+
+function showMessage(message, type = 'info', duration = 4000) {
+    return toastManager.show(message, type, duration);
+}
+
+// Inicializace při načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('My reviews page loaded with enhanced design and toast system');
+});
+
+// Funkcionalita pro dropdown řazení
+document.getElementById('sortSelect').addEventListener('change', function() {
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.set('sort', this.value);
+    window.location.href = currentUrl.toString();
+});
 </script>
 
 {% endblock %}
