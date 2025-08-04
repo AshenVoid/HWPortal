@@ -1,0 +1,94 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Přístup zakázán - Hardware Portal{% endblock %}
+
+{% block content %}
+<!-- 403 Forbidden Content -->
+<div class="flex items-center justify-center" style="min-height: 60vh;">
+    <div class="max-w-md w-full mx-auto text-center">
+        <!-- 403 Error Icon -->
+        <div class="mb-8">
+            <div class="w-32 h-32 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zM9 12a3 3 0 116 0 3 3 0 01-6 0z" />
+                </svg>
+            </div>
+            <h1 class="text-6xl font-bold text-orange-300 mb-2 pulse-animation">403</h1>
+        </div>
+
+        <!-- Error Message -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Přístup zakázán</h2>
+            <p class="text-gray-600 mb-6">
+                Nemáte oprávnění k přístupu na tuto stránku. Možná se potřebujete přihlásit 
+                nebo nemáte dostatečná práva pro zobrazení tohoto obsahu.
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-4">
+            <!-- Login Button -->
+            {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}"
+               class="w-full bg-orange-600 text-white px-6 py-3 rounded-xl hover:bg-orange-700 transition duration-200 font-semibold block">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                </svg>
+                Přihlásit se
+            </a>
+            {% else %}
+            <!-- Back Button -->
+            <button onclick="history.back()"
+                    class="w-full bg-orange-600 text-white px-6 py-3 rounded-xl hover:bg-orange-700 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Zpět na předchozí stránku
+            </button>
+            {% endif %}
+
+            <!-- Home Button -->
+            <a href="{% url 'home' %}"
+               class="block w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Přejít na hlavní stránku
+            </a>
+        </div>
+
+        <!-- Help Text -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-4">Můžete se podívat na veřejně dostupný obsah:</p>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <a href="{% url 'components' %}"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    🔧 Komponenty
+                </a>
+                <a href="{% url 'reviews' %}"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    📝 Recenze
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animace pro 403 číslo */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+</style>
+{% endblock %}
