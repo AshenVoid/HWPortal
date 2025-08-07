@@ -1,0 +1,179 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Můj profil - Hardware Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header s informacemi o uživateli -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <!-- Avatar -->
+                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-6">
+                    {{ user.username|first|upper }}
+                </div>
+                
+                <!-- Uživatelské info -->
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ user.username }}</h1>
+                    {% if user.first_name or user.last_name %}
+                        <p class="text-xl text-gray-600">{{ user.first_name }} {{ user.last_name }}</p>
+                    {% endif %}
+                    <p class="text-gray-500">Člen od {{ user.date_joined|date:"j. F Y" }}</p>
+                </div>
+            </div>
+            
+            <!-- Akční tlačítka -->
+            <div class="flex space-x-3">
+                <a href="{% url 'profile_edit' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Upravit profil
+                </a>
+                <a href="{% url 'change_password' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                    Změnit heslo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiky -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-blue-600 mb-2">{{ user_stats.total_reviews }}</div>
+            <div class="text-gray-600">Celkem recenzí</div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-green-600 mb-2">{{ user_stats.avg_rating|floatformat:1 }}</div>
+            <div class="text-gray-600">Průměrné hodnocení</div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-purple-600 mb-2">{{ user_stats.helpful_votes_received }}</div>
+            <div class="text-gray-600">Užitečné hlasy</div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 text-center">
+            <div class="text-3xl font-bold text-orange-600 mb-2">{{ user_stats.total_votes_cast }}</div>
+            <div class="text-gray-600">Hodnocení ostatních</div>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Nejnovější recenze -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Nejnovější recenze</h2>
+                <a href="{% url 'my_reviews' %}" class="text-blue-600 hover:underline text-sm">Zobrazit všechny →</a>
+            </div>
+            
+            {% if recent_reviews %}
+                <div class="space-y-4">
+                    {% for review in recent_reviews %}
+                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900">{{ review.title }}</h3>
+                            <div class="flex text-yellow-400 text-sm">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">{{ review.summary|truncatechars:100 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>{{ review.component_name }}</span>
+                            <span>{{ review.date_created|date:"j.n.Y" }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                    </svg>
+                    <p>Zatím jste nenapsali žádné recenze</p>
+                    <a href="{% url 'components' %}" class="text-blue-600 hover:underline text-sm mt-2 inline-block">
+                        Prohlédnout komponenty →
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Nejlepší recenze -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Nejužitečnější recenze</h2>
+            
+            {% if top_reviews %}
+                <div class="space-y-4">
+                    {% for review in top_reviews %}
+                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900">{{ review.title }}</h3>
+                            <div class="flex items-center text-sm">
+                                <svg class="w-4 h-4 text-blue-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                                </svg>
+                                <span class="text-blue-600 font-medium">{{ review.helpful_votes }}</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">{{ review.summary|truncatechars:100 }}</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>{{ review.component_name }}</span>
+                            <div class="flex text-yellow-400">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    <p>Zatím nemáte žádné užitečné recenze</p>
+                    <p class="text-xs mt-1">Napište kvalitní recenze a získejte hlasy od komunity!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Rychlé akce -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Rychlé akce</h2>
+        <div class="grid md:grid-cols-3 gap-4">
+            <a href="{% url 'components' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                </svg>
+                <div>
+                    <div class="font-medium">Prohlédnout komponenty</div>
+                    <div class="text-sm text-gray-500">Najít nové komponenty k recenzi</div>
+                </div>
+            </a>
+
+            <a href="{% url 'reviews' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                </svg>
+                <div>
+                    <div class="font-medium">Číst recenze</div>
+                    <div class="text-sm text-gray-500">Prozkoumat recenze od komunity</div>
+                </div>
+            </a>
+
+            <a href="{% url 'my_reviews' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                <div>
+                    <div class="font-medium">Spravovat recenze</div>
+                    <div class="text-sm text-gray-500">Upravit nebo smazat své recenze</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -46,11 +46,11 @@
         {{ form.email.label }}
       </label>
       {{ form.email }}
-      {% if form.email.errors %}}
+      {% if form.email.errors %}
         <div>
           {% for error in form.email.errors %}
             <p>{{ error }}</p>
-          {% endfor %}}
+          {% endfor %}
         </div>
       {% endif %}
     </div>
@@ -60,11 +60,11 @@
         {{ form.password1.label }}
       </label>
       {{ form.password1 }}
-      {% if form.password1.errors %}}
+      {% if form.password1.errors %}
         <div>
           {% for error in form.password1.errors %}
             <p>{{ error }}</p>
-          {% endfor %}}
+          {% endfor %}
         </div>
       {% endif %}
     </div>
@@ -74,11 +74,11 @@
         {{ form.password2.label }}
       </label>
       {{ form.password2 }}
-      {% if form.password2.errors %}}
+      {% if form.password2.errors %}
         <div>
           {% for error in form.password2.errors %}
             <p>{{ error }}</p>
-          {% endfor %}}
+          {% endfor %}
         </div>
       {% endif %}
     </div>

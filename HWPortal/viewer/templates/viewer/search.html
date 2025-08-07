@@ -21,96 +21,104 @@
 <div class="bg-white rounded-lg shadow-md p-6 mb-8">
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-lg font-semibold text-gray-800">Filtrovat výsledky</h2>
-    <button class="text-sm text-blue-600 hover:underline">Vymazat filtry</button>
+    <a href="{% url 'search' %}?q={{ query }}" class="text-sm text-blue-600 hover:underline">Vymazat filtry</a>
   </div>
 
   <form method="GET" class="space-y-4">
     <input type="hidden" name="q" value="{{ query }}">
 
     <div class="grid md:grid-cols-3 gap-4">
+      <!-- Typ obsahu -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Typ obsahu</label>
-        <div>
+        <div class="space-y-2">
           <label class="flex items-center">
-            <input type="checkbox" name="type" value="components" class="mr-2">
+            <input type="checkbox" name="type" value="components" {% if 'components' in selected_types %}checked{% endif %} class="mr-2">
             <span class="text-sm">Komponenty</span>
           </label>
           <label class="flex items-center">
-            <input type="checkbox" name="type" value="reviews" class="mr-2">
+            <input type="checkbox" name="type" value="reviews" {% if 'reviews' in selected_types %}checked{% endif %} class="mr-2">
             <span class="text-sm">Recenze</span>
-          </label>
-          <label class="flex items-center">
-            <input type="checkbox" name="type" value="articles" class="mr-2">
-            <span class="text-sm">Články</span>
           </label>
         </div>
       </div>
 
-
+      <!-- Kategorie -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
         <select name="category" class="w-full p-2 border border-gray-300 rounded-md">
           <option value="">Všechny kategorie</option>
-          <option value="processors">Procesory</option>
-          <option value="graphics">Grafické karty</option>
-          <option value="memory">Paměti</option>
-          <option value="storage">Úložiště</option>
-          <option value="motherboards">Základní desky</option>
-          <option value="power">Zdroje</option>
+          <option value="processor" {% if selected_category == 'processor' %}selected{% endif %}>Procesory</option>
+          <option value="graphics_card" {% if selected_category == 'graphics_card' %}selected{% endif %}>Grafické karty</option>
+          <option value="ram" {% if selected_category == 'ram' %}selected{% endif %}>Paměti RAM</option>
+          <option value="storage" {% if selected_category == 'storage' %}selected{% endif %}>Úložiště</option>
+          <option value="motherboard" {% if selected_category == 'motherboard' %}selected{% endif %}>Základní desky</option>
+          <option value="power_supply" {% if selected_category == 'power_supply' %}selected{% endif %}>Zdroje</option>
         </select>
       </div>
 
+      <!-- Řazení -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Řadit podle</label>
         <select name="sort" class="w-full p-2 border border-gray-300 rounded-md">
-          <option value="relevance">Relevance</option>
-          <option value="date">Datum (nejnovější)</option>
-          <option value="price_asc">Cena (vzestupně)</option>
-          <option value="price_desc">Cena (sestupně)</option>
-          <option value="rating">Hodnocení</option>
+          <option value="relevance" {% if selected_sort == 'relevance' %}selected{% endif %}>Relevance</option>
+          <option value="date" {% if selected_sort == 'date' %}selected{% endif %}>Datum (nejnovější)</option>
+          <option value="price_asc" {% if selected_sort == 'price_asc' %}selected{% endif %}>Cena (vzestupně)</option>
+          <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Cena (sestupně)</option>
+          <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Hodnocení</option>
         </select>
       </div>
     </div>
 
     <div class="flex justify-end">
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
         Aplikovat filtry
       </button>
     </div>
   </form>
 </div>
 
-<!-- Search results-->
+<!-- Search results -->
 <div class="space-y-6">
   {% if results %}
-    {%for result in results %}
-    <div>
-      <div>
+    {% for result in results %}
+    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-start space-x-4">
         <!-- Photo -->
-        <div class="w-20 h-20 bg-gray-200 rounded-lg mr-4 flex-shrink-0">
+        <div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
           {% if result.image %}
             <img src="{{ result.image }}" alt="{{ result.title }}" class="w-full h-full object-cover rounded-lg">
           {% else %}
             <div class="w-full h-full flex items-center justify-center">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
+              {% if result.category == 'processor' %}
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              {% elif result.category == 'graphics_card' %}
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h5a1 1 0 011 1v2a1 1 0 01-1 1h-1v12a2 2 0 01-2 2H5a2 2 0 01-2-2V8H2a1 1 0 01-1-1V5a1 1 0 011-1h5z" />
+                </svg>
+              {% else %}
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              {% endif %}
             </div>
           {% endif %}
         </div>
 
-        <!-- Result Content-->
-        <div class="flex-1">
+        <!-- Result Content -->
+        <div class="flex-1 min-w-0">
           <div class="flex justify-between items-start mb-2">
-            <h3 class="text-lg font-semibold text-gray-800 hover:text-blue-600">
+            <h3 class="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors">
               <a href="{{ result.url }}">{{ result.title }}</a>
             </h3>
-            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-              {{ result.type|default:"Komponenta" }}
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded flex-shrink-0 ml-2">
+              {{ result.type }}
             </span>
           </div>
 
-          <p class="text-gray-600 text-sm mb-3">
+          <p class="text-gray-600 text-sm mb-3 leading-relaxed">
             {{ result.description|truncatewords:25 }}
           </p>
 
@@ -118,11 +126,11 @@
             <div class="flex items-center space-x-4">
               {% if result.price %}
                 <span class="text-lg font-bold text-green-600">
-                  {{ result.price }} Kč
+                  {{ result.price|floatformat:0 }} Kč
                 </span>
               {% endif %}
 
-              {% if result.rating %}
+              {% if result.rating and result.rating > 0 %}
                 <div class="flex items-center">
                   <div class="flex text-yellow-400">
                     {% for i in "12345" %}
@@ -143,7 +151,7 @@
             </div>
 
             <div class="text-sm text-gray-500">
-              {{ result.date|date:"d.m.Y" }}
+              {{ result.date|date:"j.n.Y" }}
             </div>
           </div>
         </div>
@@ -151,8 +159,7 @@
     </div>
     {% endfor %}
   {% else %}
-
-  <!-- No results -->
+    <!-- No results -->
     <div class="bg-white rounded-lg shadow-md p-8 text-center">
       <div class="w-16 h-16 mx-auto mb-4 text-gray-400">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-full h-full">
@@ -161,11 +168,11 @@
       </div>
       <h3 class="text-lg font-semibold text-gray-800 mb-2">Žádné výsledky nenalezeny</h3>
       <p class="text-gray-600 mb-4">
-        Pro hledaný výraz: "{{ query }}" jsme nenašli žádné odpovídající výsledky.
+        Pro hledaný výraz "<span class="font-semibold">{{ query }}</span>" jsme nenašli žádné odpovídající výsledky.
       </p>
       <div class="text-sm text-gray-500">
-        <p>Zkuste:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <p class="mb-2">Zkuste:</p>
+        <ul class="list-disc list-inside space-y-1">
           <li>Zkontrolovat překlepy v hledaném výrazu</li>
           <li>Použít méně specifické klíčové slovo</li>
           <li>Zkusit synonyma nebo alternativní názvy</li>
@@ -179,31 +186,31 @@
 <!-- Pagination -->
 {% if results and results.has_other_pages %}
 <div class="mt-8 flex justify-center">
-  <nav>
+  <nav class="flex items-center space-x-2">
     {% if results.has_previous %}
-      <a href="?q={{ query }}&page={{ results.previous_page_number }}"
-         class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md">
-        Předchozí
+      <a href="?q={{ query }}&type={{ selected_types|join:'&type=' }}&category={{ selected_category }}&sort={{ selected_sort }}&page={{ results.previous_page_number }}"
+         class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition">
+        ← Předchozí
       </a>
     {% endif %}
 
     {% for num in results.paginator.page_range %}
       {% if results.number == num %}
-        <span>
+        <span class="px-3 py-2 text-sm bg-blue-600 text-white rounded-md">
           {{ num }}
         </span>
-      {% else %}
-        <a href="?q={{ query }}&page={{ num }}"
-           class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md">
+      {% elif num > results.number|add:'-3' and num < results.number|add:'3' %}
+        <a href="?q={{ query }}&type={{ selected_types|join:'&type=' }}&category={{ selected_category }}&sort={{ selected_sort }}&page={{ num }}"
+           class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition">
           {{ num }}
         </a>
       {% endif %}
     {% endfor %}
 
     {% if results.has_next %}
-      <a href="?q={{ query }}&page={{ results.next_page_number }}"
-         class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md">
-        Další
+      <a href="?q={{ query }}&type={{ selected_types|join:'&type=' }}&category={{ selected_category }}&sort={{ selected_sort }}&page={{ results.next_page_number }}"
+         class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition">
+        Další →
       </a>
     {% endif %}
   </nav>
@@ -211,41 +218,43 @@
 {% endif %}
 
 {% else %}
-<!-- Suggestions When Empty -->
+<!-- Dynamic Random Suggestions When Empty -->
 <div class="bg-white rounded-lg shadow-md p-6">
-  <h2 class="text-lg font-semibold text-gray-800 mb-4">Populární vyhledávání</h2>
-  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <a href="?q=RTX 4080" class=" flex items.center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <h2 class="text-lg font-semibold text-gray-800 mb-4">Návrhy vyhledávání</h2>
+
+  {% if suggestions %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for suggestion in suggestions %}
+        <a href="?q={{ suggestion|urlencode }}"
+           class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <span class="text-sm">{{ suggestion }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Refresh button pro nové návrhy -->
+    <div class="mt-4 text-center">
+      <a href="{% url 'search' %}"
+         class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 transition">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Obnovit návrhy
+      </a>
+    </div>
+  {% else %}
+    <!-- Fallback když nejsou data -->
+    <div class="text-center py-8">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
-      <span class="text-sm">RTX 4080</span>
-    </a>
-    <a href="?q=AMD Ryzen 7" class=" flex items.center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">AMD Ryzen 7</span>
-    </a>
-    <a href="?q=DDR5 pamět" class=" flex items.center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">DDR5 pamět</span>
-    </a>
-    <a href="?q=SSD NVMe" class=" flex items.center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">SSD NVMe</span>
-    </a>
-    <a href="?q=MSI MAG B650" class=" flex items.center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-      <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
-      <span class="text-sm">MSI MAG B650</span>
-    </a>
-  </div>
+      <p class="text-gray-500">Začněte vyhledáváním komponent nebo výrobců</p>
+    </div>
+  {% endif %}
 </div>
 {% endif %}
+
 {% endblock %}

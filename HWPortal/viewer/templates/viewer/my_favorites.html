@@ -1,0 +1,494 @@
+{% extends 'viewer/base.html' %}
+{% csrf_token %}
+{% load dict_extras %}
+
+{% block title %}Moje oblíbené komponenty - Hardware Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="{% url 'profile' %}" class="hover:text-blue-600">Můj profil</a></li>
+            <li class="text-gray-300">/</li>
+            <li class="text-gray-800 font-medium">Oblíbené komponenty</li>
+        </ol>
+    </nav>
+
+    <!-- Header s přehledem -->
+    <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-6 mb-8 border border-pink-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                    <span class="mr-3">💖</span>
+                    Moje oblíbené komponenty
+                </h1>
+                <p class="text-gray-600">
+                    Sledujete <span class="font-semibold text-pink-600">{{ stats.total_favorites }}</span> komponent 
+                    {% if recent_activities_count > 0 %}
+                        • <span class="font-semibold text-blue-600">{{ recent_activities_count }}</span> nových aktivit
+                    {% endif %}
+                </p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-pink-600">{{ stats.total_favorites }}</div>
+                <div class="text-sm text-gray-600">Celkem oblíbených</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rychlé statistiky podle typu -->
+    {% if stats.total_favorites > 0 %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        {% for component_type, display_name in component_types %}
+            {% with count=stats.by_type|get_item:component_type|default:0 %}
+            <div class="bg-white rounded-lg shadow-md p-4 text-center {% if count > 0 %}border-l-4 border-blue-500{% endif %}">
+                <div class="text-2xl mb-2">
+                    {% if component_type == 'processor' %}🧠
+                    {% elif component_type == 'graphics_card' %}🎮
+                    {% elif component_type == 'ram' %}💾
+                    {% elif component_type == 'storage' %}💿
+                    {% elif component_type == 'motherboard' %}🔧
+                    {% elif component_type == 'power_supply' %}⚡
+                    {% endif %}
+                </div>
+                <div class="text-xl font-bold {% if count > 0 %}text-blue-600{% else %}text-gray-400{% endif %}">{{ count }}</div>
+                <div class="text-xs text-gray-600">{{ display_name }}</div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Nedávné aktivity -->
+    {% if recent_activities %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <span class="mr-2">🔔</span>
+            Nedávné aktivity
+            <span class="ml-2 text-sm font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ recent_activities|length }}</span>
+        </h2>
+        
+        <div class="space-y-3 max-h-64 overflow-y-auto">
+            {% for activity in recent_activities %}
+            <div class="flex items-center p-3 {% if not activity.is_read %}bg-blue-50{% else %}bg-gray-50{% endif %} rounded-lg">
+                <div class="w-10 h-10 {% if not activity.is_read %}bg-blue-100{% else %}bg-gray-100{% endif %} rounded-full flex items-center justify-center mr-3">
+                    {% if activity.activity_type == 'new_review' %}📝
+                    {% elif activity.activity_type == 'price_change' %}💰
+                    {% elif activity.activity_type == 'rating_change' %}⭐
+                    {% else %}📊
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900 text-sm">{{ activity.title }}</p>
+                    <p class="text-xs text-gray-600">{{ activity.description }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ activity.date_created|timesince }} ago</p>
+                </div>
+                {% if activity.related_review %}
+                <a href="{% url 'reviews' %}" class="text-blue-600 hover:text-blue-700 text-sm">
+                    Zobrazit recenzi →
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Oblíbené komponenty seskupené podle typu -->
+    {% if favorites_by_type %}
+        {% for component_type, favorites in favorites_by_type.items %}
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                    <span class="mr-3">
+                        {% if component_type == 'processor' %}🧠
+                        {% elif component_type == 'graphics_card' %}🎮
+                        {% elif component_type == 'ram' %}💾
+                        {% elif component_type == 'storage' %}💿
+                        {% elif component_type == 'motherboard' %}🔧
+                        {% elif component_type == 'power_supply' %}⚡
+                        {% endif %}
+                    </span>
+                    {% for ct, display_name in component_types %}
+                        {% if ct == component_type %}{{ display_name }}{% endif %}
+                    {% endfor %}
+                    <span class="ml-2 text-sm font-normal text-gray-500">({{ favorites|length }})</span>
+                </h2>
+                
+                <!-- Možnost přidat další -->
+                <a href="{% url 'components' %}?type={{ component_type }}" 
+                   class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Přidat další
+                </a>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for favorite in favorites %}
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 p-6 border-l-4 {% if favorite.has_recent_activity %}border-green-500 bg-green-50{% else %}border-gray-300{% endif %}">
+                    
+                    <!-- Activity indicator -->
+                    {% if favorite.has_recent_activity %}
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                            🔥 {{ favorite.recent_reviews_count }} nových recenzí
+                        </span>
+                        <button onclick="removeFavorite({{ favorite.id }})" 
+                                class="text-red-400 hover:text-red-600 transition-colors"
+                                title="Odebrat z oblíbených">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="flex items-start justify-between mb-3">
+                        <div></div>
+                        <button onclick="removeFavorite({{ favorite.id }})" 
+                                class="text-red-400 hover:text-red-600 transition-colors"
+                                title="Odebrat z oblíbených">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    <!-- Header komponenty -->
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900 mb-1 leading-tight">{{ favorite.component_name|truncatechars:40 }}</h3>
+                        <p class="text-sm text-gray-600">{{ favorite.component_manufacturer }}</p>
+                    </div>
+
+                    <!-- Klíčové specs -->
+                    <div class="space-y-2 text-sm mb-4">
+                        {% with component=favorite.component %}
+                            {% if component_type == 'processor' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Jádra:</span>
+                                    <span class="font-medium">{{ component.corecount }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Frekvence:</span>
+                                    <span class="font-medium">{{ component.clock }} MHz</span>
+                                </div>
+                            {% elif component_type == 'graphics_card' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">VRAM:</span>
+                                    <span class="font-medium">{{ component.vram }}GB</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">TGP:</span>
+                                    <span class="font-medium">{{ component.tgp }}W</span>
+                                </div>
+                            {% elif component_type == 'ram' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Kapacita:</span>
+                                    <span class="font-medium">{{ component.capacity }}GB</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Frekvence:</span>
+                                    <span class="font-medium">{{ component.clock }} MHz</span>
+                                </div>
+                            {% elif component_type == 'storage' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Kapacita:</span>
+                                    <span class="font-medium">{{ component.capacity }}GB</span>
+                                </div>
+                            {% elif component_type == 'motherboard' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Socket:</span>
+                                    <span class="font-medium">{{ component.socket }}</span>
+                                </div>
+                            {% elif component_type == 'power_supply' %}
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Výkon:</span>
+                                    <span class="font-medium">{{ component.maxpower }}W</span>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <!-- Cena a rating -->
+                        <div class="flex justify-between border-t border-gray-200 pt-2">
+                            <span class="text-gray-600">Cena:</span>
+                            <span class="font-medium text-green-600">{{ favorite.component.price|floatformat:0 }} Kč</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Rating:</span>
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400 text-xs mr-1">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= favorite.component.rating %}★{% else %}☆{% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="text-xs">({{ favorite.component.rating }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Akční tlačítka -->
+                    <div class="space-y-2">
+                        <a href="{% url 'component_detail' component_type favorite.component.id %}" 
+                           class="w-full text-center px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition block">
+                            Zobrazit detail
+                        </a>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="{% url 'create_review_for_component' component_type favorite.component.id %}" 
+                               class="text-center px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition">
+                                Recenzovat
+                            </a>
+                            <button onclick="addToComparison('{{ component_type }}', {{ favorite.component.id }})"
+                                    class="text-center px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition">
+                                Porovnat
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Datum přidání -->
+                    <div class="text-xs text-gray-500 mt-3 text-center">
+                        Přidáno {{ favorite.date_added|date:"j. n." }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Žádné oblíbené komponenty -->
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-medium text-gray-900 mb-2">Zatím žádné oblíbené komponenty</h3>
+            <p class="text-gray-500 mb-6">
+                Začněte přidávat komponenty do oblíbených a vytvořte si svou osobní kolekci!<br>
+                <span class="text-sm">Můžete sledovat až několik komponent každého typu.</span>
+            </p>
+            <a href="{% url 'components' %}" 
+               class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                Prohlédnout komponenty
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// CSRF Token helper
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
+function addToComparison(componentType, componentId) {
+    fetch('{% url "add_to_comparison" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            component_type: componentType,
+            component_id: componentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(data.message + ' - ' + data.count + '/3', 'success');
+
+            // Pokud má uživatel už 2+ komponenty, nabídni přechod na porovnání
+            if (data.count >= 2) {
+                setTimeout(() => {
+                    if (confirm('Chcete přejít na porovnání komponent?')) {
+                        window.location.href = '{% url "component_comparison" %}';
+                    }
+                }, 1500);
+            }
+        } else {
+            showMessage(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Došlo k chybě při přidávání komponenty do porovnání', 'error');
+    });
+}
+
+// Toast Manager - stejný jako v ostatních souborech
+class ToastManager {
+    constructor() {
+        this.toasts = [];
+        this.container = null;
+        this.init();
+    }
+
+    init() {
+        this.container = document.createElement('div');
+        this.container.id = 'toast-container';
+        this.container.className = 'fixed top-6 right-6 z-50 space-y-3 pointer-events-none';
+        document.body.appendChild(this.container);
+        this.addStyles();
+    }
+
+    show(message, type = 'info', duration = 4000) {
+        const toast = this.createToast(message, type, duration);
+        this.container.appendChild(toast);
+        this.toasts.push(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0', 'scale-95');
+            toast.classList.add('translate-x-0', 'opacity-100', 'scale-100');
+        });
+
+        setTimeout(() => this.hide(toast), duration);
+        return toast;
+    }
+
+    createToast(message, type, duration) {
+        const id = 'toast-' + Date.now() + Math.random().toString(36).substr(2, 9);
+
+        const configs = {
+            success: {
+                bg: 'bg-gradient-to-r from-green-500 to-emerald-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                       </svg>`
+            },
+            error: {
+                bg: 'bg-gradient-to-r from-red-500 to-rose-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                       </svg>`
+            },
+            info: {
+                bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+                icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                       </svg>`
+            }
+        };
+
+        const config = configs[type] || configs.info;
+
+        const toast = document.createElement('div');
+        toast.id = id;
+        toast.className = 'toast-item pointer-events-auto max-w-sm w-full transform translate-x-full opacity-0 scale-95 transition-all duration-500 ease-out';
+
+        toast.innerHTML = `
+            <div class="${config.bg} text-white rounded-xl shadow-2xl overflow-hidden">
+                <div class="p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-0.5">
+                            ${config.icon}
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium leading-5">
+                                ${message}
+                            </p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            <button onclick="toastManager.hide(document.getElementById('${id}'))"
+                                    class="inline-flex text-white/70 hover:text-white focus:outline-none transition-colors p-1 rounded-md hover:bg-white/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-1 bg-black/20">
+                    <div class="toast-progress h-1 bg-white/30 transition-all ease-linear"
+                         style="width: 100%; animation: shrinkBar ${duration}ms linear forwards;"></div>
+                </div>
+            </div>
+        `;
+
+        toast.addEventListener('mouseenter', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'paused';
+        });
+
+        toast.addEventListener('mouseleave', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'running';
+        });
+
+        return toast;
+    }
+
+    hide(toast) {
+        if (!toast || !document.body.contains(toast)) return;
+
+        toast.classList.remove('translate-x-0', 'opacity-100', 'scale-100');
+        toast.classList.add('translate-x-full', 'opacity-0', 'scale-95');
+
+        setTimeout(() => {
+            this.toasts = this.toasts.filter(t => t !== toast);
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 500);
+    }
+
+    addStyles() {
+        if (document.getElementById('ultra-toast-styles')) return;
+
+        const styles = document.createElement('style');
+        styles.id = 'ultra-toast-styles';
+        styles.textContent = `
+            @keyframes shrinkBar {
+                from { width: 100%; }
+                to { width: 0%; }
+            }
+
+            .toast-item:hover {
+                transform: translateX(0) translateY(-2px) scale(1.02);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            }
+
+            @media (max-width: 640px) {
+                #toast-container {
+                    right: 1rem;
+                    left: 1rem;
+                }
+
+                .toast-item {
+                    max-width: none;
+                }
+            }
+
+            .toast-item:nth-child(n+4) {
+                opacity: 0.7;
+                transform: scale(0.95) translateX(0);
+            }
+        `;
+
+        document.head.appendChild(styles);
+    }
+}
+
+// Vytvoř globální instanci
+const toastManager = new ToastManager();
+
+function showMessage(message, type = 'info', duration = 4000) {
+    return toastManager.show(message, type, duration);
+}
+
+// Inicializace při načtení stránky
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('My favorites page loaded with comparison functionality');
+});
+
+function removeFavorite(favoriteId) {
+    if (confirm('Opravdu chcete odebrat tuto komponentu z oblíbených?')) {
+        window.location.href = `/favorites/remove/${favoriteId}/`;
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,606 @@
+[
+  {
+    "model": "viewer.sockets",
+    "pk": 1,
+    "fields": {
+      "type": "LGA1700"
+    }
+  },
+  {
+    "model": "viewer.sockets",
+    "pk": 2,
+    "fields": {
+      "type": "LGA1200"
+    }
+  },
+  {
+    "model": "viewer.sockets",
+    "pk": 3,
+    "fields": {
+      "type": "LGA1151"
+    }
+  },
+  {
+    "model": "viewer.sockets",
+    "pk": 4,
+    "fields": {
+      "type": "AM4"
+    }
+  },
+  {
+    "model": "viewer.sockets",
+    "pk": 5,
+    "fields": {
+      "type": "AM5"
+    }
+  },
+  {
+    "model": "viewer.sockets",
+    "pk": 6,
+    "fields": {
+      "type": "sTRX4"
+    }
+  },
+  {
+    "model": "viewer.boardformats",
+    "pk": 1,
+    "fields": {
+      "format": "ATX"
+    }
+  },
+  {
+    "model": "viewer.boardformats",
+    "pk": 2,
+    "fields": {
+      "format": "Micro-ATX"
+    }
+  },
+  {
+    "model": "viewer.boardformats",
+    "pk": 3,
+    "fields": {
+      "format": "Mini-ITX"
+    }
+  },
+  {
+    "model": "viewer.boardformats",
+    "pk": 4,
+    "fields": {
+      "format": "E-ATX"
+    }
+  },
+  {
+    "model": "viewer.ramtypes",
+    "pk": 1,
+    "fields": {
+      "type": "DDR4"
+    }
+  },
+  {
+    "model": "viewer.ramtypes",
+    "pk": 2,
+    "fields": {
+      "type": "DDR5"
+    }
+  },
+  {
+    "model": "viewer.ramtypes",
+    "pk": 3,
+    "fields": {
+      "type": "DDR3"
+    }
+  },
+  {
+    "model": "viewer.storagetypes",
+    "pk": 1,
+    "fields": {
+      "type": "NVMe SSD"
+    }
+  },
+  {
+    "model": "viewer.storagetypes",
+    "pk": 2,
+    "fields": {
+      "type": "SATA SSD"
+    }
+  },
+  {
+    "model": "viewer.storagetypes",
+    "pk": 3,
+    "fields": {
+      "type": "HDD"
+    }
+  },
+  {
+    "model": "viewer.storagetypes",
+    "pk": 4,
+    "fields": {
+      "type": "M.2 SSD"
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 1,
+    "fields": {
+      "name": "Radeon RX 9060 XT 16 GB",
+      "manufacturer": "AMD",
+      "vram": 16,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 5,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 2,
+    "fields": {
+      "name": "Radeon RX 9070 XT",
+      "manufacturer": "AMD",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 5,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 3,
+    "fields": {
+      "name": "GeForce RTX 5070",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 5,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 4,
+    "fields": {
+      "name": "GeForce RTX 5090",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 5,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 5,
+    "fields": {
+      "name": "GeForce RTX 5070 Ti",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 4,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 6,
+    "fields": {
+      "name": "GeForce RTX 5060",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 4,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 7,
+    "fields": {
+      "name": "GeForce RTX 5050",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 4,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 8,
+    "fields": {
+      "name": "GeForce RTX 5060 Ti 16 GB",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 3,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 9,
+    "fields": {
+      "name": "GeForce RTX 5080",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 3,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 10,
+    "fields": {
+      "name": "Radeon RX 580",
+      "manufacturer": "AMD",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 3,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 11,
+    "fields": {
+      "name": "GeForce RTX 3060 12 GB",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 2,
+      "price": 12000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 12,
+    "fields": {
+      "name": "GeForce RTX 4060",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 2,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 13,
+    "fields": {
+      "name": "GeForce RTX 3070",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 2,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 14,
+    "fields": {
+      "name": "GeForce RTX 3080",
+      "manufacturer": "NVIDIA",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 1,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.graphicscards",
+    "pk": 15,
+    "fields": {
+      "name": "Radeon RX 9070",
+      "manufacturer": "AMD",
+      "vram": 8,
+      "tgp": 200,
+      "dateadded": "2025-07-22",
+      "rating": 1,
+      "price": 15000
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 1,
+    "fields": {
+      "name": "Corsair Vengeance LPX 16GB DDR4-3200",
+      "manufacturer": "Corsair",
+      "capacity": 16,
+      "clock": 3200,
+      "type": 1,
+      "price": 2500,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 2,
+    "fields": {
+      "name": "G.SKILL Trident Z5 32GB DDR5-6000",
+      "manufacturer": "G.SKILL",
+      "capacity": 32,
+      "clock": 6000,
+      "type": 2,
+      "price": 8500,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 3,
+    "fields": {
+      "name": "Kingston HyperX Fury 8GB DDR4-2666",
+      "manufacturer": "Kingston",
+      "capacity": 8,
+      "clock": 2666,
+      "type": 1,
+      "price": 1200,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 4,
+    "fields": {
+      "name": "Crucial Ballistix 32GB DDR4-3600",
+      "manufacturer": "Crucial",
+      "capacity": 32,
+      "clock": 3600,
+      "type": 1,
+      "price": 4800,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 5,
+    "fields": {
+      "name": "TeamGroup T-Force Delta RGB 16GB DDR4-3200",
+      "manufacturer": "TeamGroup",
+      "capacity": 16,
+      "clock": 3200,
+      "type": 1,
+      "price": 2200,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.ram",
+    "pk": 6,
+    "fields": {
+      "name": "Corsair Dominator Platinum RGB 64GB DDR5-5600",
+      "manufacturer": "Corsair",
+      "capacity": 64,
+      "clock": 5600,
+      "type": 2,
+      "price": 15000,
+      "dateadded": "2025-07-22",
+      "rating": 5
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 1,
+    "fields": {
+      "name": "Samsung 980 PRO 1TB",
+      "manufacturer": "Samsung",
+      "capacity": 1000,
+      "type": 1,
+      "price": 3500,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 2,
+    "fields": {
+      "name": "WD Black SN850X 2TB",
+      "manufacturer": "Western Digital",
+      "capacity": 2000,
+      "type": 1,
+      "price": 6500,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 3,
+    "fields": {
+      "name": "Crucial MX500 1TB",
+      "manufacturer": "Crucial",
+      "capacity": 1000,
+      "type": 2,
+      "price": 2500,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 4,
+    "fields": {
+      "name": "Seagate Barracuda 4TB",
+      "manufacturer": "Seagate",
+      "capacity": 4000,
+      "type": 3,
+      "price": 2800,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 5,
+    "fields": {
+      "name": "Samsung 990 EVO 4TB",
+      "manufacturer": "Samsung",
+      "capacity": 4000,
+      "type": 1,
+      "price": 12000,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.storage",
+    "pk": 6,
+    "fields": {
+      "name": "Kingston NV2 500GB",
+      "manufacturer": "Kingston",
+      "capacity": 500,
+      "type": 1,
+      "price": 1200,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.motherboards",
+    "pk": 1,
+    "fields": {
+      "name": "ASUS ROG STRIX Z790-E GAMING WIFI",
+      "manufacturer": "ASUS",
+      "format": 1,
+      "socket": 1,
+      "maxcputdp": 250,
+      "satacount": 6,
+      "nvmecount": 4,
+      "pciegen": 5,
+      "price": 15000,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.motherboards",
+    "pk": 2,
+    "fields": {
+      "name": "MSI MAG B550 TOMAHAWK",
+      "manufacturer": "MSI",
+      "format": 1,
+      "socket": 4,
+      "maxcputdp": 180,
+      "satacount": 6,
+      "nvmecount": 2,
+      "pciegen": 4,
+      "price": 4500,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.motherboards",
+    "pk": 3,
+    "fields": {
+      "name": "Gigabyte B660M DS3H",
+      "manufacturer": "Gigabyte",
+      "format": 2,
+      "socket": 2,
+      "maxcputdp": 125,
+      "satacount": 4,
+      "nvmecount": 2,
+      "pciegen": 4,
+      "price": 2800,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.motherboards",
+    "pk": 4,
+    "fields": {
+      "name": "ASRock X670E Taichi",
+      "manufacturer": "ASRock",
+      "format": 1,
+      "socket": 5,
+      "maxcputdp": 200,
+      "satacount": 8,
+      "nvmecount": 4,
+      "pciegen": 5,
+      "price": 18000,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.powersupplyunits",
+    "pk": 1,
+    "fields": {
+      "name": "Corsair RM850x 850W 80+ Gold",
+      "manufacturer": "Corsair",
+      "maxpower": 850,
+      "price": 4500,
+      "dateadded": "2025-07-22",
+      "rating": 4
+    }
+  },
+  {
+    "model": "viewer.powersupplyunits",
+    "pk": 2,
+    "fields": {
+      "name": "Seasonic Focus GX-650 650W 80+ Gold",
+      "manufacturer": "Seasonic",
+      "maxpower": 650,
+      "price": 3200,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.powersupplyunits",
+    "pk": 3,
+    "fields": {
+      "name": "EVGA SuperNOVA 1000 G5 1000W 80+ Gold",
+      "manufacturer": "EVGA",
+      "maxpower": 1000,
+      "price": 5800,
+      "dateadded": "2025-07-22",
+      "rating": 5
+    }
+  },
+  {
+    "model": "viewer.powersupplyunits",
+    "pk": 4,
+    "fields": {
+      "name": "be quiet! Pure Power 11 500W 80+ Gold",
+      "manufacturer": "be quiet!",
+      "maxpower": 500,
+      "price": 2200,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  },
+  {
+    "model": "viewer.powersupplyunits",
+    "pk": 5,
+    "fields": {
+      "name": "Cooler Master V750 SFX Gold 750W",
+      "manufacturer": "Cooler Master",
+      "maxpower": 750,
+      "price": 4200,
+      "dateadded": "2025-07-22",
+      "rating": 3
+    }
+  }
+]

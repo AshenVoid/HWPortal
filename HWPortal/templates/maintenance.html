@@ -1,0 +1,140 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Údržba - Hardware Portal{% endblock %}
+
+{% block content %}
+<!-- Maintenance Content -->
+<div class="flex items-center justify-center" style="min-height: 60vh;">
+    <div class="max-w-md w-full mx-auto text-center">
+        <!-- Maintenance Icon -->
+        <div class="mb-8">
+            <div class="w-32 h-32 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-blue-500 mb-2 rotate-animation">🔧</h1>
+        </div>
+
+        <!-- Maintenance Message -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Probíhá údržba</h2>
+            <p class="text-gray-600 mb-6">
+                Stránky jsou dočasně nedostupné kvůli plánované údržbě. 
+                Pracujeme na vylepšeních a nových funkcích pro vás. 
+                Děkujeme za trpělivost!
+            </p>
+        </div>
+
+        <!-- Status Info -->
+        <div class="mb-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <div class="flex items-center justify-center mb-3">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2 pulse-dot"></div>
+                <span class="text-sm font-medium text-blue-800">Odhadovaný čas dokončení</span>
+            </div>
+            <p class="text-lg font-bold text-blue-600" id="estimated-time">
+                Přibližně 2 hodiny
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-4">
+            <!-- Refresh Button -->
+            <button onclick="window.location.reload()"
+                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Zkontrolovat dostupnost
+            </button>
+
+            <!-- Status Page Button -->
+            <a href="#" onclick="alert('Status stránka bude dostupná brzy!')"
+               class="block w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"/>
+                </svg>
+                Status údržby
+            </a>
+        </div>
+
+        <!-- Updates Info -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-4">Co nového připravujeme:</p>
+            <div class="text-left text-sm text-gray-600 space-y-2">
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                    <span>Vylepšení rychlosti načítání</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                    <span>Nové funkce pro porovnání komponent</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <span>Mobilní aplikace (brzy)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="mt-6 pt-4 border-t border-gray-100">
+            <p class="text-xs text-gray-500">
+                Urgentní dotazy: 
+                <a href="mailto:podpora@hardwareportal.cz" class="text-blue-600 hover:text-blue-800">podpora@hardwareportal.cz</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animace pro maintenance ikonu */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.rotate-animation {
+    animation: rotate 4s linear infinite;
+}
+
+/* Pulsující tečka */
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.pulse-dot {
+    animation: pulse-dot 2s infinite;
+}
+</style>
+
+<script>
+// Auto-refresh každých 5 minut
+setTimeout(function() {
+    window.location.reload();
+}, 300000); // = 5 minut
+
+// Aktualizace času každou minutu
+setInterval(function() {
+    const now = new Date();
+    const hours = now.getHours();
+    
+    // Jednoduchá logika pro odhadovaný čas
+    if (hours >= 2 && hours <= 4) {
+        document.getElementById('estimated-time').textContent = 'Přibližně 1 hodina';
+    } else if (hours >= 22 || hours <= 2) {
+        document.getElementById('estimated-time').textContent = 'Do rána';
+    } else {
+        document.getElementById('estimated-time').textContent = 'Přibližně 2 hodiny';
+    }
+}, 60000); // Každou minutu
+</script>
+{% endblock %}

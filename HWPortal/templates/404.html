@@ -1,0 +1,92 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Stránka nenalezena - Hardware Portal{% endblock %}
+
+{% block content %}
+<!-- 404 Error Content -->
+<div class="flex items-center justify-center" style="min-height: 60vh;">
+    <div class="max-w-md w-full mx-auto text-center">
+        <!-- 404 Error Icon -->
+        <div class="mb-8">
+            <div class="w-32 h-32 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+            </div>
+            <h1 class="text-6xl font-bold text-gray-300 mb-2 bounce-animation">404</h1>
+        </div>
+
+        <!-- Error Message -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Stránka nenalezena</h2>
+            <p class="text-gray-600 mb-6">
+                Omlouváme se, ale stránka kterou hledáte neexistuje nebo byla přesunuta.
+                Možná jste se dostali sem přes zastaralý odkaz nebo špatně napsali URL adresu.
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-4">
+            <!-- Back Button -->
+            <button onclick="history.back()"
+                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Zpět na předchozí stránku
+            </button>
+
+            <!-- Home Button -->
+            <a href="{% url 'components' %}"
+               class="block w-full bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition duration-200 font-semibold">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Přejít na komponenty
+            </a>
+        </div>
+
+        <!-- Help Text -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-4">Můžete také použít vyhledávání nahoře nebo se podívat na:</p>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <a href="{% url 'components' %}?category=cpu"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    🔧 Procesory
+                </a>
+                <a href="{% url 'components' %}?category=gpu"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    🎮 Grafické karty
+                </a>
+                <a href="{% url 'components' %}?category=ram"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    💾 Paměti RAM
+                </a>
+                <a href="{% url 'components' %}?category=storage"
+                   class="text-blue-600 hover:text-blue-800 transition">
+                    💽 Úložiště
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Animace pro 404 číslo */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.bounce-animation {
+    animation: bounce 2s infinite;
+}
+</style>
+{% endblock %}

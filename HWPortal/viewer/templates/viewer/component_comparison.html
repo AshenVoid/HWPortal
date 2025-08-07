@@ -1,0 +1,198 @@
+{% extends 'viewer/base.html' %}
+
+{% block title %}Porovnání komponent - Hardware Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Porovnání komponent</h1>
+                <p class="text-gray-600">Detailní porovnání {{ component_count }} vybraných komponent</p>
+            </div>
+
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <a href="{% url 'component_selector' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Změnit výběr
+                </a>
+                <a href="{% url 'clear_comparison' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                    Vymazat vše
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Cards Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-{{ component_count }} gap-6 mb-8">
+        {% for component in components %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-center">
+                <!-- Component Icon -->
+                <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                    </svg>
+                </div>
+
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ component.object.name }}</h3>
+                <p class="text-gray-600 mb-4">{{ component.object.manufacturer }}</p>
+
+                <!-- Quick Actions -->
+                <div class="space-y-2">
+                    <a href="{% url 'component_detail' component.type component.object.id %}"
+                       class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                        Zobrazit detail
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Detailed Specifications Table -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Detailní specifikace</h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full table-auto">
+                <thead>
+                    <tr class="border-b border-gray-200 bg-gray-50">
+                        <th class="text-left py-3 px-4 font-semibold text-gray-900">Specifikace</th>
+                        {% for component in components %}
+                        <th class="text-center py-3 px-4 font-semibold text-gray-900 min-w-[200px]">
+                            {{ component.object.name|truncatechars:25 }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spec_name, spec_data in comparison_specs.items %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50">
+                        <td class="py-3 px-4 font-medium text-gray-900">{{ spec_name }}</td>
+                        {% for value in spec_data.values %}
+                        <td class="py-3 px-4 text-center {% if forloop.counter0 in spec_data.best_indices %}bg-green-100 text-green-800 font-semibold{% endif %}">
+                            {% if spec_data.type == 'boolean' %}
+                                {% if value %}
+                                    <span class="text-green-600 font-semibold">✓ Ano</span>
+                                {% else %}
+                                    <span class="text-red-600">✗ Ne</span>
+                                {% endif %}
+                            {% elif spec_data.type == 'price' %}
+                                {% if value > 0 %}
+                                    {{ value|floatformat:0 }} Kč
+                                {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                {% endif %}
+                            {% elif spec_data.type == 'number' %}
+                                {% if value > 0 %}
+                                    {{ value|floatformat:0 }}{% if spec_data.unit %} {{ spec_data.unit }}{% endif %}
+                                    {% if forloop.counter0 in spec_data.best_indices %}
+                                        <span class="ml-1 text-green-600 font-bold">🏆</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                {% endif %}
+                            {% elif spec_data.type == 'date' %}
+                                {{ value|date:"j.n.Y" }}
+                            {% else %}
+                                {{ value|default:"N/A" }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Performance Score for Processors -->
+    {% if components.0.type == 'processor' %}
+    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Výkonnostní srovnání</h2>
+
+        <div class="space-y-4">
+            {% for component in components %}
+            {% with obj=component.object %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-600 rounded mr-3"></div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900">{{ obj.name }}</h4>
+                        <p class="text-sm text-gray-600">{{ obj.manufacturer }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    {% if obj.benchresult > 0 %}
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-blue-600">{{ obj.benchresult }}</div>
+                        <div class="text-xs text-gray-500">Benchmark skóre</div>
+                    </div>
+                    <div class="w-48 bg-gray-200 rounded-full h-3">
+                        <div class="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                             style="width: {% widthratio obj.benchresult 50000 100 %}%"></div>
+                    </div>
+                    {% else %}
+                    <div class="text-gray-400">Benchmark N/A</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Winner Summary -->
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg shadow-md p-6 mt-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">🏆 Shrnutí vítězů</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg p-4 border-l-4 border-green-500">
+                <h4 class="font-semibold text-gray-900 mb-2">💰 Nejlevnější</h4>
+                {% for spec_name, spec_data in comparison_specs.items %}
+                    {% if spec_name == 'Cena' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
+                            <p class="text-green-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
+                            <p class="text-sm text-gray-600">{{ component.object.price|floatformat:0 }} Kč</p>
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                <h4 class="font-semibold text-gray-900 mb-2">⭐ Nejvyšší hodnocení</h4>
+                {% for spec_name, spec_data in comparison_specs.items %}
+                    {% if spec_name == 'Hodnocení' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
+                            <p class="text-blue-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
+                            <p class="text-sm text-gray-600">{{ component.object.rating }}/5 hvězd</p>
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if components.0.type == 'processor' %}
+            <div class="bg-white rounded-lg p-4 border-l-4 border-purple-500">
+                <h4 class="font-semibold text-gray-900 mb-2">🚀 Nejvýkonnější</h4>
+                {% for spec_name, spec_data in comparison_specs.items %}
+                    {% if spec_name == 'Benchmark skóre' and spec_data.best_components %}
+                        {% for component in spec_data.best_components %}
+                            <p class="text-purple-600 font-medium">{{ component.object.name|truncatechars:25 }}</p>
+                            <p class="text-sm text-gray-600">{{ component.object.benchresult }} bodů</p>
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
