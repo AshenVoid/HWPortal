@@ -1,18 +1,8 @@
 from django.contrib import admin
-from .models import (
-    Sockets,
-    BoardFormats,
-    RamTypes,
-    StorageTypes,
-    Processors,
-    Motherboards,
-    Ram,
-    GraphicsCards,
-    Storage,
-    PowerSupplyUnits,
-    Reviews,
-    ReviewVotes,
-)
+
+from .models import (BoardFormats, GraphicsCards, Motherboards,
+                     PowerSupplyUnits, Processors, Ram, RamTypes, Reviews,
+                     ReviewVotes, Sockets, Storage, StorageTypes)
 
 # Register your models here.
 

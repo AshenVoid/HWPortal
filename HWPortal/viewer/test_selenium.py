@@ -1,21 +1,23 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import override_settings, tag
-from django.contrib.auth.models import User
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from webdriver_manager.chrome import ChromeDriverManager
-from .models import Reviews, Processors, GraphicsCards, Sockets
 import time
 import uuid
 
+from django.contrib.auth.models import User
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import override_settings, tag
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+
+from .models import GraphicsCards, Processors, Reviews, Sockets
+
 
 @override_settings(DEBUG=True)
-@tag('selenium')
+@tag("selenium")
 class FormsSeleniumTests(StaticLiveServerTestCase):
     """
     Selenium testy pro formuláře v HWPortal aplikaci
@@ -47,33 +49,33 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
         self.unique_suffix = str(uuid.uuid4())[:8]
 
         self.test_user = User.objects.create_user(
-            username=f'testuser_{self.unique_suffix}',
-            email=f'test_{self.unique_suffix}@example.com',
-            password='testpass123'
+            username=f"testuser_{self.unique_suffix}",
+            email=f"test_{self.unique_suffix}@example.com",
+            password="testpass123",
         )
 
-        self.test_socket = Sockets.objects.create(type=f'AM4_{self.unique_suffix}')
+        self.test_socket = Sockets.objects.create(type=f"AM4_{self.unique_suffix}")
         self.test_processor = Processors.objects.create(
-            name=f'Test CPU {self.unique_suffix}',
-            manufacturer='Test Manufacturer',
+            name=f"Test CPU {self.unique_suffix}",
+            manufacturer="Test Manufacturer",
             socket=self.test_socket,
-            price=5000
+            price=5000,
         )
 
     def tearDown(self):
         """Úklid po testech"""
         Reviews.objects.filter(title__contains="Test").delete()
-        if hasattr(self, 'test_processor') and self.test_processor:
+        if hasattr(self, "test_processor") and self.test_processor:
             try:
                 self.test_processor.delete()
             except:
                 pass
-        if hasattr(self, 'test_socket') and self.test_socket:
+        if hasattr(self, "test_socket") and self.test_socket:
             try:
                 self.test_socket.delete()
             except:
                 pass
-        if hasattr(self, 'test_user') and self.test_user:
+        if hasattr(self, "test_user") and self.test_user:
             try:
                 self.test_user.delete()
             except:
@@ -91,9 +93,13 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
         inputs = self.selenium.find_elements(By.TAG_NAME, "input")
         print(f"Found {len(inputs)} input elements:")
         for i, inp in enumerate(inputs):
-            print(f"  Input {i}: name='{inp.get_attribute('name')}', type='{inp.get_attribute('type')}'")
+            print(
+                f"  Input {i}: name='{inp.get_attribute('name')}', type='{inp.get_attribute('type')}'"
+            )
 
-        error_elements = self.selenium.find_elements(By.CSS_SELECTOR, ".error, .alert, .bg-red-100")
+        error_elements = self.selenium.find_elements(
+            By.CSS_SELECTOR, ".error, .alert, .bg-red-100"
+        )
         if error_elements:
             print(f"Found {len(error_elements)} error elements")
 
@@ -105,14 +111,16 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_login_form_structure_and_styling(self):
         """Test struktury a stylingu login formuláře"""
-        self.selenium.get(f'{self.live_server_url}/login/')
+        self.selenium.get(f"{self.live_server_url}/login/")
 
         # Test existence základních elementů
         username_input = WebDriverWait(self.selenium, 10).until(
             EC.presence_of_element_located((By.NAME, "username"))
         )
         password_input = self.selenium.find_element(By.NAME, "password")
-        submit_btn = self.selenium.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        submit_btn = self.selenium.find_element(
+            By.CSS_SELECTOR, "button[type='submit']"
+        )
 
         # Test CSS tříd z forms.py
         self.assertIn("w-full", username_input.get_attribute("class"))
@@ -120,7 +128,9 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
         self.assertIn("focus:ring-blue-400", username_input.get_attribute("class"))
 
         # Test placeholder textů z forms.py
-        self.assertEqual("Zadejte uživatelské jméno", username_input.get_attribute("placeholder"))
+        self.assertEqual(
+            "Zadejte uživatelské jméno", username_input.get_attribute("placeholder")
+        )
         self.assertEqual("Zadejte heslo", password_input.get_attribute("placeholder"))
 
         # Test required attributů
@@ -131,20 +141,24 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_login_form_functionality(self):
         """Test basic funkčnosti login formuláře"""
-        self.selenium.get(f'{self.live_server_url}/login/')
+        self.selenium.get(f"{self.live_server_url}/login/")
 
         username_input = self.selenium.find_element(By.NAME, "username")
         password_input = self.selenium.find_element(By.NAME, "password")
 
         # Test input functionality
-        username_input.send_keys(f'testuser_{self.unique_suffix}')
+        username_input.send_keys(f"testuser_{self.unique_suffix}")
         password_input.send_keys("testpass123")
 
         # Ověř že hodnoty se správně zapisují
-        self.assertEqual(f'testuser_{self.unique_suffix}', username_input.get_attribute("value"))
+        self.assertEqual(
+            f"testuser_{self.unique_suffix}", username_input.get_attribute("value")
+        )
 
         # Test submit button
-        submit_btn = self.selenium.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        submit_btn = self.selenium.find_element(
+            By.CSS_SELECTOR, "button[type='submit']"
+        )
         self.assertTrue(submit_btn.is_displayed())
         self.assertTrue(submit_btn.is_enabled())
 
@@ -156,7 +170,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_registration_form_structure_and_styling(self):
         """Test struktury a stylingu registračního formuláře"""
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         # Test existence všech required elementů
         username_input = WebDriverWait(self.selenium, 10).until(
@@ -165,7 +179,9 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
         email_input = self.selenium.find_element(By.NAME, "email")
         password1_input = self.selenium.find_element(By.NAME, "password1")
         password2_input = self.selenium.find_element(By.NAME, "password2")
-        submit_btn = self.selenium.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        submit_btn = self.selenium.find_element(
+            By.CSS_SELECTOR, "button[type='submit']"
+        )
 
         # Test CSS tříd z forms.py
         self.assertIn("w-full", username_input.get_attribute("class"))
@@ -173,7 +189,9 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
         self.assertIn("focus:ring-blue-400", password1_input.get_attribute("class"))
 
         # Test placeholder textů z forms.py
-        self.assertEqual("Zadejte uživatelské jméno", username_input.get_attribute("placeholder"))
+        self.assertEqual(
+            "Zadejte uživatelské jméno", username_input.get_attribute("placeholder")
+        )
         self.assertEqual("Zadejte email", email_input.get_attribute("placeholder"))
         self.assertEqual("Zadejte heslo", password1_input.get_attribute("placeholder"))
         self.assertEqual("Zadejte heslo", password2_input.get_attribute("placeholder"))
@@ -187,7 +205,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_registration_form_input_functionality(self):
         """Test input funkčnosti registračního formuláře"""
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         username_input = self.selenium.find_element(By.NAME, "username")
         email_input = self.selenium.find_element(By.NAME, "email")
@@ -215,7 +233,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_registration_form_validation_display(self):
         """Test zobrazení validačních prvků"""
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         # Test existence error containerů (i když jsou prázdné)
         username_field = self.selenium.find_element(By.NAME, "username")
@@ -234,26 +252,28 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_review_form_exists_and_accessible(self):
         """Test existence review formuláře"""
-        self.selenium.get(f'{self.live_server_url}/review/create/')
+        self.selenium.get(f"{self.live_server_url}/review/create/")
 
         # Zkontroluj jestli stránka existuje (není 404)
         page_source = self.selenium.page_source.lower()
-        is_404 = '404' in page_source or 'not found' in page_source
+        is_404 = "404" in page_source or "not found" in page_source
 
         if not is_404:
             # Najdi formulář nebo redirect na login
             forms = self.selenium.find_elements(By.TAG_NAME, "form")
-            self.assertGreater(len(forms), 0, "Na stránce by měl být alespoň jeden formulář")
+            self.assertGreater(
+                len(forms), 0, "Na stránce by měl být alespoň jeden formulář"
+            )
             print("✓ Review form page exists and is accessible")
         else:
             print("⚠ Review form page returns 404 - may not be implemented")
 
     def test_review_form_structure_if_accessible(self):
         """Test struktury review formuláře pokud je přístupný"""
-        self.selenium.get(f'{self.live_server_url}/review/create/')
+        self.selenium.get(f"{self.live_server_url}/review/create/")
 
         page_source = self.selenium.page_source.lower()
-        needs_login = 'login' in page_source or 'přihlás' in page_source
+        needs_login = "login" in page_source or "přihlás" in page_source
 
         if not needs_login:
             try:
@@ -267,8 +287,12 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
                     self.assertIn("border-gray-300", title_input.get_attribute("class"))
 
                     # Test placeholder z forms.py
-                    expected_placeholder = 'Název vaší recenze (např. "Skvělý procesor za rozumnou cenu")'
-                    self.assertEqual(expected_placeholder, title_input.get_attribute("placeholder"))
+                    expected_placeholder = (
+                        'Název vaší recenze (např. "Skvělý procesor za rozumnou cenu")'
+                    )
+                    self.assertEqual(
+                        expected_placeholder, title_input.get_attribute("placeholder")
+                    )
 
                     print("✓ Review form structure test PASSED")
                 else:
@@ -285,7 +309,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_form_accessibility_features(self):
         """Test accessibility funkcí formulářů"""
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         # Test labels
         username_input = self.selenium.find_element(By.NAME, "username")
@@ -311,7 +335,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
     def test_navigation_between_forms(self):
         """Test navigace mezi formuláři"""
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         # Najdi login link
         login_links = self.selenium.find_elements(By.CSS_SELECTOR, "a[href*='login']")
@@ -326,7 +350,7 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
             current_url = self.selenium.current_url
             has_login_form = len(self.selenium.find_elements(By.NAME, "username")) > 0
 
-            success = 'login' in current_url or has_login_form
+            success = "login" in current_url or has_login_form
             self.assertTrue(success, "Navigation to login should work")
             print("✓ Navigation between forms test PASSED")
         else:
@@ -335,13 +359,13 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
     def test_forms_css_styling_consistency(self):
         """Test konzistence CSS stylingu napříč formuláři"""
         # Test login form
-        self.selenium.get(f'{self.live_server_url}/login/')
+        self.selenium.get(f"{self.live_server_url}/login/")
 
         username_input = self.selenium.find_element(By.NAME, "username")
         login_classes = username_input.get_attribute("class")
 
         # Test registration form
-        self.selenium.get(f'{self.live_server_url}/register/')
+        self.selenium.get(f"{self.live_server_url}/register/")
 
         reg_username_input = self.selenium.find_element(By.NAME, "username")
         reg_classes = reg_username_input.get_attribute("class")
@@ -356,20 +380,18 @@ class FormsSeleniumTests(StaticLiveServerTestCase):
 
 
 # Sada rychlých testů pro základní ověření
-@tag('selenium', 'quick')
+@tag("selenium", "quick")
 class QuickFormsTests(FormsSeleniumTests):
     """Rychlé testy pro základní ověření"""
 
     def test_quick_forms_check(self):
         """Rychlý test všech formulářů"""
         # Login form
-        self.selenium.get(f'{self.live_server_url}/login/')
+        self.selenium.get(f"{self.live_server_url}/login/")
         self.assertTrue(len(self.selenium.find_elements(By.NAME, "username")) > 0)
 
-        # Registration form  
-        self.selenium.get(f'{self.live_server_url}/register/')
+        # Registration form
+        self.selenium.get(f"{self.live_server_url}/register/")
         self.assertTrue(len(self.selenium.find_elements(By.NAME, "email")) > 0)
 
         print("✓ Quick forms check PASSED")
-
-

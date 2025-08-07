@@ -1,14 +1,14 @@
-from django.test import TestCase
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from decimal import Decimal
-from .models import (
-    Sockets, BoardFormats, RamTypes, StorageTypes,
-    Processors, Motherboards, Ram, GraphicsCards,
-    Storage, PowerSupplyUnits, Reviews, ReviewVotes,
-    UserFavorites, HeurekaClick
-)
+from django.test import TestCase
+
+from .models import (BoardFormats, GraphicsCards, HeurekaClick, Motherboards,
+                     PowerSupplyUnits, Processors, Ram, RamTypes, Reviews,
+                     ReviewVotes, Sockets, Storage, StorageTypes,
+                     UserFavorites)
 
 
 class SocketsModelTest(TestCase):
@@ -93,7 +93,7 @@ class ProcessorsModelTest(TestCase):
             price=Decimal("8000"),
             benchresult=25000,
             clock=3700,
-            rating=5
+            rating=5,
         )
 
         self.assertEqual(processor.name, "Ryzen 5 5600X")
@@ -105,10 +105,7 @@ class ProcessorsModelTest(TestCase):
     def test_processor_str_representation(self):
         """Test string reprezentace procesoru"""
         processor = Processors.objects.create(
-            name="Test CPU",
-            manufacturer="Test Brand",
-            socket=self.socket,
-            price=5000
+            name="Test CPU", manufacturer="Test Brand", socket=self.socket, price=5000
         )
 
         str_repr = str(processor)
@@ -118,9 +115,7 @@ class ProcessorsModelTest(TestCase):
     def test_processor_defaults(self):
         """Test výchozích hodnot"""
         processor = Processors.objects.create(
-            name="Basic CPU",
-            manufacturer="Basic Brand",
-            socket=self.socket
+            name="Basic CPU", manufacturer="Basic Brand", socket=self.socket
         )
 
         self.assertEqual(processor.tdp, 0)
@@ -169,7 +164,7 @@ class MotherboardsModelTest(TestCase):
             nvmecount=2,
             pciegen=4,
             rating=4,
-            price=3500
+            price=3500,
         )
 
         self.assertEqual(mb.name, "B550 Gaming")
@@ -193,7 +188,7 @@ class RamModelTest(TestCase):
             capacity=16,
             clock=3200,
             rating=5,
-            price=2500
+            price=2500,
         )
 
         self.assertEqual(ram.name, "Corsair Vengeance")
@@ -215,7 +210,7 @@ class StorageModelTest(TestCase):
             capacity=1000,
             type=self.storage_type,
             rating=5,
-            price=4000
+            price=4000,
         )
 
         self.assertEqual(storage.name, "Samsung 980 Pro")
@@ -233,7 +228,7 @@ class PowerSupplyUnitsModelTest(TestCase):
             manufacturer="Seasonic",
             maxpower=750,
             rating=5,
-            price=3500
+            price=3500,
         )
 
         self.assertEqual(psu.name, "Seasonic Focus GX-750")
@@ -247,16 +242,11 @@ class ReviewsModelTest(TestCase):
     def setUp(self):
         """Příprava testovacích dat"""
         self.user = User.objects.create_user(
-            username="testuser",
-            email="test@example.com",
-            password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
         self.socket = Sockets.objects.create(type="AM4")
         self.processor = Processors.objects.create(
-            name="Test CPU",
-            manufacturer="Test Brand",
-            socket=self.socket,
-            price=5000
+            name="Test CPU", manufacturer="Test Brand", socket=self.socket, price=5000
         )
 
     def test_review_creation(self):
@@ -271,7 +261,7 @@ class ReviewsModelTest(TestCase):
             component_type="processor",
             processor=self.processor,
             pros="Rychlý\nTichý",
-            cons="Trochu drahý"
+            cons="Trochu drahý",
         )
 
         self.assertEqual(review.title, "Skvělý procesor")
@@ -290,7 +280,7 @@ class ReviewsModelTest(TestCase):
             summary="Test summary",
             rating=4,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
         str_repr = str(review)
@@ -307,7 +297,7 @@ class ReviewsModelTest(TestCase):
             summary="Test summary",
             rating=4,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
         # Test component property
@@ -326,7 +316,7 @@ class ReviewsModelTest(TestCase):
             summary="Test summary",
             rating=3,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
         stars = review.stars_display
@@ -344,7 +334,7 @@ class ReviewsModelTest(TestCase):
             component_type="processor",
             processor=self.processor,
             helpful_votes=8,
-            total_votes=10
+            total_votes=10,
         )
 
         percentage = review.helpful_percentage
@@ -365,7 +355,7 @@ class ReviewsModelTest(TestCase):
             summary="Test summary",
             rating=5,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
         review.full_clean()  # Nemělo by vyhodit chybu
@@ -403,15 +393,13 @@ class ReviewVotesModelTest(TestCase):
             summary="Test summary",
             rating=4,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
     def test_review_vote_creation(self):
         """Test vytvoření hlasování"""
         vote = ReviewVotes.objects.create(
-            review=self.review,
-            user=self.user2,
-            is_helpful=True
+            review=self.review, user=self.user2, is_helpful=True
         )
 
         self.assertEqual(vote.review, self.review)
@@ -421,18 +409,12 @@ class ReviewVotesModelTest(TestCase):
     def test_review_vote_unique_constraint(self):
         """Test unique constraint - jeden uživatel může hlasovat jen jednou"""
         # První hlasování OK
-        ReviewVotes.objects.create(
-            review=self.review,
-            user=self.user2,
-            is_helpful=True
-        )
+        ReviewVotes.objects.create(review=self.review, user=self.user2, is_helpful=True)
 
         # Druhé hlasování by mělo selhat
         with self.assertRaises(IntegrityError):
             ReviewVotes.objects.create(
-                review=self.review,
-                user=self.user2,
-                is_helpful=False
+                review=self.review, user=self.user2, is_helpful=False
             )
 
 
@@ -456,7 +438,7 @@ class UserFavoritesModelTest(TestCase):
             component_type="processor",
             processor=self.processor,
             watch_reviews=True,
-            watch_price_changes=False
+            watch_price_changes=False,
         )
 
         self.assertEqual(favorite.user, self.user)
@@ -468,9 +450,7 @@ class UserFavoritesModelTest(TestCase):
     def test_user_favorite_component_property(self):
         """Test component property"""
         favorite = UserFavorites.objects.create(
-            user=self.user,
-            component_type="processor",
-            processor=self.processor
+            user=self.user, component_type="processor", processor=self.processor
         )
 
         # Test component property
@@ -500,7 +480,7 @@ class HeurekaClickModelTest(TestCase):
             component_name="AMD Ryzen 5 5600X",
             search_query="AMD Ryzen 5 5600X cena",
             user=self.user,
-            session_key="test_session_123"
+            session_key="test_session_123",
         )
 
         self.assertEqual(click.component_type, "processor")
@@ -515,7 +495,7 @@ class HeurekaClickModelTest(TestCase):
             component_id=123,
             component_name="Test Component",
             search_query="test query",
-            user=self.user
+            user=self.user,
         )
 
         str_repr = str(click)
@@ -547,14 +527,12 @@ class ModelsIntegrationTest(TestCase):
             summary="Recommended",
             rating=5,
             component_type="processor",
-            processor=self.processor
+            processor=self.processor,
         )
 
         # Vytvoř oblíbenou
         favorite = UserFavorites.objects.create(
-            user=self.user,
-            component_type="processor",
-            processor=self.processor
+            user=self.user, component_type="processor", processor=self.processor
         )
 
         # Ověř propojení
@@ -577,4 +555,3 @@ class ModelsIntegrationTest(TestCase):
         sockets = list(Sockets.objects.all())
         self.assertEqual(sockets[0].type, "A")  # Mělo by být první
         self.assertEqual(sockets[1].type, "Z")  # Mělo by být druhé
-

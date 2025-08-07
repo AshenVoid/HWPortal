@@ -2,9 +2,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import (
-    Reviews,
-)
+
+from .models import Reviews
 
 
 class CustomLoginForm(AuthenticationForm):
@@ -126,7 +125,7 @@ class ReviewForm(forms.ModelForm):
             }
         ),
         label="Vyberte komponentu",
-        required=False
+        required=False,
     )
 
     class Meta:
@@ -233,7 +232,9 @@ class ReviewForm(forms.ModelForm):
                     f"{self.instance.component_type}_{component.id}"
                 )
                 # Načti správné choices při editaci
-                self.fields["component_choice"].choices = self.get_components_by_type(self.instance.component_type)
+                self.fields["component_choice"].choices = self.get_components_by_type(
+                    self.instance.component_type
+                )
 
             # Místo disabled použij hidden field pro component_type
             self.fields["component_type"].widget = forms.HiddenInput()
@@ -263,7 +264,8 @@ class ReviewForm(forms.ModelForm):
     def get_components_by_type(self, component_type):
         """Vrací komponenty podle typu"""
         # IMPORT zde aby se předešlo circular import
-        from .models import Processors, GraphicsCards, Ram, Storage, Motherboards, PowerSupplyUnits
+        from .models import (GraphicsCards, Motherboards, PowerSupplyUnits,
+                             Processors, Ram, Storage)
 
         components = [("", "Vyberte komponentu...")]
 
@@ -314,7 +316,9 @@ class ReviewForm(forms.ModelForm):
 
         # Dynamicky aktualizuj choices před validací
         if component_type:
-            self.fields["component_choice"].choices = self.get_components_by_type(component_type)
+            self.fields["component_choice"].choices = self.get_components_by_type(
+                component_type
+            )
 
         # Validace component_choice
         if not component_choice or component_choice == "":
@@ -341,15 +345,16 @@ class ReviewForm(forms.ModelForm):
 
     def get_component_instance(self, component_type, component_id):
         """Získá instanci komponenty podle typu a ID"""
-        from .models import Processors, GraphicsCards, Ram, Storage, Motherboards, PowerSupplyUnits
+        from .models import (GraphicsCards, Motherboards, PowerSupplyUnits,
+                             Processors, Ram, Storage)
 
         model_map = {
-            'processor': Processors,
-            'graphics_card': GraphicsCards,
-            'ram': Ram,
-            'storage': Storage,
-            'motherboard': Motherboards,
-            'power_supply': PowerSupplyUnits,
+            "processor": Processors,
+            "graphics_card": GraphicsCards,
+            "ram": Ram,
+            "storage": Storage,
+            "motherboard": Motherboards,
+            "power_supply": PowerSupplyUnits,
         }
 
         model = model_map.get(component_type)
@@ -360,4 +365,3 @@ class ReviewForm(forms.ModelForm):
             return model.objects.get(id=component_id)
         except model.DoesNotExist:
             return None
-

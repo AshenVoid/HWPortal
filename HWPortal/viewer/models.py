@@ -1,19 +1,10 @@
-from django.db import models
-from django.db.models import (
-    Model,
-    CharField,
-    DateField,
-    ForeignKey,
-    SET_NULL,
-    TextField,
-    DateTimeField,
-    IntegerField,
-    DecimalField,
-    CASCADE,
-)
-from django.db.models.fields import BooleanField
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models import (CASCADE, SET_NULL, CharField, DateField,
+                              DateTimeField, DecimalField, ForeignKey,
+                              IntegerField, Model, TextField)
+from django.db.models.fields import BooleanField
 
 
 class Sockets(Model):
@@ -94,9 +85,9 @@ class Processors(Model):
         verbose_name_plural = "Procesory"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['socket']),
-            models.Index(fields=['price']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["socket"]),
+            models.Index(fields=["price"]),
         ]
 
     def __repr__(self):
@@ -136,9 +127,9 @@ class Motherboards(Model):
         verbose_name_plural = "Základní desky"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['socket']),
-            models.Index(fields=['format']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["socket"]),
+            models.Index(fields=["format"]),
         ]
 
     def __repr__(self):
@@ -173,9 +164,9 @@ class Ram(Model):
         verbose_name_plural = "RAM paměti"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['type']),
-            models.Index(fields=['capacity']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["type"]),
+            models.Index(fields=["capacity"]),
         ]
 
     def __repr__(self):
@@ -207,11 +198,10 @@ class GraphicsCards(Model):
         verbose_name_plural = "Grafické karty"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['vram']),
-            models.Index(fields=['price']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["vram"]),
+            models.Index(fields=["price"]),
         ]
-
 
     def __repr__(self):
         return (
@@ -241,9 +231,9 @@ class Storage(Model):
         verbose_name_plural = "Úložiště"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['type']),
-            models.Index(fields=['capacity']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["type"]),
+            models.Index(fields=["capacity"]),
         ]
 
     def __repr__(self):
@@ -273,8 +263,8 @@ class PowerSupplyUnits(Model):
         verbose_name_plural = "Zdroje"
         ordering = ["manufacturer", "name"]
         indexes = [
-            models.Index(fields=['manufacturer']),
-            models.Index(fields=['maxpower']),
+            models.Index(fields=["manufacturer"]),
+            models.Index(fields=["maxpower"]),
         ]
 
     def __repr__(self):
@@ -577,14 +567,12 @@ class HeurekaClick(Model):
     class Meta:
         verbose_name = "Heureka klik"
         verbose_name_plural = "Heureka kliky"
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
         indexes = [
-            models.Index(fields=['component_type', 'component_id']),
-            models.Index(fields=['timestamp']),
-            models.Index(fields=['user']),
+            models.Index(fields=["component_type", "component_id"]),
+            models.Index(fields=["timestamp"]),
+            models.Index(fields=["user"]),
         ]
 
     def __str__(self):
         return f"{self.component_name} - {self.timestamp.strftime('%d.%m.%Y %H:%M')}"
-
-

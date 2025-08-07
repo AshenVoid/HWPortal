@@ -13,17 +13,17 @@ urlpatterns = [
         name="component_detail",
     ),
     # Heureka API
-    path('heureka-data/<str:component_type>/<int:component_id>/',
-         views.get_heureka_data,
-         name='get_heureka_data'),
-
-    path('heureka-price-history/<str:component_type>/<int:component_id>/',
-         views.get_fake_price_history,
-         name='get_heureka_price_history'),
-
-    path('track-heureka-click/',
-         views.track_heureka_click,
-         name='track_heureka_click'),
+    path(
+        "heureka-data/<str:component_type>/<int:component_id>/",
+        views.get_heureka_data,
+        name="get_heureka_data",
+    ),
+    path(
+        "heureka-price-history/<str:component_type>/<int:component_id>/",
+        views.get_fake_price_history,
+        name="get_heureka_price_history",
+    ),
+    path("track-heureka-click/", views.track_heureka_click, name="track_heureka_click"),
     # Reviews
     path("reviews/", views.reviews_view, name="reviews"),
     path("reviews/vote/", views.vote_review_ajax, name="vote_review_ajax"),
@@ -33,7 +33,7 @@ urlpatterns = [
         views.create_review_for_component,
         name="create_review_for_component",
     ),
-    path('get-components/', views.get_components_ajax, name='get_components_ajax'),
+    path("get-components/", views.get_components_ajax, name="get_components_ajax"),
     path("review/edit/<int:review_id>/", views.edit_review_view, name="edit_review"),
     path(
         "review/delete/<int:review_id>/", views.delete_review_view, name="delete_review"

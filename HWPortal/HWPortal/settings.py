@@ -1,10 +1,11 @@
 """
 Konfigurační nastavení pro HWPortal aplikaci.
 """
+
 import os
 from pathlib import Path
-import environ
 
+import environ
 from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -14,7 +15,7 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('DJANGO_SECRET_KEY')
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # Development fake heureka API
 USE_FAKE_HEUREKA_API = True
@@ -24,10 +25,10 @@ HEUREKA_API_KEY = None
 
 # Fake API nastavení
 FAKE_API_SETTINGS = {
-    'simulate_delays': True,
-    'min_products': 3,
-    'max_products': 8,
-    'price_variation': 0.3,
+    "simulate_delays": True,
+    "min_products": 3,
+    "max_products": 8,
+    "price_variation": 0.3,
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -35,20 +36,20 @@ FAKE_API_SETTINGS = {
 DEBUG = True
 
 # FIX: Opraven STATIC files setup
-STATIC_URL = '/static/'  # Pouze jedna definice!
+STATIC_URL = "/static/"  # Pouze jedna definice!
 
 # Pro development (DEBUG=True)
 STATICFILES_DIRS = [
-    BASE_DIR / 'viewer' / 'static',
+    BASE_DIR / "viewer" / "static",
 ]
 
 # Pro production (DEBUG=False) - použije se když nasadíš na server
-STATIC_ROOT = BASE_DIR / 'static_collected'
+STATIC_ROOT = BASE_DIR / "static_collected"
 
 # Allowed hosts - rozšířeno pro development
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0']
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0"]
 
-#REDIRECT URLs
+# REDIRECT URLs
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
@@ -61,7 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "viewer"
+    "viewer",
 ]
 
 MIDDLEWARE = [
@@ -72,15 +73,15 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'viewer.middleware.ClearMessagesMiddleware',
+    "viewer.middleware.ClearMessagesMiddleware",
 ]
 
 MESSAGE_TAGS = {
-    message_constants.DEBUG: 'debug',
-    message_constants.INFO: 'info',
-    message_constants.SUCCESS: 'success',
-    message_constants.WARNING: 'warning',
-    message_constants.ERROR: 'error',
+    message_constants.DEBUG: "debug",
+    message_constants.INFO: "info",
+    message_constants.SUCCESS: "success",
+    message_constants.WARNING: "warning",
+    message_constants.ERROR: "error",
 }
 
 ROOT_URLCONF = "HWPortal.urls"
@@ -107,13 +108,13 @@ WSGI_APPLICATION = "HWPortal.wsgi.application"
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
     }
 }
 

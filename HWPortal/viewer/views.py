@@ -10,31 +10,24 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db.models import Count, Avg, Sum
+from django.db.models import Avg, Count, Sum
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import CustomLoginForm, CustomUserCreationForm, ReviewForm
-from .models import (
-    Processors,
-    Reviews,
-    Ram,
-    Storage,
-    Motherboards,
-    PowerSupplyUnits,
-    GraphicsCards,
-    ReviewVotes,
-    UserFavorites,
-    COMPONENT_TYPES,
-)
-from .services import ComponentService, ReviewService, SearchService, BreadcrumbService
+from .models import (COMPONENT_TYPES, GraphicsCards, Motherboards,
+                     PowerSupplyUnits, Processors, Ram, Reviews, ReviewVotes,
+                     Storage, UserFavorites)
+from .services import (BreadcrumbService, ComponentService, ReviewService,
+                       SearchService)
 
 # ============================================================================
 # CORE VIEWS
 # ============================================================================
+
 
 def home(request):
     """Home page view - original implementation for now"""
@@ -69,16 +62,18 @@ def home_view(request):
 
     if top_processor:
         favorites_count = getattr(top_processor, "favorites_count", 0)
-        top_components.append({
-            "name": top_processor.name,
-            "manufacturer": top_processor.manufacturer,
-            "price": top_processor.price,
-            "type": "processor",
-            "id": top_processor.id,
-            "icon_class": "bg-blue-100 text-blue-600",
-            "icon": "cpu",
-            "favorites_count": favorites_count,
-        })
+        top_components.append(
+            {
+                "name": top_processor.name,
+                "manufacturer": top_processor.manufacturer,
+                "price": top_processor.price,
+                "type": "processor",
+                "id": top_processor.id,
+                "icon_class": "bg-blue-100 text-blue-600",
+                "icon": "cpu",
+                "favorites_count": favorites_count,
+            }
+        )
 
     # Similar logic for other component types...
     # (keeping the original implementation for brevity)
@@ -108,6 +103,7 @@ def home_view(request):
 # COMPONENT VIEWS
 # ============================================================================
 
+
 def components_view(request):
     """
     Components listing view using ComponentService.
@@ -120,10 +116,7 @@ def components_view(request):
 
     # Use ComponentService to get filtered and sorted components
     components = ComponentService.get_all_components(
-        category=category,
-        brand=brand,
-        price_range=price_range,
-        sort_by=sort_by
+        category=category, brand=brand, price_range=price_range, sort_by=sort_by
     )
 
     # Pagination
@@ -155,7 +148,12 @@ def component_detail_view(request, component_type, component_id):
         component, category = ComponentService.get_component_by_type_and_id(
             component_type, component_id
         )
-    except (ValueError, ComponentService.COMPONENT_MODELS[list(ComponentService.COMPONENT_MODELS.keys())[0]].DoesNotExist):
+    except (
+        ValueError,
+        ComponentService.COMPONENT_MODELS[
+            list(ComponentService.COMPONENT_MODELS.keys())[0]
+        ].DoesNotExist,
+    ):
         return render(request, "404.html")
 
     # Use ReviewService to get reviews and statistics
@@ -163,8 +161,8 @@ def component_detail_view(request, component_type, component_id):
     review_stats = ReviewService.get_review_statistics(component, component_type)
 
     # Update component rating based on reviews
-    if review_stats['total_reviews'] > 0:
-        component.calculated_rating = round(review_stats['avg_rating'] or 0)
+    if review_stats["total_reviews"] > 0:
+        component.calculated_rating = round(review_stats["avg_rating"] or 0)
     else:
         component.calculated_rating = 0
 
@@ -192,7 +190,7 @@ def component_detail_view(request, component_type, component_id):
         "specs": specs,
         "reviews": reviews,
         "review_stats": review_stats,
-        "rating_distribution": review_stats.get('rating_distribution', {}),
+        "rating_distribution": review_stats.get("rating_distribution", {}),
         "similar_components": similar_components,
         "breadcrumbs": breadcrumbs,
     }
@@ -203,6 +201,7 @@ def component_detail_view(request, component_type, component_id):
 # ============================================================================
 # SEARCH VIEWS
 # ============================================================================
+
 
 def search(request):
     """
@@ -219,7 +218,7 @@ def search(request):
             query=query,
             selected_types=selected_types,
             selected_category=selected_category,
-            sort=sort
+            sort=sort,
         )
 
         results_count = len(results)
@@ -258,15 +257,16 @@ def search(request):
 # HEUREKA API VIEWS
 # ============================================================================
 
+
 def get_component_by_type_and_id(component_type, component_id):
     """Helper function for getting component by type and ID"""
     model_mapping = {
-        'processor': Processors,
-        'motherboard': Motherboards,
-        'ram': Ram,
-        'graphics_card': GraphicsCards,
-        'storage': Storage,
-        'power_supply': PowerSupplyUnits,
+        "processor": Processors,
+        "motherboard": Motherboards,
+        "ram": Ram,
+        "graphics_card": GraphicsCards,
+        "storage": Storage,
+        "power_supply": PowerSupplyUnits,
     }
 
     model = model_mapping.get(component_type)
@@ -281,12 +281,21 @@ def get_component_by_type_and_id(component_type, component_id):
 
 def generate_fake_products(component):
     """Generate fake products for Heureka"""
-    base_price = float(component.price) if component.price > 0 else random.randint(1000, 50000)
+    base_price = (
+        float(component.price) if component.price > 0 else random.randint(1000, 50000)
+    )
 
     fake_shops = [
-        'Alza.cz', 'CZC.cz', 'Mall.cz', 'Electroworld.cz',
-        'Datart.cz', 'TSBohemia.cz', 'Smarty.cz', 'GIGACOMPUTER.cz',
-        'Počítače.cz', 'Mironet.cz'
+        "Alza.cz",
+        "CZC.cz",
+        "Mall.cz",
+        "Electroworld.cz",
+        "Datart.cz",
+        "TSBohemia.cz",
+        "Smarty.cz",
+        "GIGACOMPUTER.cz",
+        "Počítače.cz",
+        "Mironet.cz",
     ]
 
     products = []
@@ -301,7 +310,7 @@ def generate_fake_products(component):
             f"{component.name} - BOX",
             f"{component.name} (OEM)",
             f"{component.manufacturer} {component.name}",
-            f"{component.name} + doprava zdarma"
+            f"{component.name} + doprava zdarma",
         ]
 
         shop = random.choice(fake_shops)
@@ -319,25 +328,29 @@ def generate_fake_products(component):
         shop_reviews = random.randint(500, 15000)
         delivery_price = random.choice([0, 99, 149, 199])
 
-        products.append({
-            'id': f'fake_{i}_{component.id}',
-            'name': product_name,
-            'price': price,
-            'price_formatted': f"{price:,} Kč".replace(',', ' '),
-            'currency': 'CZK',
-            'shop_name': shop,
-            'shop_url': f"https://www.{shop.lower().replace('.cz', '')}.cz",
-            'product_url': f"https://www.{shop.lower().replace('.cz', '')}.cz/product/{component.id}",
-            'availability': availability,
-            'shop_rating': shop_rating,
-            'shop_reviews_count': shop_reviews,
-            'delivery_price': delivery_price,
-            'delivery_price_formatted': f"{delivery_price} Kč" if delivery_price > 0 else "Zdarma",
-            'is_marketplace': random.choice([True, False]),
-            'last_update': timezone.now().strftime('%Y-%m-%d')
-        })
+        products.append(
+            {
+                "id": f"fake_{i}_{component.id}",
+                "name": product_name,
+                "price": price,
+                "price_formatted": f"{price:,} Kč".replace(",", " "),
+                "currency": "CZK",
+                "shop_name": shop,
+                "shop_url": f"https://www.{shop.lower().replace('.cz', '')}.cz",
+                "product_url": f"https://www.{shop.lower().replace('.cz', '')}.cz/product/{component.id}",
+                "availability": availability,
+                "shop_rating": shop_rating,
+                "shop_reviews_count": shop_reviews,
+                "delivery_price": delivery_price,
+                "delivery_price_formatted": (
+                    f"{delivery_price} Kč" if delivery_price > 0 else "Zdarma"
+                ),
+                "is_marketplace": random.choice([True, False]),
+                "last_update": timezone.now().strftime("%Y-%m-%d"),
+            }
+        )
 
-    products.sort(key=lambda x: x['price'])
+    products.sort(key=lambda x: x["price"])
     return products
 
 
@@ -346,33 +359,37 @@ def get_heureka_data(request, component_type, component_id):
     try:
         component = get_component_by_type_and_id(component_type, component_id)
         if not component:
-            return JsonResponse({'error': 'Komponenta nenalezena'}, status=404)
+            return JsonResponse({"error": "Komponenta nenalezena"}, status=404)
 
         # Simulate API delay
-        if getattr(settings, 'FAKE_API_SETTINGS', {}).get('simulate_delays', True):
+        if getattr(settings, "FAKE_API_SETTINGS", {}).get("simulate_delays", True):
             time.sleep(random.uniform(0.1, 0.5))
 
         fake_products = generate_fake_products(component)
 
-        return JsonResponse({
-            'success': True,
-            'products': fake_products,
-            'search_query': f"{component.manufacturer} {component.name}",
-            'total_found': len(fake_products),
-            'api_status': 'fake'
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "products": fake_products,
+                "search_query": f"{component.manufacturer} {component.name}",
+                "total_found": len(fake_products),
+                "api_status": "fake",
+            }
+        )
 
     except Exception as e:
-        return JsonResponse({'error': f'API Error: {str(e)}'}, status=500)
+        return JsonResponse({"error": f"API Error: {str(e)}"}, status=500)
 
 
 def get_fake_price_history(request, component_type, component_id):
     """Fake price history"""
     component = get_component_by_type_and_id(component_type, component_id)
     if not component:
-        return JsonResponse({'error': 'Komponenta nenalezena'}, status=404)
+        return JsonResponse({"error": "Komponenta nenalezena"}, status=404)
 
-    base_price = float(component.price) if component.price > 0 else random.randint(1000, 50000)
+    base_price = (
+        float(component.price) if component.price > 0 else random.randint(1000, 50000)
+    )
 
     price_history = []
     current_date = timezone.now() - timedelta(days=30)
@@ -382,33 +399,37 @@ def get_fake_price_history(request, component_type, component_id):
         price_change = random.uniform(-0.05, 0.05)
         current_price = max(current_price * (1 + price_change), base_price * 0.7)
 
-        price_history.append({
-            'date': (current_date + timedelta(days=day)).strftime('%Y-%m-%d'),
-            'min_price': int(current_price * 0.95),
-            'avg_price': int(current_price),
-            'max_price': int(current_price * 1.1)
-        })
+        price_history.append(
+            {
+                "date": (current_date + timedelta(days=day)).strftime("%Y-%m-%d"),
+                "min_price": int(current_price * 0.95),
+                "avg_price": int(current_price),
+                "max_price": int(current_price * 1.1),
+            }
+        )
 
-    return JsonResponse({
-        'success': True,
-        'price_history': price_history,
-        'component_name': component.name
-    })
+    return JsonResponse(
+        {
+            "success": True,
+            "price_history": price_history,
+            "component_name": component.name,
+        }
+    )
 
 
 @csrf_exempt
 def track_heureka_click(request):
     """Tracking Heureka clicks"""
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             data = json.loads(request.body)
-            component_type = data.get('component_type')
-            component_id = data.get('component_id')
-            search_query = data.get('search_query')
+            component_type = data.get("component_type")
+            component_id = data.get("component_id")
+            search_query = data.get("search_query")
 
             component = get_component_by_type_and_id(component_type, component_id)
             if not component:
-                return JsonResponse({'error': 'Component not found'}, status=404)
+                return JsonResponse({"error": "Component not found"}, status=404)
 
             # Imports here to avoid circular import
             from .models import HeurekaClick
@@ -419,20 +440,21 @@ def track_heureka_click(request):
                 component_name=component.name,
                 search_query=search_query,
                 user=request.user if request.user.is_authenticated else None,
-                session_key=request.session.session_key or ''
+                session_key=request.session.session_key or "",
             )
 
-            return JsonResponse({'success': True})
+            return JsonResponse({"success": True})
 
         except Exception as e:
-            return JsonResponse({'error': 'Tracking failed'}, status=500)
+            return JsonResponse({"error": "Tracking failed"}, status=500)
 
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
 # ============================================================================
 # REVIEW VIEWS
 # ============================================================================
+
 
 def reviews_view(request):
     """
@@ -479,7 +501,8 @@ def reviews_view(request):
         "total_reviews": Reviews.objects.filter(is_published=True).count(),
         "avg_rating": Reviews.objects.filter(is_published=True).aggregate(
             Avg("rating")
-        )["rating__avg"] or 0,
+        )["rating__avg"]
+        or 0,
         "categories_count": {
             "processor": Reviews.objects.filter(
                 is_published=True, component_type="processor"
@@ -699,14 +722,12 @@ def create_review_view(request, component_type=None, component_id=None):
             component = None
 
     # Check GET parameter for component type
-    if not component_type and request.GET.get('type'):
-        component_type = request.GET.get('type')
+    if not component_type and request.GET.get("type"):
+        component_type = request.GET.get("type")
 
     if request.method == "POST":
         form = ReviewForm(
-            request.POST,
-            component_type=component_type,
-            component_id=component_id
+            request.POST, component_type=component_type, component_id=component_id
         )
 
         if form.is_valid():
@@ -725,7 +746,9 @@ def create_review_view(request, component_type=None, component_id=None):
                 if choice_type == "processor":
                     review.processor = get_object_or_404(Processors, id=choice_id)
                 elif choice_type == "graphics_card":
-                    review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
+                    review.graphics_card = get_object_or_404(
+                        GraphicsCards, id=choice_id
+                    )
                 elif choice_type == "ram":
                     review.ram = get_object_or_404(Ram, id=choice_id)
                 elif choice_type == "storage":
@@ -733,7 +756,9 @@ def create_review_view(request, component_type=None, component_id=None):
                 elif choice_type == "motherboard":
                     review.motherboard = get_object_or_404(Motherboards, id=choice_id)
                 elif choice_type == "power_supply":
-                    review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+                    review.power_supply = get_object_or_404(
+                        PowerSupplyUnits, id=choice_id
+                    )
 
             review.save()
 
@@ -742,7 +767,11 @@ def create_review_view(request, component_type=None, component_id=None):
             # Redirect to component detail
             if component_choice:
                 choice_type, choice_id = component_choice.rsplit("_", 1)
-                return redirect("component_detail", component_type=choice_type, component_id=choice_id)
+                return redirect(
+                    "component_detail",
+                    component_type=choice_type,
+                    component_id=choice_id,
+                )
             else:
                 return redirect("reviews")
     else:
@@ -759,7 +788,8 @@ def create_review_view(request, component_type=None, component_id=None):
         "component_type": component_type,
         "component_type_display": (
             ComponentService.TYPE_DISPLAY_NAMES.get(component_type)
-            if component_type else None
+            if component_type
+            else None
         ),
     }
 
@@ -771,22 +801,29 @@ def get_components_ajax(request):
     """AJAX endpoint for getting components by type"""
     component_type = request.GET.get("type")
 
-    if not component_type or component_type not in ComponentService.COMPONENT_TYPE_MAPPING.values():
+    if (
+        not component_type
+        or component_type not in ComponentService.COMPONENT_TYPE_MAPPING.values()
+    ):
         return JsonResponse({"components": []})
 
     components = []
 
     # Reverse mapping to get category from component_type
-    type_to_category = {v: k for k, v in ComponentService.COMPONENT_TYPE_MAPPING.items()}
+    type_to_category = {
+        v: k for k, v in ComponentService.COMPONENT_TYPE_MAPPING.items()
+    }
     category = type_to_category.get(component_type)
 
     if category and category in ComponentService.COMPONENT_MODELS:
         model = ComponentService.COMPONENT_MODELS[category]
         for comp in model.objects.all().order_by("manufacturer", "name"):
-            components.append({
-                "id": f"{component_type}_{comp.id}",
-                "name": f"{comp.manufacturer} {comp.name}",
-            })
+            components.append(
+                {
+                    "id": f"{component_type}_{comp.id}",
+                    "name": f"{comp.manufacturer} {comp.name}",
+                }
+            )
 
     return JsonResponse({"components": components})
 
@@ -832,17 +869,25 @@ def edit_review_view(request, review_id):
 
                 # Set the correct one
                 if choice_type == "processor":
-                    updated_review.processor = get_object_or_404(Processors, id=choice_id)
+                    updated_review.processor = get_object_or_404(
+                        Processors, id=choice_id
+                    )
                 elif choice_type == "graphics_card":
-                    updated_review.graphics_card = get_object_or_404(GraphicsCards, id=choice_id)
+                    updated_review.graphics_card = get_object_or_404(
+                        GraphicsCards, id=choice_id
+                    )
                 elif choice_type == "ram":
                     updated_review.ram = get_object_or_404(Ram, id=choice_id)
                 elif choice_type == "storage":
                     updated_review.storage = get_object_or_404(Storage, id=choice_id)
                 elif choice_type == "motherboard":
-                    updated_review.motherboard = get_object_or_404(Motherboards, id=choice_id)
+                    updated_review.motherboard = get_object_or_404(
+                        Motherboards, id=choice_id
+                    )
                 elif choice_type == "power_supply":
-                    updated_review.power_supply = get_object_or_404(PowerSupplyUnits, id=choice_id)
+                    updated_review.power_supply = get_object_or_404(
+                        PowerSupplyUnits, id=choice_id
+                    )
 
             updated_review.save()
 
@@ -920,6 +965,7 @@ def toggle_review_visibility(request, review_id):
 # AUTHENTICATION VIEWS
 # ============================================================================
 
+
 def login_view(request):
     """User login view"""
     if request.user.is_authenticated:
@@ -985,6 +1031,7 @@ def logout_view(request):
 # USER PROFILE VIEWS
 # ============================================================================
 
+
 @login_required(login_url="/login/")
 def profile_view(request):
     """User profile dashboard view"""
@@ -999,11 +1046,14 @@ def profile_view(request):
         "total_votes_cast": user_votes.count(),
         "helpful_votes_received": user_reviews.aggregate(
             total_helpful=Sum("helpful_votes")
-        )["total_helpful"] or 0,
+        )["total_helpful"]
+        or 0,
     }
 
     recent_reviews = user_reviews.order_by("-date_created")[:5]
-    top_reviews = user_reviews.filter(helpful_votes__gt=0).order_by("-helpful_votes")[:5]
+    top_reviews = user_reviews.filter(helpful_votes__gt=0).order_by("-helpful_votes")[
+        :5
+    ]
 
     context = {
         "user_stats": stats,
@@ -1058,6 +1108,7 @@ def change_password_view(request):
             request.user.save()
 
             from django.contrib.auth import update_session_auth_hash
+
             update_session_auth_hash(request, request.user)
 
             messages.success(request, "Heslo bylo úspěšně změněno!")
@@ -1071,7 +1122,9 @@ def my_reviews_view(request):
     """User's reviews management view"""
     # Get filter parameters from URL
     status_filter = request.GET.get("status", "all")  # all, published, unpublished
-    sort_by = request.GET.get("sort", "newest")  # newest, oldest, helpful, rating_high, rating_low
+    sort_by = request.GET.get(
+        "sort", "newest"
+    )  # newest, oldest, helpful, rating_high, rating_low
 
     # Base query - only current user's reviews
     user_reviews = Reviews.objects.filter(author=request.user).select_related(
@@ -1101,11 +1154,18 @@ def my_reviews_view(request):
 
     # Statistics for header
     total_reviews = Reviews.objects.filter(author=request.user).count()
-    published_reviews = Reviews.objects.filter(author=request.user, is_published=True).count()
-    avg_rating = Reviews.objects.filter(author=request.user).aggregate(Avg("rating"))["rating__avg"]
-    total_helpful_votes = Reviews.objects.filter(author=request.user).aggregate(
-        Sum("helpful_votes")
-    )["helpful_votes__sum"] or 0
+    published_reviews = Reviews.objects.filter(
+        author=request.user, is_published=True
+    ).count()
+    avg_rating = Reviews.objects.filter(author=request.user).aggregate(Avg("rating"))[
+        "rating__avg"
+    ]
+    total_helpful_votes = (
+        Reviews.objects.filter(author=request.user).aggregate(Sum("helpful_votes"))[
+            "helpful_votes__sum"
+        ]
+        or 0
+    )
 
     # Pagination
     paginator = Paginator(user_reviews, 10)
@@ -1132,6 +1192,7 @@ def my_reviews_view(request):
 # ============================================================================
 # FAVORITES VIEWS
 # ============================================================================
+
 
 @login_required
 @require_POST
@@ -1289,6 +1350,7 @@ def get_user_favorites(request):
 # ============================================================================
 # COMPONENT COMPARISON VIEWS
 # ============================================================================
+
 
 def component_selector_view(request):
     """Component selector for comparison - could be refactored to use ComponentService"""
@@ -1651,8 +1713,8 @@ def prepare_comparison_data(components):
     # Mark best values
     for spec_name, spec_data in all_specs.items():
         if (
-                spec_data["type"] in ["number", "price"]
-                and len(set(spec_data["values"])) > 1
+            spec_data["type"] in ["number", "price"]
+            and len(set(spec_data["values"])) > 1
         ):
             values = spec_data["values"]
             numeric_values = [
