@@ -12,8 +12,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
@@ -33,30 +31,29 @@ FAKE_API_SETTINGS = {
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# FIX: Změněno na True pro development - static files potřebují DEBUG=True
 DEBUG = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+# FIX: Opraven STATIC files setup
+STATIC_URL = '/static/'  # Pouze jedna definice!
+
+# Pro development (DEBUG=True)
+STATICFILES_DIRS = [
+    BASE_DIR / 'viewer' / 'static',
+]
+
+# Pro production (DEBUG=False) - použije se když nasadíš na server
 STATIC_ROOT = BASE_DIR / 'static_collected'
 
-# Pro development
-"""
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-"""
-
-# Allowed hosts pro DEBUG=False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# Allowed hosts - rozšířeno pro development
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0']
 
 #REDIRECT URLs
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
-
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -86,8 +83,6 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'error',
 }
 
-
-
 ROOT_URLCONF = "HWPortal.urls"
 
 TEMPLATES = [
@@ -110,10 +105,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "HWPortal.wsgi.application"
 
-
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -126,8 +118,6 @@ DATABASES = {
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -143,25 +133,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = "static/"
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
