@@ -15,7 +15,7 @@
     {% endfor %}
   {% endif %}
 
-  <form method="post" class="space-y-4">
+  <form method="post" id="registrationForm" class="space-y-4">
     {% csrf_token %}
 
     <!-- Non-field errory -->
@@ -32,8 +32,11 @@
         {{ form.username.label }}
       </label>
       {{ form.username }}
+      <!-- JS validační chyba -->
+      <div id="username-error-js" class="text-red-600 text-sm mt-1 hidden"></div>
+      <!-- Django chyby -->
       {% if form.username.errors %}
-        <div>
+        <div class="text-red-600 text-sm mt-1">
           {% for error in form.username.errors %}
             <p>{{ error }}</p>
           {% endfor %}
@@ -46,8 +49,11 @@
         {{ form.email.label }}
       </label>
       {{ form.email }}
+      <!-- JS validační chyba -->
+      <div id="email-error-js" class="text-red-600 text-sm mt-1 hidden"></div>
+      <!-- Django chyby -->
       {% if form.email.errors %}
-        <div>
+        <div class="text-red-600 text-sm mt-1">
           {% for error in form.email.errors %}
             <p>{{ error }}</p>
           {% endfor %}
@@ -60,8 +66,14 @@
         {{ form.password1.label }}
       </label>
       {{ form.password1 }}
+      <!-- JS validační chyba -->
+      <div id="password1-error-js" class="text-red-600 text-sm mt-1 hidden"></div>
+      <div class="text-xs text-gray-500 mt-1">
+        Heslo musí mít alespoň 8 znaků, obsahovat velké i malé písmena a číslo
+      </div>
+      <!-- Django chyby -->
       {% if form.password1.errors %}
-        <div>
+        <div class="text-red-600 text-sm mt-1">
           {% for error in form.password1.errors %}
             <p>{{ error }}</p>
           {% endfor %}
@@ -74,8 +86,11 @@
         {{ form.password2.label }}
       </label>
       {{ form.password2 }}
+      <!-- JS validační chyba -->
+      <div id="password2-error-js" class="text-red-600 text-sm mt-1 hidden"></div>
+      <!-- Django chyby -->
       {% if form.password2.errors %}
-        <div>
+        <div class="text-red-600 text-sm mt-1">
           {% for error in form.password2.errors %}
             <p>{{ error }}</p>
           {% endfor %}
@@ -84,7 +99,8 @@
     </div>
 
     <button type="submit"
-            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-200 font-medium">
+            id="submitBtn"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-200 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed">
       Zaregistrovat se
     </button>
   </form>
@@ -98,4 +114,256 @@
     </p>
   </div>
 </div>
+
+<script>
+class RegistrationFormValidator {
+    constructor() {
+        this.form = document.getElementById('registrationForm');
+        if (!this.form) return;
+
+        // Najdeme pole podle skutečných ID, které generuje Django
+        this.fields = {};
+        this.errorElements = {};
+
+        // Dynamicky najdeme všechna pole formuláře
+        const fieldNames = ['username', 'email', 'password1', 'password2'];
+        fieldNames.forEach(fieldName => {
+            // Najdi pole s ID obsahujícím fieldName
+            const field = this.form.querySelector(`input[name="${fieldName}"]`);
+            if (field) {
+                this.fields[fieldName] = field;
+                this.errorElements[fieldName] = document.getElementById(`${fieldName}-error-js`);
+
+                // Přidej CSS třídy pro styling (pokud už nejsou nastavené)
+                if (!field.classList.contains('w-full')) {
+                    field.className = 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent';
+                }
+            }
+        });
+
+        this.submitBtn = document.getElementById('submitBtn');
+        this.originalSubmitText = this.submitBtn ? this.submitBtn.textContent : '';
+
+        this.init();
+    }
+
+    init() {
+        // Přidání event listenerů pro všechna pole
+        Object.keys(this.fields).forEach(fieldName => {
+            if (this.fields[fieldName]) {
+                this.fields[fieldName].addEventListener('blur', () => this.validateField(fieldName));
+                this.fields[fieldName].addEventListener('input', () => this.clearError(fieldName));
+            }
+        });
+
+        // Zabránění odeslání při nevalidním formuláři
+        if (this.form) {
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        }
+
+        // Počáteční kontrola stavu tlačítka
+        this.updateSubmitButton();
+    }
+
+    validateField(fieldName) {
+        const field = this.fields[fieldName];
+        if (!field) return true;
+
+        const value = field.value.trim();
+        let isValid = true;
+        let errorMessage = '';
+
+        switch(fieldName) {
+            case 'username':
+                if (!value) {
+                    errorMessage = 'Uživatelské jméno je povinné';
+                    isValid = false;
+                } else if (value.length < 3) {
+                    errorMessage = 'Uživatelské jméno musí mít alespoň 3 znaky';
+                    isValid = false;
+                } else if (value.length > 150) {
+                    errorMessage = 'Uživatelské jméno je příliš dlouhé (max 150 znaků)';
+                    isValid = false;
+                } else if (!/^[a-zA-Z0-9@.+_-]+$/.test(value)) {
+                    errorMessage = 'Uživatelské jméno obsahuje nepovolené znaky';
+                    isValid = false;
+                }
+                break;
+
+            case 'email':
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!value) {
+                    errorMessage = 'Email je povinný';
+                    isValid = false;
+                } else if (!emailRegex.test(value)) {
+                    errorMessage = 'Zadejte platný email';
+                    isValid = false;
+                } else if (value.length > 254) {
+                    errorMessage = 'Email je příliš dlouhý';
+                    isValid = false;
+                }
+                break;
+
+            case 'password1':
+                if (!value) {
+                    errorMessage = 'Heslo je povinné';
+                    isValid = false;
+                } else if (value.length < 8) {
+                    errorMessage = 'Heslo musí mít alespoň 8 znaků';
+                    isValid = false;
+                } else {
+                    // Pokročilejší validace hesla
+                    const hasLower = /[a-z]/.test(value);
+                    const hasUpper = /[A-Z]/.test(value);
+                    const hasNumber = /\d/.test(value);
+
+                    if (!hasLower || !hasUpper || !hasNumber) {
+                        errorMessage = 'Heslo musí obsahovat velké i malé písmena a číslo';
+                        isValid = false;
+                    }
+
+                    // Kontrola běžných hesel
+                    const commonPasswords = ['12345678', 'password', 'heslo123', 'admin123'];
+                    if (commonPasswords.some(common => value.toLowerCase().includes(common.toLowerCase()))) {
+                        errorMessage = 'Heslo je příliš běžné';
+                        isValid = false;
+                    }
+                }
+
+                // Pokud je password2 vyplněné, znovu validuj shodu
+                if (this.fields.password2 && this.fields.password2.value) {
+                    setTimeout(() => this.validateField('password2'), 10);
+                }
+                break;
+
+            case 'password2':
+                if (!value) {
+                    errorMessage = 'Potvrzení hesla je povinné';
+                    isValid = false;
+                } else if (this.fields.password1 && value !== this.fields.password1.value) {
+                    errorMessage = 'Hesla se neshodují';
+                    isValid = false;
+                }
+                break;
+        }
+
+        this.showError(fieldName, errorMessage, !isValid);
+        this.updateFieldStyle(fieldName, isValid);
+
+        // Aktualizuj stav tlačítka po každé validaci
+        setTimeout(() => this.updateSubmitButton(), 10);
+
+        return isValid;
+    }
+
+    validateAll() {
+        let isFormValid = true;
+        Object.keys(this.fields).forEach(fieldName => {
+            const isFieldValid = this.validateField(fieldName);
+            if (!isFieldValid) {
+                isFormValid = false;
+            }
+        });
+        return isFormValid;
+    }
+
+    showError(fieldName, message, show) {
+        const errorElement = this.errorElements[fieldName];
+        if (!errorElement) return;
+
+        if (show && message) {
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        } else {
+            errorElement.classList.add('hidden');
+        }
+    }
+
+    clearError(fieldName) {
+        this.showError(fieldName, '', false);
+        this.updateFieldStyle(fieldName, true);
+    }
+
+    updateFieldStyle(fieldName, isValid) {
+        const field = this.fields[fieldName];
+        if (!field) return;
+
+        if (isValid) {
+            field.classList.remove('border-red-500', 'focus:ring-red-400');
+            field.classList.add('border-gray-300', 'focus:ring-blue-400');
+        } else {
+            field.classList.remove('border-gray-300', 'focus:ring-blue-400');
+            field.classList.add('border-red-500', 'focus:ring-red-400');
+        }
+    }
+
+    updateSubmitButton() {
+        if (!this.submitBtn) return;
+
+        // Zkontroluj jestli jsou všechna pole vyplněná
+        const allFieldsFilled = Object.values(this.fields).every(field =>
+            field && field.value.trim() !== ''
+        );
+
+        // Zkontroluj jestli nejsou žádné chyby
+        const noErrors = Object.values(this.errorElements).every(errorEl =>
+            !errorEl || errorEl.classList.contains('hidden')
+        );
+
+        if (allFieldsFilled && noErrors) {
+            this.submitBtn.disabled = false;
+            this.submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            this.submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        } else {
+            this.submitBtn.disabled = true;
+            this.submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            this.submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        }
+    }
+
+    handleSubmit(e) {
+        // Zablokuj tlačítko během odeslání
+        if (this.submitBtn) {
+            this.submitBtn.disabled = true;
+            this.submitBtn.textContent = 'Odesílám...';
+        }
+
+        // Validace před odesláním
+        if (!this.validateAll()) {
+            e.preventDefault();
+
+            // Obnov tlačítko
+            if (this.submitBtn) {
+                this.submitBtn.disabled = false;
+                this.submitBtn.textContent = this.originalSubmitText;
+            }
+
+            // Zaměř se na první pole s chybou
+            const firstErrorField = Object.keys(this.fields).find(fieldName =>
+                this.errorElements[fieldName] &&
+                !this.errorElements[fieldName].classList.contains('hidden')
+            );
+
+            if (firstErrorField && this.fields[firstErrorField]) {
+                this.fields[firstErrorField].focus();
+            }
+
+            return false;
+        }
+
+        // Pokud je vše v pořádku, formulář se odešle normálně
+        return true;
+    }
+
+    // Veřejná metoda pro manuální validaci
+    validate() {
+        return this.validateAll();
+    }
+}
+
+// Inicializace po načtení DOM
+document.addEventListener('DOMContentLoaded', function() {
+    window.registrationValidator = new RegistrationFormValidator();
+});
+</script>
 {% endblock %}
