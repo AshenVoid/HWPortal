@@ -401,10 +401,10 @@ flake8 .                   # PEP 8 compliance
 ### **Spuštění testů**
 ```bash
 # Django testy
-python manage.py test
+python manage.py test --settings=HWPortal.test_settings
 
 # Konkrétní app
-python manage.py test viewer
+python manage.py test viewer --settings=HWPortal.test_settings
 
 # S coverage reportem
 coverage run --source='.' manage.py test
