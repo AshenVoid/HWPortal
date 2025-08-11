@@ -44,39 +44,87 @@ def home_view(request):
 
     top_components = []
 
-    # Top processor by favorites
-    top_processor = (
-        Processors.objects.annotate(favorites_count=Count("userfavorites"))
-        .filter(favorites_count__gt=0)
-        .order_by("-favorites_count", "-rating", "-benchresult")
-        .first()
-    )
-
-    # Fallback to best processor by rating
-    if not top_processor:
-        top_processor = (
-            Processors.objects.filter(rating__gt=0)
-            .order_by("-rating", "-benchresult")
+    # Helper function to get top component
+    def get_top_component(model_class, component_type, icon, icon_class, fallback_order=None):
+        # Top component by favorites
+        top_component = (
+            model_class.objects.annotate(favorites_count=Count("userfavorites"))
+            .filter(favorites_count__gt=0)
+            .order_by("-favorites_count", "-rating")
             .first()
         )
 
-    if top_processor:
-        favorites_count = getattr(top_processor, "favorites_count", 0)
-        top_components.append(
-            {
-                "name": top_processor.name,
-                "manufacturer": top_processor.manufacturer,
-                "price": top_processor.price,
-                "type": "processor",
-                "id": top_processor.id,
-                "icon_class": "bg-blue-100 text-blue-600",
-                "icon": "cpu",
+        # Fallback to best component by rating or custom order
+        if not top_component:
+            if fallback_order:
+                top_component = (
+                    model_class.objects.filter(rating__gt=0)
+                    .order_by(*fallback_order)
+                    .first()
+                )
+            else:
+                top_component = (
+                    model_class.objects.filter(rating__gt=0)
+                    .order_by("-rating")
+                    .first()
+                )
+
+        if top_component:
+            favorites_count = getattr(top_component, "favorites_count", 0)
+            return {
+                "name": top_component.name,
+                "manufacturer": top_component.manufacturer,
+                "price": top_component.price,
+                "type": component_type,
+                "id": top_component.id,
+                "icon_class": icon_class,
+                "icon": icon,
                 "favorites_count": favorites_count,
             }
-        )
+        return None
 
-    # Similar logic for other component types...
-    # (keeping the original implementation for brevity)
+    # Top processor by favorites
+    processor_component = get_top_component(
+        Processors,
+        "processor",
+        "cpu",
+        "bg-blue-100 text-blue-600",
+        ["-rating", "-benchresult"]
+    )
+    if processor_component:
+        top_components.append(processor_component)
+
+    # Top graphics card by favorites
+    gpu_component = get_top_component(
+        GraphicsCards,
+        "graphics_card",
+        "monitor",
+        "bg-green-100 text-green-600",
+        ["-rating", "-benchresult"]
+    )
+    if gpu_component:
+        top_components.append(gpu_component)
+
+    # Top motherboard by favorites
+    motherboard_component = get_top_component(
+        Motherboards,
+        "motherboard",
+        "circuit-board",
+        "bg-purple-100 text-purple-600"
+    )
+    if motherboard_component:
+        top_components.append(motherboard_component)
+
+    # Top RAM by favorites
+    ram_component = get_top_component(
+        Ram,
+        "ram",
+        "memory-stick",
+        "bg-orange-100 text-orange-600",
+        ["-rating", "-frequency"]
+    )
+    if ram_component:
+        top_components.append(ram_component)
 
     stats = {
         "total_components": sum(
@@ -86,6 +134,7 @@ def home_view(request):
         "total_reviews": Reviews.objects.filter(is_published=True).count(),
         "processors_count": Processors.objects.count(),
         "gpus_count": GraphicsCards.objects.count(),
+        "motherboards_count": Motherboards.objects.count(),
         "ram_count": Ram.objects.count(),
         "total_favorites": UserFavorites.objects.count(),
     }
